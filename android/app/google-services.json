@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "972588904282",
+    "project_id": "taskotel",
+    "storage_bucket": "taskotel.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:972588904282:android:623e09ebda220ceda84d63",
+        "android_client_info": {
+          "package_name": "com.diwizon.taskotel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhXtQRUky_hN3unSXi0yFQ0CmyoQr1VTI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:972588904282:android:a7db2fada94980b1a84d63",
+        "android_client_info": {
+          "package_name": "com.diwizon.taskoteladmin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhXtQRUky_hN3unSXi0yFQ0CmyoQr1VTI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:972588904282:android:ff26c77606a086a4a84d63",
+        "android_client_info": {
+          "package_name": "com.example.taskoteladmin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhXtQRUky_hN3unSXi0yFQ0CmyoQr1VTI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package com.example.taskoteladmin
+package com.diwizon.taskoteladmin
 
 import io.flutter.embedding.android.FlutterActivity
 
