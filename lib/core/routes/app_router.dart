@@ -2,6 +2,10 @@ import 'package:go_router/go_router.dart';
 import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/features/clients/presentation/page/clients_page.dart';
 import 'package:taskoteladmin/features/clients/presentation/page/client_detail_page.dart';
+import 'package:taskoteladmin/features/master_hotels/presentation/pages/master_hotels_page.dart';
+import 'package:taskoteladmin/features/subscription_plans/presentation/pages/subscription_plans_page.dart';
+import 'package:taskoteladmin/features/transactions/presentation/pages/transactions_page.dart';
+import 'package:taskoteladmin/features/reports/presentation/pages/reports_page.dart';
 import 'package:taskoteladmin/features/dasboard/presentation/pages/dashboard.dart';
 import 'package:taskoteladmin/features/dasboard/presentation/pages/dashboard_page.dart';
 
@@ -47,6 +51,30 @@ List<RouteBase> get _routes {
               },
             ),
           ],
+        ),
+        GoRoute(
+          path: "/master-hotels",
+          pageBuilder: (context, state) {
+            return NoTransitionPage(child: MasterHotelsPage());
+          },
+        ),
+        GoRoute(
+          path: "/subscription-plans",
+          pageBuilder: (context, state) {
+            return NoTransitionPage(child: SubscriptionPlansPage());
+          },
+        ),
+        GoRoute(
+          path: "/transactions",
+          pageBuilder: (context, state) {
+            return NoTransitionPage(child: TransactionsPage());
+          },
+        ),
+        GoRoute(
+          path: "/reports",
+          pageBuilder: (context, state) {
+            return NoTransitionPage(child: ReportsPage());
+          },
         ),
         // GoRoute(
         //   path: "${Routes.document}/:id",
