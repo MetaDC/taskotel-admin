@@ -4,6 +4,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
+  // NEW
+  static final headerHeading = GoogleFonts.albertSans(
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
+    color: AppColors.primary,
+  );
+  static final headerSubheading = GoogleFonts.albertSans(
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+    color: Colors.grey.shade500,
+  );
   // Navigation
   static final navBarItems = GoogleFonts.albertSans(
     fontSize: 34,

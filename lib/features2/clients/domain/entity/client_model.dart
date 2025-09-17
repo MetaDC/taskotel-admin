@@ -7,7 +7,7 @@ class ClientModel {
   String phone;
   DateTime createdAt;
   String status;
-  DateTime planExpireDate;
+  DateTime hotelExpireDate;
   DateTime updatedAt;
   DateTime lastLogin;
   double totalRevenue;
@@ -19,7 +19,7 @@ class ClientModel {
     required this.phone,
     required this.createdAt,
     required this.status,
-    required this.planExpireDate,
+    required this.hotelExpireDate,
     required this.updatedAt,
     required this.lastLogin,
     required this.totalRevenue,
@@ -34,7 +34,7 @@ class ClientModel {
       phone: json['phone'] ?? '',
       createdAt: (json['createdAt'] as Timestamp).toDate(),
       status: json['status'] ?? '',
-      planExpireDate: (json['hotelExpireDate'] as Timestamp).toDate(),
+      hotelExpireDate: (json['hotelExpireDate'] as Timestamp).toDate(),
       updatedAt: (json['updatedAt'] as Timestamp).toDate(),
       lastLogin: (json['lastLogin'] as Timestamp).toDate(),
       totalRevenue: (json['totalRevenue'] as num).toDouble(),
@@ -59,7 +59,7 @@ class ClientModel {
       'phone': phone,
       'createdAt': Timestamp.fromDate(createdAt),
       'status': status,
-      'hotelExpireDate': Timestamp.fromDate(planExpireDate),
+      'hotelExpireDate': Timestamp.fromDate(hotelExpireDate),
       'updatedAt': Timestamp.fromDate(updatedAt),
       'lastLogin': Timestamp.fromDate(lastLogin),
       'totalRevenue': totalRevenue,

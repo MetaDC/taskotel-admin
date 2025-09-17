@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
-import 'package:taskoteladmin/features2/super_admin/domain/entities/client_entity.dart';
+import 'package:taskoteladmin/features2/super_admin/domain/entities/master_hotel_entity.dart';
 import 'package:intl/intl.dart';
 
-class ClientsTable extends StatelessWidget {
-  final List<ClientEntity> clients;
+class MasterHotelsTable extends StatelessWidget {
+  final List<MasterHotelEntity> masterHotels;
   final bool isLoading;
-  final Function(ClientEntity) onClientTap;
-  final Function(ClientEntity) onExtendTrial;
-  final Function(ClientEntity) onDeleteClient;
+  final Function(MasterHotelEntity) onMasterHotelTap;
+  final Function(MasterHotelEntity) onEditMasterHotel;
+  final Function(MasterHotelEntity) onDeleteMasterHotel;
+  final Function(MasterHotelEntity) onToggleActive;
 
-  const ClientsTable({
+  const MasterHotelsTable({
     super.key,
-    required this.clients,
+    required this.masterHotels,
     required this.isLoading,
-    required this.onClientTap,
-    required this.onExtendTrial,
-    required this.onDeleteClient,
+    required this.onMasterHotelTap,
+    required this.onEditMasterHotel,
+    required this.onDeleteMasterHotel,
+    required this.onToggleActive,
   });
 
   @override
@@ -27,7 +29,7 @@ class ClientsTable extends StatelessWidget {
       );
     }
 
-    if (clients.isEmpty) {
+    if (masterHotels.isEmpty) {
       return _buildEmptyState();
     }
 
@@ -35,7 +37,7 @@ class ClientsTable extends StatelessWidget {
       child: Column(
         children: [
           _buildTableHeader(),
-          ...clients.map((client) => _buildTableRow(context, client)),
+          ...masterHotels.map((masterHotel) => _buildTableRow(context, masterHotel)),
         ],
       ),
     );
@@ -47,13 +49,13 @@ class ClientsTable extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.people_outline,
+            Icons.hotel_outlined,
             size: 64,
             color: Colors.grey[400],
           ),
           const SizedBox(height: 16),
           Text(
-            'No clients found',
+            'No master hotels found',
             style: TextStyle(
               fontSize: 18,
               color: Colors.grey[600],
@@ -62,7 +64,7 @@ class ClientsTable extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Add your first client to get started',
+            'Create your first master hotel template to get started',
             style: TextStyle(
               fontSize: 14,
               color: Colors.grey[500],
@@ -87,7 +89,7 @@ class ClientsTable extends StatelessWidget {
           const Expanded(
             flex: 3,
             child: Text(
-              'Client',
+              'Template Name',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
@@ -97,7 +99,7 @@ class ClientsTable extends StatelessWidget {
           const Expanded(
             flex: 2,
             child: Text(
-              'Company',
+              'Property Type',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
@@ -117,7 +119,7 @@ class ClientsTable extends StatelessWidget {
           const Expanded(
             flex: 1,
             child: Text(
-              'Hotels',
+              'Departments',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
@@ -127,7 +129,7 @@ class ClientsTable extends StatelessWidget {
           const Expanded(
             flex: 1,
             child: Text(
-              'Revenue',
+              'Tasks',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
@@ -137,22 +139,32 @@ class ClientsTable extends StatelessWidget {
           const Expanded(
             flex: 1,
             child: Text(
-              'Last Login',
+              'Imports',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.primary,
               ),
             ),
           ),
-          const SizedBox(width: 100), // Actions column
+          const Expanded(
+            flex: 1,
+            child: Text(
+              'Created',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+          const SizedBox(width: 120), // Actions column
         ],
       ),
     );
   }
 
-  Widget _buildTableRow(BuildContext context, ClientEntity client) {
+  Widget _buildTableRow(BuildContext context, MasterHotelEntity masterHotel) {
     return InkWell(
-      onTap: () => onClientTap(client),
+      onTap: () => onMasterHotelTap(masterHotel),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
@@ -168,7 +180,7 @@ class ClientsTable extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    client.name,
+                    masterHotel.name,
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       color: AppColors.primary,
@@ -176,9 +188,68 @@ class ClientsTable extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    client.email,
+                    masterHotel.description,
                     style: TextStyle(
                       fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Row(
+                children: [
+                  Icon(
+                    _getPropertyTypeIcon(masterHotel.propertyType),
+                    size: 16,
+                    color: AppColors.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    masterHotel.propertyType,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: _buildStatusChip(masterHotel.isActive),
+            ),
+            Expanded(
+              flex: 1,
+              child: Text(
+                '${masterHotel.departments.length}',
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Text(
+                '${masterHotel.tasks.length}',
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${masterHotel.totalImports}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '${masterHotel.activeImports} active',
+                    style: TextStyle(
+                      fontSize: 11,
                       color: Colors.grey[600],
                     ),
                   ),
@@ -186,39 +257,9 @@ class ClientsTable extends StatelessWidget {
               ),
             ),
             Expanded(
-              flex: 2,
-              child: Text(
-                client.companyName,
-                style: const TextStyle(fontSize: 14),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: _buildStatusChip(client.status),
-            ),
-            Expanded(
               flex: 1,
               child: Text(
-                '${client.totalHotels}',
-                style: const TextStyle(fontSize: 14),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Text(
-                '\$${_formatNumber(client.totalRevenue)}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Text(
-                client.lastLogin != null
-                    ? _formatDate(client.lastLogin!)
-                    : 'Never',
+                _formatDate(masterHotel.createdAt),
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey[600],
@@ -226,21 +267,29 @@ class ClientsTable extends StatelessWidget {
               ),
             ),
             SizedBox(
-              width: 100,
+              width: 120,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  if (client.isTrialAccount)
-                    IconButton(
-                      onPressed: () => onExtendTrial(client),
-                      icon: const Icon(Icons.schedule, size: 18),
-                      tooltip: 'Extend Trial',
-                      color: Colors.blue,
-                    ),
                   IconButton(
-                    onPressed: () => onDeleteClient(client),
+                    onPressed: () => onToggleActive(masterHotel),
+                    icon: Icon(
+                      masterHotel.isActive ? Icons.pause : Icons.play_arrow,
+                      size: 18,
+                    ),
+                    tooltip: masterHotel.isActive ? 'Deactivate' : 'Activate',
+                    color: masterHotel.isActive ? Colors.orange : Colors.green,
+                  ),
+                  IconButton(
+                    onPressed: () => onEditMasterHotel(masterHotel),
+                    icon: const Icon(Icons.edit, size: 18),
+                    tooltip: 'Edit Template',
+                    color: Colors.blue,
+                  ),
+                  IconButton(
+                    onPressed: () => onDeleteMasterHotel(masterHotel),
                     icon: const Icon(Icons.delete_outline, size: 18),
-                    tooltip: 'Delete Client',
+                    tooltip: 'Delete Template',
                     color: Colors.red,
                   ),
                 ],
@@ -252,47 +301,40 @@ class ClientsTable extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusChip(ClientStatus status) {
-    Color color;
-    switch (status) {
-      case ClientStatus.active:
-        color = Colors.green;
-        break;
-      case ClientStatus.trial:
-        color = Colors.blue;
-        break;
-      case ClientStatus.expired:
-        color = Colors.orange;
-        break;
-      case ClientStatus.churned:
-        color = Colors.red;
-        break;
-    }
-
+  Widget _buildStatusChip(bool isActive) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: isActive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        status.displayName,
+        isActive ? 'Active' : 'Inactive',
         style: TextStyle(
           fontSize: 12,
-          color: color,
+          color: isActive ? Colors.green : Colors.red,
           fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
 
-  String _formatNumber(double number) {
-    if (number >= 1000000) {
-      return '${(number / 1000000).toStringAsFixed(1)}M';
-    } else if (number >= 1000) {
-      return '${(number / 1000).toStringAsFixed(1)}K';
-    } else {
-      return number.toStringAsFixed(0);
+  IconData _getPropertyTypeIcon(String type) {
+    switch (type) {
+      case 'Luxury Hotel':
+        return Icons.star;
+      case 'Business Hotel':
+        return Icons.business;
+      case 'Boutique Hotel':
+        return Icons.local_florist;
+      case 'Resort':
+        return Icons.beach_access;
+      case 'Budget Hotel':
+        return Icons.attach_money;
+      case 'Extended Stay':
+        return Icons.home;
+      default:
+        return Icons.hotel;
     }
   }
 
