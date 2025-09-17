@@ -1,245 +1,256 @@
-# PRP: Taskotel Super Admin — Implementation Steps
+Perfect ✅ — so you want a **detailed PRD-style project requirement prompt (PRP)** that you can give to an AI agent, and it should generate the full SaaS project (with **Firebase backend** + **Cubit for state management**).
 
-## 🏨 **Taskotel – Hotel Management SaaS Platform**
-
-Taskotel is a **SaaS platform** that hotels subscribe to on a **per-hotel basis**.
-It helps manage:
-
-- **Tasks** (assigned to GM, RM, DM, OP)
-- **Vendors (VN)**
-- **Hotel Analytics (performance, usage, revenue, etc.)**
-- **Client & Subscription Management**
-
-The subscription model is tied to **room count per hotel** (pricing tiers).
-Each hotel = separate subscription.
-Example: If a Client Admin owns 10 hotels, each one needs its own subscription plan.
+Here’s the **final structured PRP** you can directly copy-paste into your agent:
 
 ---
 
-## 👥 **Roles in the System**
+# 🚀 PRP: Taskotel – Hotel Management SaaS Platform (with Firebase + Cubit)
 
-1. **Super Admin (SA)**
+## 📌 Overview
 
-   - Owner of the SaaS platform.
-   - Creates subscription plans, manages clients, revenue tracking, churn, etc.
+Taskotel is a **SaaS platform** for hotel management, provided on a **per-hotel subscription basis**.
+Each hotel has **staff roles, departments, tasks, vendors, and analytics**, all centrally managed.
+The platform is powered by **Firebase** (Firestore, Auth, Storage, Functions) and uses **Cubit** for state management in Flutter.
 
-2. **Client Admin (CA)**
-
-   - Pays for subscriptions for their hotels.
-   - Can add hotels → assign roles (GM, RM, DM, OP) → manage tasks & vendors.
-
-3. **Hotel Staff Roles (under CA)**
-
-   - **GM (General Manager)**
-   - **RM (Regional Manager)**
-   - **DM (Department Manager)**
-   - **OP (Operators / staff like gardener, maid, etc.)**
-   - **VN (Vendors)** (external service providers)
+The **subscription model** is tied to **room count per hotel**.
+Example: If a Client Admin has 10 hotels, each requires its own subscription plan.
 
 ---
 
-## 📊 **Super Admin (SA) Module Overview**
+## 👥 User Roles
 
-This is your current focus. The SA side has multiple sections:
+1. **Super Admin (SA)** – Owner of the SaaS platform.
+
+   - Manages clients, subscriptions, revenue, churn, master hotels, master departments, master tasks.
+   - Defines subscription plans.
+
+2. **Client Admin (CA)** – Owns hotels.
+
+   - Pays for subscriptions.
+   - Adds/manages hotels.
+   - Assigns staff roles (GM, RM, DM, OP).
+   - Manages vendors.
+
+3. **Hotel Roles** (under CA):
+
+   - **GM** – General Manager (hotel-wide tasks).
+   - **RM** – Regional Manager.
+   - **DM** – Department Manager.
+   - **OP** – Operators (maids, cleaners, etc.).
+   - **VN** – Vendors (external service providers).
+
+---
+
+## 🏨 Master Hotel Structure
+
+The **Super Admin** defines **Master Hotels**, which act as **templates**.
+Each Master Hotel contains:
+
+### 1. **Master Departments**
+
+- Example: Cleaning, Kitchen, Maintenance, Front Desk.
+- Each supervised by a **Department Manager (DM)**.
+
+### 2. **Master Tasks**
+
+- Predefined tasks for roles & departments:
+
+  - GM → General tasks (not tied to department).
+  - RM → Regional-level tasks.
+  - DM → Department-level tasks.
+  - OP → Operator tasks inside their department.
+
+- Can be **role-only** or **department-specific**.
+
+---
+
+## 🔄 Import Flow
+
+1. **Client Admin imports a Master Hotel** to create a real hotel.
+
+   - Imports: departments, roles, tasks.
+
+2. **Imported Master Tasks**:
+
+   - Default: **linked** to Master Task (auto-updated if SA edits).
+   - If CA/GM edits → a **copy** is created → becomes independent (no sync).
+
+3. **Example**:
+
+   - SA defines “Daily Room Cleaning” under Cleaning Department (OP).
+   - CA imports Master Hotel → OPs in Cleaning Department get this task.
+   - If CA edits → new copy stored as `ClientTask`, detached from master.
+
+---
+
+## 📊 Super Admin Module (Web Dashboard)
 
 ### 1. **Dashboard**
 
-Analytics & KPIs:
+- KPIs:
 
-- Active Subscriptions (per hotel basis)
-- Monthly Revenue, Total Revenue
-- Total Clients
-- Total Hotels created
-- Total Subscription Plans
-- Churn Clients (lost after subscription expiry)
-- Most Popular Subscription Tier
-- **Graphs/Charts**:
+  - Active subscriptions
+  - Monthly & Total revenue
+  - Total clients, hotels, subscription plans
+  - Churned clients
 
-  - Revenue Trend (line)
-  - Subscription Growth (line/bar)
-  - Active vs Churn Hotels (bar)
-  - Subscription Distribution (pie)
+- Charts:
 
-- **Quick Insights**:
+  - Revenue trend
+  - Subscription growth
+  - Active vs Churn hotels
+  - Subscription distribution
 
-  - Which plan is selling best
+- Insights:
+
+  - Best-selling plan
   - Trial → Paid conversion %
   - Average revenue per hotel
 
 ---
 
-### 2. **Clients (Active / Lost / Churned)**
+### 2. **Clients**
 
-- **Onboarding Paths**:
+- Onboarding:
 
-  1. **Self-signup** (CA signs up on SaaS site → adds hotel → buys plan).
-  2. **Super Admin creates client manually** (credentials shared).
+  1. Self-signup by CA.
+  2. SA creates manually (sends credentials).
 
-- **Client List View**:
+- Client List View:
 
-  - Client name, email, plans, number of hotels, total rooms, status (active/expired/churned).
+  - Name, email, plans, hotels, rooms, status.
 
-- **Client Detail View**:
+- Client Detail:
 
-  - Basic Info (name, contact, company)
   - Hotels under client
-  - Subscription history (per hotel)
+  - Subscription history
   - Transactions
-  - Option to **extend trial (1 month)** to avoid churn.
+  - Option to **extend trial**
 
-- **Hotel Detail View (under Client)**:
+- Hotel Detail:
 
-  1. **Hotel Info** (name, location, plan, subscription validity, performance rating).
-  2. **Performance Cards**:
+  - Info (plan, rooms, expiry, location)
+  - Performance cards:
 
-     - Task completion rate
-     - On-time delivery
-     - Quality score
-     - Daily active staff
-     - Tasks/day
-     - Issues resolved
-     - Revenue contribution from hotel
-     - Renewal rate
+    - Task completion rate
+    - On-time delivery
+    - Quality score
+    - Active staff/day
+    - Tasks/day
+    - Issues resolved
+    - Renewal rate
 
-  3. **Task Management (detailed)**:
-
-     - Role-wise task view (RM, GM, DM, OP)
-     - Columns: ID, title, desc, frequency, priority, time, status, toggle active/inactive, actions.
-
-  4. **Lifecycle Tracking**:
-
-     - Active / Expired → Trial offer → Churn status.
-     - Handle lost client cases (0 hotels subscribed = lost, partial subscription = active but with inactive hotels).
+  - Task Management (role-wise)
+  - Lifecycle tracking (active → trial → expired → churn)
 
 ---
 
-### 3. 🏨 Master Hotel Structure (Revised)
+### 3. **Master Hotels**
 
-- **Purpose**: Templates for franchise-style hotels.
-- Contains:
+- **Purpose**: Provides pre-built hotel structures for clients.
 
-### 1. **Master Hotel**
+- **Entities**
 
-- Created by **Super Admin**.
-- Defines the **base structure** for client hotels.
-- Includes:
+  - **Master Hotel**:
 
-  - Roles (GM, RM, DM, OP)
-  - Departments (Master Departments, e.g., Cleaning, Maintenance, Kitchen)
-  - Master Tasks (linked to roles + optionally departments)
+    - Base structure, created by SA
 
----
+  - **Master Departments**:
 
-### 2. **Master Departments**
+    - E.g., Cleaning, Kitchen, Maintenance, Front Desk
+    - Managed by DM role
 
-- Departments inside a Master Hotel (like "Cleaning Department", "Maintenance Department").
-- Each department is supervised by a **Department Manager (DM)**.
-- Example departments:
+  - **Master Tasks**:
 
-  - Cleaning Department
-  - Kitchen Department
-  - Front Desk
-  - Maintenance
+    - Role-only tasks (GM/RM)
+    - Department-specific tasks (DM/OP inside departments)
 
----
+- **Import Flow**
 
-### 3. **Master Tasks**
+  - When CA creates a hotel → option to **Import Master Hotel**
+  - Imports: roles, departments, tasks
 
-- Tasks are defined under either:
+- **Task Import Behavior**
 
-  - **Role-only** (e.g., GM → “Weekly Revenue Review”)
-  - **Department-specific** (e.g., Cleaning Department → “Daily Room Cleaning”)
-
-- **Assignment Rules**:
-
-  - GM, RM → General role tasks (not tied to department).
-  - DM → Can create/manage tasks **inside departments**.
-  - OP → Operators get tasks **inside their department** (assigned by DM).
+  - Imported tasks are **linked** to Master Tasks by default (auto-update if SA changes them).
+  - If CA edits a task → system creates a **copy (Client Task)** that overrides the Master Task for that hotel.
+  - Client sees only one version (linked or edited copy).
 
 ---
-
-## 🔄 Example Flow with Departments
-
-1. **Super Admin Creates Master Hotel** → “Luxury Hotel Template”.
-
-   - Adds **Departments**: Cleaning, Kitchen, Front Desk.
-
-2. **Super Admin Adds Master Tasks**:
-
-   - GM → "Weekly Revenue Review"
-   - RM → "Regional Check-in Report"
-   - DM (Cleaning Department) → "Check staff schedules"
-   - OP (Cleaning Department) → "Daily Room Cleaning"
-
-3. **Client Admin Imports Master Hotel** → creates "Grand Palace Hotel".
-
-   - System imports:
-
-     - Departments: Cleaning, Kitchen, Front Desk
-     - Roles: GM, RM, DM, OP
-     - Tasks: all predefined Master Tasks assigned to the correct role/department
-
-4. **Grand Palace Hotel (Client)** now has:
-
-   - GM → Weekly Revenue Review
-   - RM → Regional Check-in Report
-   - Cleaning Department
-
-     - DM (Cleaning) → "Check staff schedules"
-     - OP (Cleaning) → "Daily Room Cleaning"
 
 ---
 
 ### 4. **Subscription Plans**
 
-- Plans are **room-based tiers** (e.g., 1–50 = \$29/mo, 51–100 = \$49/mo, etc.).
-- Manage plans: Create / Edit / Delete.
-- Each plan has **features** (analytics level, support, mobile app, integrations).
+- Room-based tiers:
+
+  - 1–50 rooms → \$29/mo per hotel
+  - 51–100 rooms → \$49/mo per hotel
+  - 101–200 rooms → \$99/mo per hotel
+
+- CRUD: Create / Edit / Delete plans
+- Plan Features:
+
+  - Analytics level (basic/advanced)
+  - Email / priority support
+  - Mobile app access
+  - Multi-language support
+  - Custom integrations
+
 - Analytics:
 
-  - How many hotels subscribed to each plan
-  - Revenue breakdown
+  - Hotels subscribed per plan
+  - Revenue breakdown per plan
   - Most popular tier
 
 ---
 
 ### 5. **Transactions**
 
-- **Transaction List**:
-
-  - Date, Client, Hotel, Plan, Amount, Payment Method, Status.
-
-- **Financial Analytics**:
-
-  - MRR (Monthly Recurring Revenue)
-  - ARR (Annual Recurring Revenue)
-  - Refunds, failed payments
-  - Most profitable clients
-  - Revenue split by tier
+- Track: Date, Client, Hotel, Plan, Amount, Method, Status.
+- Analytics: MRR, ARR, refunds, failed payments, top clients.
 
 ---
 
-### 6. **Reports / Analytics**
+### 6. **Reports**
 
-- **Subscription Analytics**:
-
-  - Active hotels
-  - Revenue growth
-  - Churned clients/hotels
-  - Trial → Paid conversion
-
-- **Hotel Usage Analytics**:
-
-  - Avg rooms per hotel
-  - Avg staff distribution (RMs, GMs, OPs, etc.)
-  - Vendor usage
-
-- **Client Analytics**:
-
-  - Retention rate
-  - High-value clients
-
-Ahh got it ✅ — so your **Master Hotel** has another layer: **Master Departments**.
-Let me restructure everything with this addition.
+- Subscription Analytics: active hotels, churn, trial → paid.
+- Hotel Usage: avg rooms, staff, vendor usage.
+- Client Analytics: retention, high-value clients.
 
 ---
+
+## 🗄 Firebase Data Models (Firestore Collections)
+
+---
+
+## ⚙️ Tech Stack
+
+- **Frontend**: Flutter (Web + Mobile)
+- **State Management**: Cubit (Bloc library)
+- **Backend**: Firebase
+
+  - Firestore (database)
+  - Firebase Auth (email/password, Google login)
+  - Firebase Functions (subscription handling, scheduled jobs)
+  - Firebase Storage (media/files)
+  - Firebase Hosting (web app)
+
+- **Payments**: CashFree
+
+---
+
+## 🎯 Deliverables
+
+- Super Admin Web Dashboard (Flutter Web + mobile Web)
+- Cubit-based state management for:
+
+  - Auth
+  - Clients
+  - Hotels
+  - Master Hotels
+  - Tasks
+  - Plans
+  - Transactions
+
+- Analytics dashboards with charts
