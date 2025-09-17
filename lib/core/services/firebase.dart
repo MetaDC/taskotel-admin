@@ -10,25 +10,19 @@ class FBAuth {
 
 class FBFireStore {
   static final fb = FirebaseFirestore.instance;
-  //Common
-  static final users = fb.collection('users');
-  static final projects = fb.collection('projects');
-  static final commonTasks = fb.collection('commonTasks');
-  //Admin
-  static final masterTasks = fb.collection('masterTasks');
-  static final adminTasks = fb.collection('adminTasks');
-  //project
-  static final activities = fb.collection('activities');
-  static final tasks = fb.collection('tasks');
-  static final bills = fb.collection('bills');
-  static final documents = fb.collection('documents');
-  static final settings = fb.collection('setting').doc("sets");
-  //Attendance
-  static final punches = fb.collection('punches');
-  static final records = fb.collection('records');
-  static final requests = fb.collection('requests');
 
-  //Notification
+  // Super Admin Collections
+  static final clients = fb.collection('clients');
+  static final subscriptionPlans = fb.collection('subscription_plans');
+  static final masterHotels = fb.collection('master_hotels');
+  static final masterTasks = fb.collection('master_tasks');
+  static final hotels = fb.collection('hotels');
+  static final transactions = fb.collection('transactions');
+  static final users = fb.collection('users');
+  static final departments = fb.collection('departments');
+  static final vendors = fb.collection('vendors');
+
+  // Notification collections
   static final activityNotifications = fb.collection('activity_notifications');
   static final taskNotifications = fb.collection('task_notifications');
   static final notifications = fb.collection('notifications');

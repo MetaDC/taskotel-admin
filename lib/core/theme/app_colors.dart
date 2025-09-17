@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFF4E7856);
-  static const Color secondary = Color(0xFF7A9B80);
-  static const Color containerGreyColor = Color(0xFFFBFBFB);
-  static const Color chipGreyColor = Color(0xFFEAEAEA);
-  static const Color grey2 = Color(0xFFF838383);
-  static const Color borderGrey = Color(0xFFFE7E7E7);
-  static const Color black = Colors.black;
-  static const Color white = Colors.white;
-  static const Color msg = Color(0xFFe4ebe6);
+  static const Color primary = Color(0xFF17191d);
+  static const Color secondary = Colors.white;
+  static const Color borderGrey = Color(0xFFFebeef1);
+  static const Color backgroundColor = Color(0xFFfafafa);
+  static const Color black = Color(0xFF17191d);
 
   // btn Colors
   static const Color taskBtn = Color(0xFF9FA051);
@@ -20,5 +16,4 @@ class AppColors {
   //warning
   static const Color today = Color(0xFF499B21);
   static const Color overDue = Color(0xFFC37B34);
-  
 }

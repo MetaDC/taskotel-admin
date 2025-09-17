@@ -4,7 +4,7 @@ import 'app_colors.dart';
 
 class AppTheme {
   static ThemeData lightTheme = ThemeData(
-    scaffoldBackgroundColor: AppColors.white,
+    scaffoldBackgroundColor: Colors.white,
     primaryColor: AppColors.primary,
     colorScheme: ColorScheme.light(
       primary: AppColors.primary,
@@ -12,14 +12,14 @@ class AppTheme {
     ),
     textTheme: GoogleFonts.albertSansTextTheme(),
     appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.white,
-      foregroundColor: AppColors.black,
+      backgroundColor: AppColors.secondary,
+      foregroundColor: AppColors.primary,
       elevation: 0,
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        foregroundColor: AppColors.secondary,
         textStyle: GoogleFonts.albertSans(fontWeight: FontWeight.w500),
       ),
     ),

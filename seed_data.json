@@ -1,0 +1,350 @@
+{
+  "clients": [
+    {
+      "docId": "client_001",
+      "name": "Grand Palace Hotels",
+      "email": "admin@grandpalace.com",
+      "phone": "+1-555-0101",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "status": "active",
+      "SubscriptionId": "sub_001",
+      "maxRooms": 150,
+      "billingcycle": "monthly",
+      "SubscriptionStart": "2024-01-15T00:00:00Z",
+      "SubscriptionEnd": "2024-02-15T00:00:00Z",
+      "updatedAt": "2024-01-20T15:30:00Z",
+      "lastLogin": "2024-01-25T09:15:00Z",
+      "totalRooms": 120,
+      "totalRevenue": 15000
+    },
+    {
+      "docId": "client_002",
+      "name": "Luxury Suites Chain",
+      "email": "contact@luxurysuites.com",
+      "phone": "+1-555-0202",
+      "createdAt": "2024-01-10T14:30:00Z",
+      "status": "trial",
+      "SubscriptionId": "sub_002",
+      "maxRooms": 75,
+      "billingcycle": "yearly",
+      "SubscriptionStart": "2024-01-10T00:00:00Z",
+      "SubscriptionEnd": "2024-02-10T00:00:00Z",
+      "updatedAt": "2024-01-18T11:45:00Z",
+      "lastLogin": "2024-01-24T16:20:00Z",
+      "totalRooms": 65,
+      "totalRevenue": 8500
+    },
+    {
+      "docId": "client_003",
+      "name": "Budget Inn Network",
+      "email": "info@budgetinn.com",
+      "phone": "+1-555-0303",
+      "createdAt": "2024-01-05T08:15:00Z",
+      "status": "churned",
+      "SubscriptionId": "sub_003",
+      "maxRooms": 40,
+      "billingcycle": "monthly",
+      "SubscriptionStart": "2024-01-05T00:00:00Z",
+      "SubscriptionEnd": "2024-01-20T00:00:00Z",
+      "updatedAt": "2024-01-20T10:00:00Z",
+      "lastLogin": "2024-01-19T14:30:00Z",
+      "totalRooms": 35,
+      "totalRevenue": 2100
+    }
+  ],
+  "subscription_plans": [
+    {
+      "docId": "plan_001",
+      "title": "Starter Plan",
+      "desc": "Perfect for small hotels with basic needs",
+      "minRooms": 1,
+      "maxRooms": 50,
+      "price": {
+        "monthly": 29,
+        "yearly": 290
+      },
+      "features": ["Basic Dashboard", "Task Management", "Email Support"],
+      "isActive": true,
+      "totalSubScribers": 15,
+      "totalRevenue": 4350,
+      "forGeneral": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-15T12:00:00Z"
+    },
+    {
+      "docId": "plan_002",
+      "title": "Professional Plan",
+      "desc": "Advanced features for growing hotel businesses",
+      "minRooms": 51,
+      "maxRooms": 100,
+      "price": {
+        "monthly": 49,
+        "yearly": 490
+      },
+      "features": ["Advanced Analytics", "Priority Support", "Mobile App", "Integrations"],
+      "isActive": true,
+      "totalSubScribers": 8,
+      "totalRevenue": 3920,
+      "forGeneral": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-15T12:00:00Z"
+    },
+    {
+      "docId": "plan_003",
+      "title": "Enterprise Plan",
+      "desc": "Complete solution for large hotel chains",
+      "minRooms": 101,
+      "maxRooms": 500,
+      "price": {
+        "monthly": 99,
+        "yearly": 990
+      },
+      "features": ["Full Analytics Suite", "24/7 Support", "Custom Integrations", "Multi-language", "White Label"],
+      "isActive": true,
+      "totalSubScribers": 3,
+      "totalRevenue": 2970,
+      "forGeneral": true,
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-15T12:00:00Z"
+    }
+  ],
+  "master_hotels": [
+    {
+      "docId": "mh_001",
+      "name": "Standard Business Hotel Template",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-10T10:00:00Z",
+      "isActive": true,
+      "propertyType": "Business Hotel"
+    },
+    {
+      "docId": "mh_002",
+      "name": "Luxury Resort Template",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-10T10:00:00Z",
+      "isActive": true,
+      "propertyType": "Resort"
+    },
+    {
+      "docId": "mh_003",
+      "name": "Budget Inn Template",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-10T10:00:00Z",
+      "isActive": true,
+      "propertyType": "Budget Hotel"
+    }
+  ],
+  "transactions": [
+    {
+      "docId": "txn_001",
+      "clientId": "client_001",
+      "hotelId": "hotel_001",
+      "clientName": "Grand Palace Hotels",
+      "email": "admin@grandpalace.com",
+      "purchaseModelId": "plan_003",
+      "planName": "Enterprise Plan",
+      "amount": 99,
+      "status": "success",
+      "paymentMethod": "credit_card",
+      "isPaid": true,
+      "paidAt": "2024-01-15T10:30:00Z",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "transactionId": "txn_stripe_001"
+    },
+    {
+      "docId": "txn_002",
+      "clientId": "client_002",
+      "hotelId": "hotel_002",
+      "clientName": "Luxury Suites Chain",
+      "email": "contact@luxurysuites.com",
+      "purchaseModelId": "plan_002",
+      "planName": "Professional Plan",
+      "amount": 490,
+      "status": "success",
+      "paymentMethod": "bank_transfer",
+      "isPaid": true,
+      "paidAt": "2024-01-10T15:45:00Z",
+      "createdAt": "2024-01-10T15:00:00Z",
+      "transactionId": "txn_bank_002"
+    },
+    {
+      "docId": "txn_003",
+      "clientId": "client_003",
+      "hotelId": "hotel_003",
+      "clientName": "Budget Inn Network",
+      "email": "info@budgetinn.com",
+      "purchaseModelId": "plan_001",
+      "planName": "Starter Plan",
+      "amount": 29,
+      "status": "failed",
+      "paymentMethod": "credit_card",
+      "isPaid": false,
+      "paidAt": null,
+      "createdAt": "2024-01-20T09:00:00Z",
+      "transactionId": "txn_stripe_003"
+    },
+    {
+      "docId": "txn_004",
+      "clientId": "client_001",
+      "hotelId": "hotel_004",
+      "clientName": "Grand Palace Hotels",
+      "email": "admin@grandpalace.com",
+      "purchaseModelId": "plan_002",
+      "planName": "Professional Plan",
+      "amount": 49,
+      "status": "success",
+      "paymentMethod": "credit_card",
+      "isPaid": true,
+      "paidAt": "2024-01-18T14:20:00Z",
+      "createdAt": "2024-01-18T14:00:00Z",
+      "transactionId": "txn_stripe_004"
+    },
+    {
+      "docId": "txn_005",
+      "clientId": "client_002",
+      "hotelId": "hotel_005",
+      "clientName": "Luxury Suites Chain",
+      "email": "contact@luxurysuites.com",
+      "purchaseModelId": "plan_001",
+      "planName": "Starter Plan",
+      "amount": 290,
+      "status": "success",
+      "paymentMethod": "paypal",
+      "isPaid": true,
+      "paidAt": "2024-01-12T11:15:00Z",
+      "createdAt": "2024-01-12T11:00:00Z",
+      "transactionId": "txn_paypal_005"
+    }
+  ],
+  "metrics": [
+    {
+      "docId": "monthly_2024_01",
+      "period": "2024-01",
+      "totalActiveSubscriptions": 26,
+      "monthlyRevenue": 11240,
+      "totalClients": 3,
+      "totalHotels": 8,
+      "churnedClients": 1,
+      "mostPopularPlan": "Starter Plan",
+      "trialToConversionRate": 75.5,
+      "averageRevenuePerHotel": 1405,
+      "createdAt": "2024-02-01T00:00:00Z"
+    }
+  ],
+  "hotels": [
+    {
+      "docId": "hotel_001",
+      "name": "Grand Palace Downtown",
+      "clientId": "client_001",
+      "floors": {
+        "1": 25,
+        "2": 25,
+        "3": 25,
+        "4": 25
+      },
+      "createdAt": "2024-01-15T12:00:00Z",
+      "updatedAt": "2024-01-20T10:00:00Z",
+      "masterHotelId": "mh_001",
+      "propertyType": "Business Hotel",
+      "isActive": true,
+      "subscriptionPurchaseId": "txn_001",
+      "subscriptionName": "Enterprise Plan",
+      "subscriptionStart": "2024-01-15T00:00:00Z",
+      "subscriptionEnd": "2024-02-15T00:00:00Z",
+      "logoUrl": "https://example.com/logo1.png",
+      "lastSync": "2024-01-25T08:00:00Z",
+      "hotelImageUrl": "https://example.com/hotel1.jpg",
+      "addressModel": {
+        "addressLine1": "123 Main Street",
+        "addressLine2": "Suite 100",
+        "city": "New York",
+        "state": "NY",
+        "country": "USA",
+        "postalCode": "10001",
+        "latitude": 40.7128,
+        "longitude": -74.0060
+      },
+      "otherDocuments": {
+        "tradeLicense": "https://example.com/license1.pdf",
+        "gstCertificate": "https://example.com/gst1.pdf"
+      }
+    },
+    {
+      "docId": "hotel_002",
+      "name": "Luxury Suites Central",
+      "clientId": "client_002",
+      "floors": {
+        "1": 20,
+        "2": 20,
+        "3": 25
+      },
+      "createdAt": "2024-01-10T16:00:00Z",
+      "updatedAt": "2024-01-18T14:00:00Z",
+      "masterHotelId": "mh_002",
+      "propertyType": "Resort",
+      "isActive": true,
+      "subscriptionPurchaseId": "txn_002",
+      "subscriptionName": "Professional Plan",
+      "subscriptionStart": "2024-01-10T00:00:00Z",
+      "subscriptionEnd": "2025-01-10T00:00:00Z",
+      "logoUrl": "https://example.com/logo2.png",
+      "lastSync": "2024-01-24T12:00:00Z",
+      "hotelImageUrl": "https://example.com/hotel2.jpg",
+      "addressModel": {
+        "addressLine1": "456 Park Avenue",
+        "addressLine2": "",
+        "city": "Los Angeles",
+        "state": "CA",
+        "country": "USA",
+        "postalCode": "90210",
+        "latitude": 34.0522,
+        "longitude": -118.2437
+      },
+      "otherDocuments": {
+        "tradeLicense": "https://example.com/license2.pdf",
+        "gstCertificate": "https://example.com/gst2.pdf"
+      }
+    }
+  ],
+  "users": [
+    {
+      "docId": "user_sa_001",
+      "name": "Super Admin",
+      "email": "superadmin@taskotel.com",
+      "phone": "+1-555-9999",
+      "role": "super_admin",
+      "hotelIds": [],
+      "departmentId": "",
+      "isActive": true,
+      "lastLogin": "2024-01-25T10:00:00Z",
+      "createdAt": "2024-01-01T00:00:00Z",
+      "updatedAt": "2024-01-25T10:00:00Z"
+    },
+    {
+      "docId": "user_ca_001",
+      "name": "John Smith",
+      "email": "admin@grandpalace.com",
+      "phone": "+1-555-0101",
+      "role": "client_admin",
+      "hotelIds": ["hotel_001"],
+      "departmentId": "",
+      "isActive": true,
+      "lastLogin": "2024-01-25T09:15:00Z",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-25T09:15:00Z"
+    },
+    {
+      "docId": "user_ca_002",
+      "name": "Sarah Johnson",
+      "email": "contact@luxurysuites.com",
+      "phone": "+1-555-0202",
+      "role": "client_admin",
+      "hotelIds": ["hotel_002"],
+      "departmentId": "",
+      "isActive": true,
+      "lastLogin": "2024-01-24T16:20:00Z",
+      "createdAt": "2024-01-10T14:30:00Z",
+      "updatedAt": "2024-01-24T16:20:00Z"
+    }
+  ]
+}
