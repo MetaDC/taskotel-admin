@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/features/clients/presentation/page/clients_page.dart';
+import 'package:taskoteladmin/features/clients/presentation/page/client_detail_page.dart';
 import 'package:taskoteladmin/features/dasboard/presentation/pages/dashboard.dart';
 import 'package:taskoteladmin/features/dasboard/presentation/pages/dashboard_page.dart';
 
@@ -35,6 +36,17 @@ List<RouteBase> get _routes {
           pageBuilder: (context, state) {
             return NoTransitionPage(child: ClientsPage());
           },
+          routes: [
+            GoRoute(
+              path: "/:clientId",
+              pageBuilder: (context, state) {
+                final clientId = state.pathParameters['clientId']!;
+                return NoTransitionPage(
+                  child: ClientDetailPage(clientId: clientId),
+                );
+              },
+            ),
+          ],
         ),
         // GoRoute(
         //   path: "${Routes.document}/:id",
