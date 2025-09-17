@@ -1,87 +1,245 @@
 # PRP: Taskotel Super Admin — Implementation Steps
 
-## Overview
+## 🏨 **Taskotel – Hotel Management SaaS Platform**
 
-Implement SA portal incrementally. Each numbered step should be a separate commit and tested before moving to the next.
+Taskotel is a **SaaS platform** that hotels subscribe to on a **per-hotel basis**.
+It helps manage:
 
-## Step 0 — Repo bootstrap
+- **Tasks** (assigned to GM, RM, DM, OP)
+- **Vendors (VN)**
+- **Hotel Analytics (performance, usage, revenue, etc.)**
+- **Client & Subscription Management**
 
-- Create `flutter` project `taskotel_admin`.
-- Create `functions` directory with javascript (npm init, install firebase-admin, firebase-functions).
-- Add `.claire` files for command usage if needed.
+The subscription model is tied to **room count per hotel** (pricing tiers).
+Each hotel = separate subscription.
+Example: If a Client Admin owns 10 hotels, each one needs its own subscription plan.
 
-## Step 1 — Firestore model & seed
+---
 
-- Create Firestore `subscription_plans`, `clients`, `masterhotels`, `mastertask` , `hotels`, `users`, `transactions`, `master_hotels`, `tasks`, `departments`, `vendors`, `audit_logs`, `metrics`.
-- Add JSON seed file (3 clients, 5 hotels, 3 plans, 20 transactions).
-- Acceptance: `seed_data.json` imports into emulator successfully.
+## 👥 **Roles in the System**
 
-## Step 2 — Cloud Functions: user lifecycle & webhook
+1. **Super Admin (SA)**
 
-- Implement `createClientAccount` callable function:
-  - Validate SA auth (custom claim or UID).
-  - Create Auth user, create `clients` doc, create `users` doc (role=client_admin), send email stub (log).
-- Implement `deleteClientUser`.
-- Implement `paymentWebhook(req)` (webhook).
-- Implement `generateMonthlyReport` (scheduled).
-- Acceptance: functions compile and run on emulator. `createClientAccount` creates auth + docs.
+   - Owner of the SaaS platform.
+   - Creates subscription plans, manages clients, revenue tracking, churn, etc.
 
-## Step 3 — Firestore rules
+2. **Client Admin (CA)**
 
-- Implement and deploy rules restricting writes for `subscription_plans`, `clients` to SA or cloud functions.
-- Acceptance: rules pass basic tests in emulator.
+   - Pays for subscriptions for their hotels.
+   - Can add hotels → assign roles (GM, RM, DM, OP) → manage tasks & vendors.
 
-## Step 4 — Flutter Auth + SA login
+3. **Hotel Staff Roles (under CA)**
 
-- Implement `AuthRepository` that uses Firebase Auth emulator.
-- Implement `AuthCubit`, `LoginPage`.
-- Protect routes with `SAOnlyRouteGuard` reading user doc or custom claim.
-- Acceptance: SA can login locally.
+   - **GM (General Manager)**
+   - **RM (Regional Manager)**
+   - **DM (Department Manager)**
+   - **OP (Operators / staff like gardener, maid, etc.)**
+   - **VN (Vendors)** (external service providers)
 
-## Step 5 — Dashboard
+---
 
-- Implement `DashboardCubit` that reads metrics in `metrics/monthly` and returns KPI state.
-- UI: top cards (Active Subs, Revenue, Master Hotels, Top Plan), line chart for revenue (last 12 months), churn list on right.
-- Acceptance: UI renders seed metrics, charts use seed data.
+## 📊 **Super Admin (SA) Module Overview**
 
-## Step 6 — Clients Page (CRUD)
+This is your current focus. The SA side has multiple sections:
 
-- Implement `ClientsRepository` for clients collection.
-- Implement `ClientsCubit` (fetch, addClient, editClient).
-- UI: datatable with columns: Client, Email, Plans, #Hotels, #Rooms, Status, Actions.
-- AddClient modal calls Cloud Function `createClientAccount`.
-- Acceptance: Add Client creates auth user + client doc in emulator.
+### 1. **Dashboard**
 
-## Step 7 — Client Detail & Hotels
+Analytics & KPIs:
 
-- Client detail page shows list of hotels, per-hotel plan, subscription dates, import master hotel.
-- Implement hotel import endpoint (Cloud Function `importMasterHotel(masterId, clientId)`).
-- Acceptance: importing a master adds hotel and copies default tasks.
+- Active Subscriptions (per hotel basis)
+- Monthly Revenue, Total Revenue
+- Total Clients
+- Total Hotels created
+- Total Subscription Plans
+- Churn Clients (lost after subscription expiry)
+- Most Popular Subscription Tier
+- **Graphs/Charts**:
 
-## Step 8 — Master Hotels & Tasks
+  - Revenue Trend (line)
+  - Subscription Growth (line/bar)
+  - Active vs Churn Hotels (bar)
+  - Subscription Distribution (pie)
 
-- UI: List of master hotels with import count and manage template.
-- SA can create predefined tasks and departments in a master hotel.
-- Acceptance: creating master templates writes to `master_hotels`.
+- **Quick Insights**:
 
-## Step 9 — Subscription Plans & Transactions
+  - Which plan is selling best
+  - Trial → Paid conversion %
+  - Average revenue per hotel
 
-- SA can CRUD plans; assign plan to hotel (planStartDate/EndDate).
-- Transactions page shows payments with filters and export CSV.
-- Acceptance: Create plan, simulate payment (create transaction), UI shows transaction.
+---
 
-## Step 10 — Reports
+### 2. **Clients (Active / Lost / Churned)**
 
-- Implement `ReportsCubit` to aggregate active vs churn, MRR, ARR.
-- UI: charts consistent with screenshots; export CSV.
-- Acceptance: sample reports generated and exported CSV matches metrics.
+- **Onboarding Paths**:
 
-## Step 11 — Tests & CI
+  1. **Self-signup** (CA signs up on SaaS site → adds hotel → buys plan).
+  2. **Super Admin creates client manually** (credentials shared).
 
-- Unit tests for AuthCubit, ClientsCubit, DashboardCubit.
-- GitHub Actions: on push run `flutter analyze`, `flutter test`, and `npm test` for functions.
-- Acceptance: CI passes.
+- **Client List View**:
 
-## Final Acceptance Criteria
+  - Client name, email, plans, number of hotels, total rooms, status (active/expired/churned).
 
-- SA can login, create a client, assign subscriptions per hotel, view transactions and reports, import master hotels, and all sensitive operations are done via cloud functions.
+- **Client Detail View**:
+
+  - Basic Info (name, contact, company)
+  - Hotels under client
+  - Subscription history (per hotel)
+  - Transactions
+  - Option to **extend trial (1 month)** to avoid churn.
+
+- **Hotel Detail View (under Client)**:
+
+  1. **Hotel Info** (name, location, plan, subscription validity, performance rating).
+  2. **Performance Cards**:
+
+     - Task completion rate
+     - On-time delivery
+     - Quality score
+     - Daily active staff
+     - Tasks/day
+     - Issues resolved
+     - Revenue contribution from hotel
+     - Renewal rate
+
+  3. **Task Management (detailed)**:
+
+     - Role-wise task view (RM, GM, DM, OP)
+     - Columns: ID, title, desc, frequency, priority, time, status, toggle active/inactive, actions.
+
+  4. **Lifecycle Tracking**:
+
+     - Active / Expired → Trial offer → Churn status.
+     - Handle lost client cases (0 hotels subscribed = lost, partial subscription = active but with inactive hotels).
+
+---
+
+### 3. 🏨 Master Hotel Structure (Revised)
+
+- **Purpose**: Templates for franchise-style hotels.
+- Contains:
+
+### 1. **Master Hotel**
+
+- Created by **Super Admin**.
+- Defines the **base structure** for client hotels.
+- Includes:
+
+  - Roles (GM, RM, DM, OP)
+  - Departments (Master Departments, e.g., Cleaning, Maintenance, Kitchen)
+  - Master Tasks (linked to roles + optionally departments)
+
+---
+
+### 2. **Master Departments**
+
+- Departments inside a Master Hotel (like "Cleaning Department", "Maintenance Department").
+- Each department is supervised by a **Department Manager (DM)**.
+- Example departments:
+
+  - Cleaning Department
+  - Kitchen Department
+  - Front Desk
+  - Maintenance
+
+---
+
+### 3. **Master Tasks**
+
+- Tasks are defined under either:
+
+  - **Role-only** (e.g., GM → “Weekly Revenue Review”)
+  - **Department-specific** (e.g., Cleaning Department → “Daily Room Cleaning”)
+
+- **Assignment Rules**:
+
+  - GM, RM → General role tasks (not tied to department).
+  - DM → Can create/manage tasks **inside departments**.
+  - OP → Operators get tasks **inside their department** (assigned by DM).
+
+---
+
+## 🔄 Example Flow with Departments
+
+1. **Super Admin Creates Master Hotel** → “Luxury Hotel Template”.
+
+   - Adds **Departments**: Cleaning, Kitchen, Front Desk.
+
+2. **Super Admin Adds Master Tasks**:
+
+   - GM → "Weekly Revenue Review"
+   - RM → "Regional Check-in Report"
+   - DM (Cleaning Department) → "Check staff schedules"
+   - OP (Cleaning Department) → "Daily Room Cleaning"
+
+3. **Client Admin Imports Master Hotel** → creates "Grand Palace Hotel".
+
+   - System imports:
+
+     - Departments: Cleaning, Kitchen, Front Desk
+     - Roles: GM, RM, DM, OP
+     - Tasks: all predefined Master Tasks assigned to the correct role/department
+
+4. **Grand Palace Hotel (Client)** now has:
+
+   - GM → Weekly Revenue Review
+   - RM → Regional Check-in Report
+   - Cleaning Department
+
+     - DM (Cleaning) → "Check staff schedules"
+     - OP (Cleaning) → "Daily Room Cleaning"
+
+---
+
+### 4. **Subscription Plans**
+
+- Plans are **room-based tiers** (e.g., 1–50 = \$29/mo, 51–100 = \$49/mo, etc.).
+- Manage plans: Create / Edit / Delete.
+- Each plan has **features** (analytics level, support, mobile app, integrations).
+- Analytics:
+
+  - How many hotels subscribed to each plan
+  - Revenue breakdown
+  - Most popular tier
+
+---
+
+### 5. **Transactions**
+
+- **Transaction List**:
+
+  - Date, Client, Hotel, Plan, Amount, Payment Method, Status.
+
+- **Financial Analytics**:
+
+  - MRR (Monthly Recurring Revenue)
+  - ARR (Annual Recurring Revenue)
+  - Refunds, failed payments
+  - Most profitable clients
+  - Revenue split by tier
+
+---
+
+### 6. **Reports / Analytics**
+
+- **Subscription Analytics**:
+
+  - Active hotels
+  - Revenue growth
+  - Churned clients/hotels
+  - Trial → Paid conversion
+
+- **Hotel Usage Analytics**:
+
+  - Avg rooms per hotel
+  - Avg staff distribution (RMs, GMs, OPs, etc.)
+  - Vendor usage
+
+- **Client Analytics**:
+
+  - Retention rate
+  - High-value clients
+
+Ahh got it ✅ — so your **Master Hotel** has another layer: **Master Departments**.
+Let me restructure everything with this addition.
+
+---

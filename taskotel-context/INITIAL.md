@@ -3,7 +3,8 @@
 Goal: Build the Super Admin portal for Taskotel — SaaS hotel operations. Start with full SA module: Dashboard, Clients (list + detail + onboarding), Master Hotels, Subscription Plans, Transactions, Reports, and admin utilities. Use Flutter web and Firebase (Firestore, Auth, Functions).
 
 Primary requirements:
-- SA auth (email/password) + role guard.
+
+- SA auth (email/password)
 - Dashboard with KPI cards, revenue graph (line), subscription growth (bar), churn list.
 - Clients list + detail pages: hotels under client, per-hotel subscription, transaction history, ability to grant trial/extend subscription, import master hotel template into client's hotel.
 - Master Hotels: create franchise templates (departments, default tasks), track imports & uses.
@@ -15,6 +16,7 @@ Primary requirements:
 - UI should follow the supplied screenshots (card layout, tables, modals). Use the models image as data reference.
 
 Deliverables:
+
 - PRP for AI execution.
 - Firestore model definitions and JSON seed.
 - Cloud Functions TypeScript code.
