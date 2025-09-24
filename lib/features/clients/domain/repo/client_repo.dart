@@ -1,16 +1,13 @@
-import 'package:taskoteladmin/features2/super_admin/data/models/client_model.dart';
+// 1. Update ClientRepo to support pagination
+import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 
 abstract class ClientRepo {
-  // create, update, delete clients
-  Future<ClientModel> createClient(ClientModel client);
-  Future<ClientModel> updateClient(ClientModel client);
-  Future<void> deleteClient(String clientId);
+  // Fetch clients with pagination
+  Future<List<ClientModel>> fetchClients(
+    int limit,
+    DateTime? startAfter,
+    String clientStatus,
+  );
 
-  // fetch clients
-  Future<List<ClientModel>> fetchClients({
-    String? searchQuery,
-    int? limit,
-    String? lastDocumentId,
-  });
   Future<ClientModel> fetchClientById(String clientId);
 }

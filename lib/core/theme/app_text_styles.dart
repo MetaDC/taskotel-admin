@@ -4,67 +4,53 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  // NEW
-  static final headerHeading = GoogleFonts.albertSans(
+  static final headerHeading = TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.bold,
     color: AppColors.primary,
   );
-  static final headerSubheading = GoogleFonts.albertSans(
+  static final headerSubheading = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w500,
-    color: Colors.grey.shade500,
+    color: AppColors.slateGray,
   );
+  static final tabelHeader = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.slateGray,
+  );
+  static final dialogHeading = TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    color: AppColors.primary,
+  );
+  static final textFieldTitle = TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 14,
+    color: AppColors.primary,
+  );
+
   // Navigation
-  static final navBarItems = GoogleFonts.albertSans(
+  static final navBarItems = TextStyle(
     fontSize: 34,
     fontWeight: FontWeight.w700,
     color: AppColors.primary,
   );
 
-  // Headings
-  static final heading1 = GoogleFonts.albertSans(
-    fontSize: 32,
-    fontWeight: FontWeight.w700,
+  //stat cards styles
+  static final statCardLabel = GoogleFonts.albertSans(
+    fontSize: 15,
+    fontWeight: FontWeight.bold,
+    color: AppColors.slateGray,
+  );
+  static final statCardValue = GoogleFonts.albertSans(
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
     color: AppColors.primary,
   );
-
-  static final heading2 = GoogleFonts.albertSans(
-    fontSize: 24,
-    fontWeight: FontWeight.w600,
-    color: AppColors.primary,
-  );
-
-  static final heading3 = GoogleFonts.albertSans(
-    fontSize: 20,
-    fontWeight: FontWeight.w600,
-    color: AppColors.primary,
-  );
-
-  // Body text
-  static final body1 = GoogleFonts.albertSans(
+  static final hintText = GoogleFonts.albertSans(
     fontSize: 16,
+    color: AppColors.slateGray,
     fontWeight: FontWeight.w400,
-    color: AppColors.primary,
-  );
-
-  static final body2 = GoogleFonts.albertSans(
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-    color: AppColors.primary,
-  );
-
-  // Caption
-  static final caption = GoogleFonts.albertSans(
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    color: AppColors.primary,
-  );
-
-  // Button text
-  static final button = GoogleFonts.albertSans(
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    color: Colors.white,
   );
 }

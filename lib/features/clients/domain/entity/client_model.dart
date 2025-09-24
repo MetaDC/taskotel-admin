@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ClientModel {
-  String docId;
-  String name;
-  String email;
-  String phone;
-  DateTime createdAt;
-  String status;
-  DateTime planExpireDate;
-  DateTime updatedAt;
-  DateTime lastLogin;
-  double totalRevenue;
+  final String docId; // Firestore document ID
+  final String name;
+  final String email;
+  final String phone;
+  final DateTime createdAt;
+  final String status; // active | inactive | suspended etc.
+  final DateTime lastPaymentExpiry;
+  final DateTime updatedAt;
+  final DateTime? lastLogin;
+  final int totalHotels; // current hotel count
+  final double totalRevenue; // generated revenue
 
   ClientModel({
     required this.docId,
@@ -19,53 +20,126 @@ class ClientModel {
     required this.phone,
     required this.createdAt,
     required this.status,
-    required this.planExpireDate,
     required this.updatedAt,
-    required this.lastLogin,
+    required this.lastPaymentExpiry,
+    this.lastLogin,
+    required this.totalHotels,
     required this.totalRevenue,
   });
 
-  // Create from JSON map
-  factory ClientModel.fromJson(Map<String, dynamic> json) {
-    return ClientModel(
-      docId: json['docId'] ?? '',
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
-      phone: json['phone'] ?? '',
-      createdAt: (json['createdAt'] as Timestamp).toDate(),
-      status: json['status'] ?? '',
-      planExpireDate: (json['hotelExpireDate'] as Timestamp).toDate(),
-      updatedAt: (json['updatedAt'] as Timestamp).toDate(),
-      lastLogin: (json['lastLogin'] as Timestamp).toDate(),
-      totalRevenue: (json['totalRevenue'] as num).toDouble(),
-    );
-  }
-
-  // Create from DocumentSnapshot
-  factory ClientModel.fromDocSnap(DocumentSnapshot docSnap) {
-    final data = docSnap.data() as Map<String, dynamic>;
-    return ClientModel.fromJson({
-      ...data,
-      'docId': docSnap.id, // Ensure docId is set from snapshot ID
-    });
-  }
-
-  // Convert to JSON map
+  /// 🔹 Convert to JSON for Firestore
   Map<String, dynamic> toJson() {
     return {
-      'docId': docId,
-      'name': name,
-      'email': email,
-      'phone': phone,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'status': status,
-      'hotelExpireDate': Timestamp.fromDate(planExpireDate),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-      'lastLogin': Timestamp.fromDate(lastLogin),
-      'totalRevenue': totalRevenue,
+      "name": name,
+      "email": email,
+      "phone": phone,
+      "createdAt": createdAt.millisecondsSinceEpoch,
+      "status": status,
+      "lastPaymentExpiry": lastPaymentExpiry.millisecondsSinceEpoch,
+      "updatedAt": updatedAt.millisecondsSinceEpoch,
+      "lastLogin": lastLogin?.millisecondsSinceEpoch,
+      "totalHotels": totalHotels,
+      "totalRevenue": totalRevenue,
     };
   }
 
-  // Convert to Map (optional helper if needed, same as toJson in most cases)
-  Map<String, dynamic> toMap() => toJson();
+  /// 🔹 Create model from JSON map
+  factory ClientModel.fromJson(Map<String, dynamic> json, String docId) {
+    return ClientModel(
+      docId: docId,
+      name: json["name"] ?? "",
+      email: json["email"] ?? "",
+      phone: json["phone"] ?? "",
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updatedAt']),
+      lastPaymentExpiry: DateTime.fromMillisecondsSinceEpoch(
+        json['lastPaymentExpiry'],
+      ),
+      status: json["status"] ?? "active",
+
+      lastLogin: json["lastLogin"] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['lastLogin'])
+          : null,
+      totalHotels: json["totalHotels"] ?? 0,
+      totalRevenue: (json["totalRevenue"] ?? 0).toDouble(),
+    );
+  }
+
+  /// 🔹 From Firestore DocumentSnapshot
+  factory ClientModel.fromSnap(DocumentSnapshot<Map<String, dynamic>> snap) {
+    final data = snap.data()!;
+    return ClientModel(
+      docId: snap.id,
+      name: data['name'] ?? '',
+      email: data['email'] ?? '',
+      phone: data['phone'] ?? '',
+      createdAt: DateTime.fromMillisecondsSinceEpoch(data['createdAt']),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(data['updatedAt']),
+      lastPaymentExpiry: DateTime.fromMillisecondsSinceEpoch(
+        data['lastPaymentExpiry'],
+      ),
+      status: data['status'] ?? 'active',
+
+      lastLogin: data['lastLogin'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(data['lastLogin'])
+          : null,
+      totalHotels: data['totalHotels'] ?? 0,
+      totalRevenue: (data['totalRevenue'] ?? 0).toDouble(),
+    );
+  }
+
+  /// 🔹 From Firestore QueryDocumentSnapshot
+  factory ClientModel.fromDocSnap(
+    QueryDocumentSnapshot<Map<String, dynamic>> snap,
+  ) {
+    final data = snap.data();
+    print('data: $data');
+
+    return ClientModel(
+      docId: snap.id,
+      name: data['name'] ?? '',
+      email: data['email'] ?? '',
+      phone: data['phone'] ?? '',
+      createdAt: DateTime.fromMillisecondsSinceEpoch(data['createdAt']),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(data['updatedAt']),
+      lastPaymentExpiry: DateTime.fromMillisecondsSinceEpoch(
+        data['lastPaymentExpiry'],
+      ),
+      status: data['status'] ?? 'active',
+
+      lastLogin: data['lastLogin'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(data['lastLogin'])
+          : null,
+      totalHotels: data['totalHotels'] ?? 0,
+      totalRevenue: (data['totalRevenue'] ?? 0).toDouble(),
+    );
+  }
+
+  /// 🔹 CopyWith for updating specific fields
+  ClientModel copyWith({
+    String? name,
+    String? email,
+    String? phone,
+    DateTime? createdAt,
+    String? status,
+    DateTime? updatedAt,
+    DateTime? lastPaymentExpiry,
+    DateTime? lastLogin,
+    int? totalHotels,
+    double? totalRevenue,
+  }) {
+    return ClientModel(
+      docId: docId, // docId never changes
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      createdAt: createdAt ?? this.createdAt,
+      status: status ?? this.status,
+      lastPaymentExpiry: lastPaymentExpiry ?? this.lastPaymentExpiry,
+      updatedAt: updatedAt ?? this.updatedAt,
+      lastLogin: lastLogin ?? this.lastLogin,
+      totalHotels: totalHotels ?? this.totalHotels,
+      totalRevenue: totalRevenue ?? this.totalRevenue,
+    );
+  }
 }

@@ -1,69 +1,84 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:taskoteladmin/core/widget/stats_card.dart';
-
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
+import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.dart';
+import 'package:taskoteladmin/features/clients/presentation/widgets/active_clients.dart';
+import 'package:taskoteladmin/features/clients/presentation/widgets/lost_clients.dart';
 
-class ClientsPage extends StatelessWidget {
+enum ClientTab { active, lost }
+
+class ClientsPage extends StatefulWidget {
   const ClientsPage({super.key});
 
   @override
+  State<ClientsPage> createState() => _ClientsPageState();
+}
+
+class _ClientsPageState extends State<ClientsPage> {
+  ClientTab selectedTab = ClientTab.active;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<ClientCubit>().initializePagination();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        PageHeader(
-          heading: 'Clients',
-          subHeading: 'Manage your clients',
-          buttonText: 'Add Client',
-          onButtonPressed: () {
-            // Handle button press
-          },
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Expanded(
-              child: StatCard(
-                icon: Icons.group,
-                label: 'Total Clients',
-                value: '2,847',
-                iconColor: Colors.blue,
-                iconPosition: StatCardIconPosition.left,
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          PageHeader(
+            heading: 'Clients',
+            subHeading: 'Manage your clients',
+            buttonText: 'Add Client',
+            onButtonPressed: () {},
+          ),
+          const SizedBox(height: 20),
+
+          CupertinoSlidingSegmentedControl<ClientTab>(
+            backgroundColor: AppColors.slateLightGray,
+            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            groupValue: selectedTab,
+            children: const {
+              ClientTab.active: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(CupertinoIcons.person_2),
+                  SizedBox(width: 15),
+                  Text("Active Clients"),
+                ],
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: StatCard(
-                icon: Icons.group,
-                label: 'Total Clients',
-                value: '2,847',
-                iconColor: Colors.blue,
-                iconPosition: StatCardIconPosition.left,
+              ClientTab.lost: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(CupertinoIcons.person_crop_circle_badge_xmark),
+                  SizedBox(width: 15),
+                  Text("Lost Clients"),
+                ],
               ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: StatCard(
-                icon: Icons.group,
-                label: 'Total Clients',
-                value: '2,847',
-                iconColor: Colors.blue,
-                iconPosition: StatCardIconPosition.left,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: StatCard(
-                icon: Icons.group,
-                label: 'Total Clients',
-                value: '2,847',
-                iconColor: Colors.blue,
-                iconPosition: StatCardIconPosition.left,
-              ),
-            ),
-          ],
-        ),
-      ],
+            },
+            onValueChanged: (val) {
+              if (val != null) {
+                setState(() {
+                  selectedTab = val;
+                });
+              }
+            },
+          ),
+          const SizedBox(height: 20),
+
+          SizedBox(
+            height: 600, // Fixed height for better scroll behavior
+            child: selectedTab == ClientTab.active
+                ? ActiveClients()
+                : LostClients(),
+          ),
+        ],
+      ),
     );
   }
 }

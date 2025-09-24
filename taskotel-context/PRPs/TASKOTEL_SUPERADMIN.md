@@ -6,6 +6,24 @@ Here’s the **final structured PRP** you can directly copy-paste into your agen
 
 # 🚀 PRP: Taskotel – Hotel Management SaaS Platform (with Firebase + Cubit)
 
+---
+
+## ⚙️ Tech Stack
+
+- **Frontend**: Flutter (Web + Mobile)
+- **State Management**: Cubit (Bloc library)
+- **Backend**: Firebase
+
+  - Firestore (database)
+  - Firebase Auth (email/password, Google login)
+  - Firebase Functions (subscription handling, scheduled jobs)
+  - Firebase Storage (media/files)
+  - Firebase Hosting (web app)
+
+- **Payments**: CashFree
+
+---
+
 ## 📌 Overview
 
 Taskotel is a **SaaS platform** for hotel management, provided on a **per-hotel subscription basis**.
@@ -220,25 +238,20 @@ Each Master Hotel contains:
 
 ---
 
-## 🗄 Firebase Data Models (Firestore Collections)
+## 🎯 Deliverables
 
----
+- Super Admin Web Dashboard (Flutter Web + mobile Web)
+- Cubit-based state management for:
 
-## ⚙️ Tech Stack
+  - Auth
+  - Clients
+  - Hotels
+  - Master Hotels
+  - Tasks
+  - Plans
+  - Transactions
 
-- **Frontend**: Flutter (Web + Mobile)
-- **State Management**: Cubit (Bloc library)
-- **Backend**: Firebase
-
-  - Firestore (database)
-  - Firebase Auth (email/password, Google login)
-  - Firebase Functions (subscription handling, scheduled jobs)
-  - Firebase Storage (media/files)
-  - Firebase Hosting (web app)
-
-- **Payments**: CashFree
-
----
+- Analytics dashboards with charts
 
 ## 🎯 Deliverables
 

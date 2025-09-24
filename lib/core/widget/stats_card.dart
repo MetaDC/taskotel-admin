@@ -1,62 +1,99 @@
 import 'package:flutter/material.dart';
+import 'package:taskoteladmin/core/theme/app_colors.dart';
+import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 
-enum StatCardIconPosition { left, right }
-
-class StatCard extends StatelessWidget {
+class StatCardIconRight extends StatelessWidget {
   final IconData icon;
   final String label;
-  final String value; // use String so we can format like "2,847"
+  final String value;
   final Color iconColor;
-  final Color backgroundColor;
-  final StatCardIconPosition iconPosition;
 
-  const StatCard({
+  const StatCardIconRight({
     super.key,
     required this.icon,
     required this.label,
     required this.value,
-    this.iconColor = Colors.blue,
-    this.backgroundColor = Colors.white,
-    this.iconPosition = StatCardIconPosition.left,
+    required this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final iconWidget = Container(
-      padding: const EdgeInsets.all(8),
+    return Container(
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: iconColor.withOpacity(0.1),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
       ),
-      child: Icon(icon, color: iconColor, size: 24),
-    );
-
-    final textWidget = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-      ],
-    );
-
-    return CustomContainer(
       child: Row(
-        children: iconPosition == StatCardIconPosition.left
-            ? [iconWidget, const SizedBox(width: 15), textWidget]
-            : [textWidget, const SizedBox(width: 15), iconWidget],
+        crossAxisAlignment: CrossAxisAlignment.start, // ✅ pushes icon to top
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: AppTextStyles.statCardLabel),
+                const SizedBox(height: 6),
+                Text(value, style: AppTextStyles.statCardValue),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.slateGray.withOpacity(0.1),
+            ),
+            child: Icon(icon, color: iconColor, size: 28),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StatCardIconLeft extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color iconColor;
+
+  const StatCardIconLeft({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(shape: BoxShape.circle),
+            child: Icon(icon, color: iconColor, size: 28),
+          ),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: AppTextStyles.statCardLabel),
+
+              Text(value, style: AppTextStyles.statCardValue),
+            ],
+          ),
+        ],
       ),
     );
   }

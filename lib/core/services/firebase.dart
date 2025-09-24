@@ -13,14 +13,15 @@ class FBFireStore {
 
   // Super Admin Collections
   static final clients = fb.collection('clients');
-  static final subscriptionPlans = fb.collection('subscription_plans');
-  static final masterHotels = fb.collection('master_hotels');
-  static final masterTasks = fb.collection('master_tasks');
-  static final hotels = fb.collection('hotels');
-  static final transactions = fb.collection('transactions');
-  static final users = fb.collection('users');
+  static final contractHistories = fb.collection('contractHistories');
   static final departments = fb.collection('departments');
-  static final vendors = fb.collection('vendors');
+  static final hotels = fb.collection('hotels');
+  static final masterHotels = fb.collection('masterHotels');
+  static final serviceContractors = fb.collection('serviceContractors');
+  static final subscriptionPurchases = fb.collection('subscriptionPurchases');
+  static final subscriptions = fb.collection('subscriptions');
+  static final tasks = fb.collection('tasks');
+  static final transactions = fb.collection('transactions');
 
   // Notification collections
   static final activityNotifications = fb.collection('activity_notifications');
