@@ -31,7 +31,7 @@ class FBFireStore {
 
 class FBStorage {
   static final fbstore = FirebaseStorage.instance;
-  static final bills = fbstore.ref().child('bills');
+  static final masterHotel = fbstore.ref().child('masterHotel');
   static final project = fbstore.ref().child('project');
   static final documents = fbstore.ref().child('documents');
   static final tasks = fbstore.ref().child('tasks');

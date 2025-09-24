@@ -12,9 +12,11 @@ class CustomTextField extends StatelessWidget {
     required this.title,
     this.enabled = true,
     this.prefixIcon,
+    this.validator,
   });
 
   final TextEditingController controller;
+  bool? validator;
   String hintText;
   String title;
   bool enabled;
@@ -70,6 +72,9 @@ class CustomTextField extends StatelessWidget {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
           validator: (value) {
+            if (validator == false) {
+              return null;
+            }
             if (value == null || value.isEmpty) {
               return title.isEmpty ? "This field is required" : "Enter $title";
             }
@@ -158,12 +163,16 @@ class CustomFileUploadField extends StatelessWidget {
   String title;
   String hintText;
   Icon prefixIcon;
+  Widget? uploadImg;
+  Function? onDeleteImageTap;
   CustomFileUploadField({
     super.key,
     required this.hintText,
     required this.title,
     required this.onTap,
     required this.prefixIcon,
+    this.uploadImg,
+    this.onDeleteImageTap,
   });
 
   @override
@@ -175,22 +184,37 @@ class CustomFileUploadField extends StatelessWidget {
         SizedBox(height: 5),
         GestureDetector(
           onTap: () async => onTap(),
-          child: AbsorbPointer(
-            child: TextFormField(
-              readOnly: true,
-              decoration: InputDecoration(
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                hintText: hintText,
-                prefixIcon: prefixIcon,
-                hintStyle: TextStyle(color: Colors.grey),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  onTap: () => onTap(),
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    hintText: hintText,
+                    prefixIcon: prefixIcon,
+                    suffixIcon: uploadImg != null
+                        ? InkWell(
+                            onTap: () => onDeleteImageTap!(),
+                            child: Icon(CupertinoIcons.xmark_circle),
+                          )
+                        : Icon(CupertinoIcons.add_circled, color: Colors.black),
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
                 ),
               ),
-            ),
+              if (uploadImg != null) ...[
+                const SizedBox(width: 12),
+                SizedBox(width: 50, height: 50, child: uploadImg),
+              ],
+            ],
           ),
         ),
       ],

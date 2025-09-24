@@ -1,16 +1,21 @@
 import 'package:taskoteladmin/core/services/firebase.dart';
-import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
-import 'package:taskoteladmin/features/master_hotel/domain/repo/masterhotel_repo.dart';
+import 'package:taskoteladmin/features/master_hotel/models/masterhotel_model.dart';
 
-class MasterHotelFirebaseRepo extends MasterHotelRepo {
+class MasterHotelFirebaseRepo {
   final masterHotelCollectionRef = FBFireStore.masterHotels;
 
-  @override
+  Stream<List<MasterHotelModel>> getMasterHotelsStream() {
+    return masterHotelCollectionRef.snapshots().map((querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => MasterHotelModel.fromDocSnap(doc))
+          .toList();
+    });
+  }
+
   Future<void> createMasterHotel(MasterHotelModel masterHotel) async {
     await masterHotelCollectionRef.add(masterHotel.toJson());
   }
 
-  @override
   Future<void> updateMasterHotel(MasterHotelModel masterHotel) async {
     await masterHotelCollectionRef
         .doc(masterHotel.docId)

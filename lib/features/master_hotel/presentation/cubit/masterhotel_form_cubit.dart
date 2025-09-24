@@ -1,48 +1,120 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
-import 'package:taskoteladmin/features/master_hotel/domain/repo/masterhotel_repo.dart';
+import 'package:taskoteladmin/core/services/image_picker.dart';
+import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
+import 'package:taskoteladmin/features/master_hotel/models/masterhotel_model.dart';
+import 'package:taskoteladmin/features/stroage/data/firebase_storage_repo.dart';
 
 part 'masterhotel_form_state.dart';
 
 class MasterhotelFormCubit extends Cubit<MasterhotelFormState> {
-  final MasterHotelRepo masterHotelRepo;
+  final MasterHotelFirebaseRepo masterHotelRepo;
 
   MasterhotelFormCubit({required this.masterHotelRepo})
     : super(MasterhotelFormState.initial());
 
   final franchiseController = TextEditingController();
   final descriptionController = TextEditingController();
-  final logoUrlController = TextEditingController();
-  final websiteController = TextEditingController();
+  final websiteUrlController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+
+  // Initialize form
+  void initializeForm(MasterHotelModel? editMasterHotel) {
+    emit(state.copyWith(message: "", isLoading: true));
+    if (editMasterHotel != null) {
+      franchiseController.text = editMasterHotel.franchiseName;
+      descriptionController.text = editMasterHotel.description;
+      websiteUrlController.text = editMasterHotel.websiteUrl ?? '';
+      emit(state.copyWith(selectedPropertyType: editMasterHotel.propertyType));
+
+      emit(
+        state.copyWith(
+          dbFile: editMasterHotel.logoUrl,
+          isLoading: false,
+          selectedFile: null,
+        ),
+      );
+    } else {
+      emit(MasterhotelFormState.initial());
+    }
+  }
+
+  // Files related methods
+  Future<void> pickFile(BuildContext context) async {
+    final selectedFile = await ImagePickerService().pickFile(
+      context,
+      useCompressor: true,
+    );
+    if (selectedFile != null) {
+      emit(state.copyWith(selectedFile: selectedFile, message: ""));
+    }
+  }
+
+  // Pick file from camera
+  Future<void> pickFileFromCamera(BuildContext context) async {
+    final selectedFile = await ImagePickerService().pickImageNewCamera(
+      context,
+      useCompressor: true,
+    );
+    if (selectedFile != null) {
+      emit(state.copyWith(selectedFile: selectedFile, message: ""));
+    }
+  }
+
+  // View file
+  Future<void> viewPickFile(
+    String? dbImg,
+    BuildContext context,
+    String? dbImgExt,
+  ) async {}
+
+  // Delete file
+  void deletPickFile(bool dbImage) {
+    if (dbImage) {
+      emit(state.copyWith(dbFile: false));
+    } else {
+      emit(state.copyWith(selectedFile: false));
+    }
+    print("File deleted:${state.selectedFile}");
+  }
 
   Future<void> submitForm(
     BuildContext context,
     MasterHotelModel? editMasterHotel,
   ) async {
-    emit(state.copyWith(isLoading: true));
-
-    if (_validateForm()) {
+    if (state.isLoading) {
+      return;
+    }
+    if (formKey.currentState?.validate() ?? false) {
+      emit(state.copyWith(isLoading: true));
       try {
+        final fileUrl = state.selectedFile != null
+            ? await FirebaseStorageRepo().uploadMasterHotelIconFile(
+                state.selectedFile!,
+              )
+            : state.dbFile;
+
         final hotelData = MasterHotelModel(
-          docId: editMasterHotel?.docId ?? '', // If editing, docId will be set
+          docId: editMasterHotel?.docId ?? '',
           franchiseName: franchiseController.text.trim(),
           propertyType: state.selectedPropertyType ?? '',
           description: descriptionController.text.trim(),
           amenities: [],
-          logoUrl: logoUrlController.text.trim(),
-          websiteUrl: websiteController.text.trim(),
+          logoUrl: fileUrl ?? null,
+          logoName: state.selectedFile?.name ?? null,
+          logoExtension: state.selectedFile?.extension ?? null,
+          websiteUrl: websiteUrlController.text.trim(),
           createdAt: editMasterHotel == null ? DateTime.now() : DateTime.now(),
           updatedAt: DateTime.now(),
           isActive: true,
+          totalClients: 0,
+          totalMasterTasks: 0,
         );
 
         if (editMasterHotel == null) {
-          // If docId is null, it's a new hotel (add operation)
           await masterHotelRepo.createMasterHotel(hotelData);
         } else {
-          // If docId is set, update the existing hotel
           await masterHotelRepo.updateMasterHotel(hotelData);
         }
 
@@ -53,27 +125,11 @@ class MasterhotelFormCubit extends Cubit<MasterhotelFormState> {
                 'Hotel Master ${editMasterHotel == null ? 'Created' : 'Updated'} Successfully!',
           ),
         );
-        Navigator.pop(context); // Close the form on success
+        Navigator.pop(context);
       } catch (e) {
         emit(state.copyWith(isLoading: false, message: 'Error: $e'));
       }
-    } else {
-      emit(
-        state.copyWith(
-          isLoading: false,
-          message: 'Please fill all required fields.',
-        ),
-      );
     }
-  }
-
-  bool _validateForm() {
-    if (franchiseController.text.isEmpty ||
-        state.selectedPropertyType == null ||
-        descriptionController.text.isEmpty) {
-      return false;
-    }
-    return true;
   }
 
   void setPropertyType(String? value) {

@@ -7,10 +7,14 @@ class MasterHotelModel {
   final String description;
   final List<String> amenities;
   final String? logoUrl;
+  final String? logoName;
+  final String? logoExtension;
   final String? websiteUrl;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isActive;
+  final int totalClients;
+  final int totalMasterTasks;
 
   MasterHotelModel({
     required this.docId,
@@ -19,10 +23,14 @@ class MasterHotelModel {
     required this.description,
     required this.amenities,
     this.logoUrl,
+    this.logoName,
+    this.logoExtension,
     this.websiteUrl,
     required this.createdAt,
     required this.updatedAt,
     required this.isActive,
+    required this.totalClients,
+    required this.totalMasterTasks,
   });
 
   factory MasterHotelModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +41,8 @@ class MasterHotelModel {
       description: json['description'] ?? '',
       amenities: List<String>.from(json['amenities'] ?? []),
       logoUrl: json['logoUrl'],
+      logoName: json['logoName'],
+      logoExtension: json['logoExtension'],
       websiteUrl: json['websiteUrl'],
       createdAt: (json['createdAt'] is Timestamp)
           ? (json['createdAt'] as Timestamp).toDate()
@@ -41,6 +51,8 @@ class MasterHotelModel {
           ? (json['updatedAt'] as Timestamp).toDate()
           : DateTime.now(),
       isActive: json['isActive'] ?? false,
+      totalClients: json['totalClients'] ?? 0,
+      totalMasterTasks: json['totalMasterTasks'] ?? 0,
     );
   }
 
@@ -56,10 +68,15 @@ class MasterHotelModel {
       'description': description,
       'amenities': amenities,
       'logoUrl': logoUrl,
+      'logoName': logoName,
+      'logoExtension': logoExtension,
+
       'websiteUrl': websiteUrl,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'updatedAt': updatedAt.millisecondsSinceEpoch,
       'isActive': isActive,
+      'totalClients': totalClients,
+      'totalMasterTasks': totalMasterTasks,
     };
   }
 
@@ -72,10 +89,14 @@ class MasterHotelModel {
     String? description,
     List<String>? amenities,
     String? logoUrl,
+    String? logoName,
+    String? logoExtension,
     String? websiteUrl,
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isActive,
+    int? totalClients,
+    int? totalMasterTasks,
   }) {
     return MasterHotelModel(
       docId: docId ?? this.docId,
@@ -84,10 +105,14 @@ class MasterHotelModel {
       description: description ?? this.description,
       amenities: amenities ?? this.amenities,
       logoUrl: logoUrl ?? this.logoUrl,
+      logoName: logoName ?? this.logoName,
+      logoExtension: logoExtension ?? this.logoExtension,
       websiteUrl: websiteUrl ?? this.websiteUrl,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isActive: isActive ?? this.isActive,
+      totalClients: totalClients ?? this.totalClients,
+      totalMasterTasks: totalMasterTasks ?? this.totalMasterTasks,
     );
   }
 }

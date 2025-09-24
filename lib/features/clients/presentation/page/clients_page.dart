@@ -19,7 +19,6 @@ class _ClientsPageState extends State<ClientsPage> {
   ClientTab selectedTab = ClientTab.active;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     context.read<ClientCubit>().initializePagination();
   }

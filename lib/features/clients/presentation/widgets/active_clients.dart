@@ -37,7 +37,12 @@ class _ActiveClientsState extends State<ActiveClients> {
               children: [
                 Text('Error: ${state.message}'),
                 const SizedBox(height: 16),
-                ElevatedButton(onPressed: () {}, child: const Text('Retry')),
+                ElevatedButton(
+                  onPressed: () {
+                    // context.read<ClientCubit>().refresh();
+                  },
+                  child: const Text('Retry'),
+                ),
               ],
             ),
           );

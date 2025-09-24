@@ -93,7 +93,6 @@ class ClientModel {
     QueryDocumentSnapshot<Map<String, dynamic>> snap,
   ) {
     final data = snap.data();
-    print('data: $data');
 
     return ClientModel(
       docId: snap.id,
