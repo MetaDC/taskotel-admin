@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
@@ -38,35 +39,41 @@ class _ClientsPageState extends State<ClientsPage> {
           ),
           const SizedBox(height: 20),
 
-          CupertinoSlidingSegmentedControl<ClientTab>(
-            backgroundColor: AppColors.slateLightGray,
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            groupValue: selectedTab,
-            children: const {
-              ClientTab.active: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(CupertinoIcons.person_2),
-                  SizedBox(width: 15),
-                  Text("Active Clients"),
-                ],
+          Row(
+            children: [
+              CupertinoSlidingSegmentedControl<ClientTab>(
+                backgroundColor: AppColors.slateLightGray,
+                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                groupValue: selectedTab,
+                children: {
+                  ClientTab.active: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(CupertinoIcons.person_2),
+                      SizedBox(width: 15),
+                      Text("Active Clients"),
+
+                      //serach bar and filter
+                    ],
+                  ),
+                  ClientTab.lost: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(CupertinoIcons.person_crop_circle_badge_xmark),
+                      SizedBox(width: 15),
+                      Text("Lost Clients"),
+                    ],
+                  ),
+                },
+                onValueChanged: (val) {
+                  if (val != null) {
+                    setState(() {
+                      selectedTab = val;
+                    });
+                  }
+                },
               ),
-              ClientTab.lost: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(CupertinoIcons.person_crop_circle_badge_xmark),
-                  SizedBox(width: 15),
-                  Text("Lost Clients"),
-                ],
-              ),
-            },
-            onValueChanged: (val) {
-              if (val != null) {
-                setState(() {
-                  selectedTab = val;
-                });
-              }
-            },
+            ],
           ),
           const SizedBox(height: 20),
 
