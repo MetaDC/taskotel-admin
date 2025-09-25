@@ -27,11 +27,11 @@ class _LostClientsState extends State<LostClients> {
   Widget build(BuildContext context) {
     return BlocBuilder<ClientCubit, ClientState>(
       builder: (context, state) {
-        if (state.isLoading && state.clients.isEmpty) {
+        if (state.isLoading && state.lostClients.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (state.message != null && state.clients.isEmpty) {
+        if (state.message != null && state.lostClients.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

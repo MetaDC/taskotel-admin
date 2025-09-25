@@ -1,5 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+class ClientStatus {
+  static const String active = 'active';
+  static const String inactive = 'inactive';
+  static const String suspended = 'suspended';
+  static const String trial = 'trial';
+  static const String churned = 'churned';
+}
+
 class ClientModel {
   final String docId; // Firestore document ID
   final String name;
@@ -7,9 +15,9 @@ class ClientModel {
   final String phone;
   final DateTime createdAt;
   final String status; // active | inactive | suspended etc.
-  final DateTime lastPaymentExpiry;
+  final DateTime? lastPaymentExpiry; // ✅ Nullable
   final DateTime updatedAt;
-  final DateTime? lastLogin;
+  final DateTime? lastLogin; // ✅ Nullable
   final int totalHotels; // current hotel count
   final double totalRevenue; // generated revenue
 
@@ -21,7 +29,7 @@ class ClientModel {
     required this.createdAt,
     required this.status,
     required this.updatedAt,
-    required this.lastPaymentExpiry,
+    this.lastPaymentExpiry, // ✅ nullable in constructor
     this.lastLogin,
     required this.totalHotels,
     required this.totalRevenue,
@@ -35,7 +43,8 @@ class ClientModel {
       "phone": phone,
       "createdAt": createdAt.millisecondsSinceEpoch,
       "status": status,
-      "lastPaymentExpiry": lastPaymentExpiry.millisecondsSinceEpoch,
+      "lastPaymentExpiry":
+          lastPaymentExpiry?.millisecondsSinceEpoch, // ✅ null safe
       "updatedAt": updatedAt.millisecondsSinceEpoch,
       "lastLogin": lastLogin?.millisecondsSinceEpoch,
       "totalHotels": totalHotels,
@@ -52,11 +61,10 @@ class ClientModel {
       phone: json["phone"] ?? "",
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updatedAt']),
-      lastPaymentExpiry: DateTime.fromMillisecondsSinceEpoch(
-        json['lastPaymentExpiry'],
-      ),
-      status: json["status"] ?? "active",
-
+      lastPaymentExpiry: json['lastPaymentExpiry'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['lastPaymentExpiry'])
+          : null, // ✅ handle null
+      status: json["status"] ?? ClientStatus.active,
       lastLogin: json["lastLogin"] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['lastLogin'])
           : null,
@@ -75,11 +83,10 @@ class ClientModel {
       phone: data['phone'] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(data['createdAt']),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(data['updatedAt']),
-      lastPaymentExpiry: DateTime.fromMillisecondsSinceEpoch(
-        data['lastPaymentExpiry'],
-      ),
-      status: data['status'] ?? 'active',
-
+      lastPaymentExpiry: data['lastPaymentExpiry'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(data['lastPaymentExpiry'])
+          : null, // ✅ handle null
+      status: data['status'] ?? ClientStatus.active,
       lastLogin: data['lastLogin'] != null
           ? DateTime.fromMillisecondsSinceEpoch(data['lastLogin'])
           : null,
@@ -93,7 +100,6 @@ class ClientModel {
     QueryDocumentSnapshot<Map<String, dynamic>> snap,
   ) {
     final data = snap.data();
-
     return ClientModel(
       docId: snap.id,
       name: data['name'] ?? '',
@@ -101,11 +107,10 @@ class ClientModel {
       phone: data['phone'] ?? '',
       createdAt: DateTime.fromMillisecondsSinceEpoch(data['createdAt']),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(data['updatedAt']),
-      lastPaymentExpiry: DateTime.fromMillisecondsSinceEpoch(
-        data['lastPaymentExpiry'],
-      ),
-      status: data['status'] ?? 'active',
-
+      lastPaymentExpiry: data['lastPaymentExpiry'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(data['lastPaymentExpiry'])
+          : null, // ✅ handle null
+      status: data['status'] ?? ClientStatus.active,
       lastLogin: data['lastLogin'] != null
           ? DateTime.fromMillisecondsSinceEpoch(data['lastLogin'])
           : null,

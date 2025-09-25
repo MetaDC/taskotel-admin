@@ -5,10 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
+import 'package:taskoteladmin/core/utils/helpers.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
+import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.dart';
+import 'package:taskoteladmin/features/clients/presentation/cubit/client_form_cubit.dart';
+import 'package:taskoteladmin/features/clients/presentation/widgets/client_form.dart';
 import 'package:taskoteladmin/features/clients/presentation/widgets/pagination.dart';
 
 class ActiveClients extends StatefulWidget {
@@ -19,18 +23,25 @@ class ActiveClients extends StatefulWidget {
 }
 
 class _ActiveClientsState extends State<ActiveClients> {
+  final TextEditingController _searchController = TextEditingController();
+
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ClientCubit, ClientState>(
       builder: (context, state) {
         // Show loading for initial load
-        if (state.isLoading && state.clients.isEmpty) {
+        if (state.isLoading && state.activeClients.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
         // Show error state
-        if (state.message != null && state.clients.isEmpty) {
+        if (state.message != null && state.activeClients.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -186,25 +197,28 @@ class _ActiveClientsState extends State<ActiveClients> {
 
                     // Clients List
                     Expanded(
-                      child: state.filteredClients.isNotEmpty
+                      child: state.filteredActiveClients.isNotEmpty
                           ? ListView.separated(
-                              itemCount: state.filteredClients.length,
+                              itemCount: state.filteredActiveClients.length,
                               separatorBuilder: (context, index) => Divider(
                                 color: AppColors.slateGray.withOpacity(0.3),
                                 height: 1,
                               ),
                               itemBuilder: (context, index) {
-                                final client = state.filteredClients[index];
+                                final client =
+                                    state.filteredActiveClients[index];
                                 return buildClientRow(client);
                               },
                             )
                           : Center(child: Text("No active clients found")),
                     ),
                     DynamicPagination(
-                      currentPage: state.currentPage,
-                      totalPages: state.totalPages,
+                      currentPage: state.activeCurrentPage,
+                      totalPages: state.activeTotalPages,
                       onPageChanged: (page) => {
-                        context.read<ClientCubit>().fetchNextPage(page: page),
+                        context.read<ClientCubit>().fetchNextActiveClientsPage(
+                          page: page,
+                        ),
                       },
                     ),
                   ],
@@ -270,7 +284,7 @@ class _ActiveClientsState extends State<ActiveClients> {
               ],
             ),
           ),
-          Expanded(child: Text(_formatDate(client.lastPaymentExpiry))),
+          Expanded(child: Text(client.lastPaymentExpiry?.goodDayDate() ?? "-")),
           Expanded(child: Text("${client.totalHotels}")),
           Expanded(child: Text("\$${client.totalRevenue.toStringAsFixed(2)}")),
           Expanded(
@@ -297,7 +311,26 @@ class _ActiveClientsState extends State<ActiveClients> {
                 PopupMenuItem(
                   child: Text('Edit'),
                   onTap: () {
-                    // Handle edit client
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          backgroundColor: Color(0xffFAFAFA),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: BlocProvider(
+                            create: (context) => ClientFormCubit(
+                              clientRepo: ClientFirebaseRepo(),
+                            ),
+                            child: Container(
+                              constraints: BoxConstraints(maxWidth: 600),
+                              child: ClientFormModal(clientToEdit: client),
+                            ),
+                          ),
+                        );
+                      },
+                    );
                   },
                 ),
                 PopupMenuItem(

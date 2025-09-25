@@ -1,6 +1,6 @@
 part of 'susbcription_cubit.dart';
 
-class SubscriptionState {
+class SubscriptionState extends Equatable {
   final bool isLoading;
   final List<SubscriptionPlanModel> subscriptionPlans;
   final List<SubscriptionPlanModel> filteredPlans;

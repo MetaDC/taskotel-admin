@@ -23,6 +23,7 @@ class FBFireStore {
   static final subscriptions = fb.collection('subscriptions');
   static final tasks = fb.collection('tasks');
   static final transactions = fb.collection('transactions');
+  static final users = fb.collection('users');
 
   // Notification collections
   static final activityNotifications = fb.collection('activity_notifications');

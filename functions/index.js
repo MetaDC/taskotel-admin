@@ -30,24 +30,31 @@ exports.createUser = onCall(async (request) => {
     if (!request.auth)
       return { status: "error", code: 401, message: "Not signed in" };
     let user = await auth.createUser({
-      // phoneNumber: request.data.phoneNumber,
       email: request.data.email,
       password: request.data.password,
     });
 
     try {
-      let dbUser = await db.collection("users").doc(user.uid).create({
+      let dbUser = await db.collection("clients").doc(user.uid).create({
         name: request.data.name,
         email: request.data.email,
- 
-        // createdAt: FieldValue.serverTimestamp(),
+        phone: request.data.phone,
+        createdAt: request.data.createdAt,
+        status: request.data.status,
+        lastPaymentExpiry: null,
+        updatedAt: request.data.updatedAt,
+        lastLogin: null,
+        totalHotels: request.data.totalHotels,
+        totalRevenue: request.data.totalRevenue,
       });
       console.log("User Data saved Successfully");
       return { success: true, msg: dbUser };
     } catch (error) {
-      console.log("Failed to create user doc, need to delete this user again!");
+      console.log(
+        `Failed to create user doc, need to delete this user again ${error}!`
+      );
       await auth.deleteUser(user.uid);
-      console.log("User deleted successfully!");
+      console.log(`User deleted successfully ${error} !`);
       return { success: false, msg: error };
     }
   } catch (error) {

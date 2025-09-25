@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
-import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.dart';
-import 'package:taskoteladmin/features/clients/presentation/widgets/active_clients.dart';
-import 'package:taskoteladmin/features/clients/presentation/widgets/lost_clients.dart';
+import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
+
+import 'package:taskoteladmin/features/clients/presentation/cubit/client_form_cubit.dart';
+import 'package:taskoteladmin/features/clients/presentation/widgets/active_clients_new.dart';
+import 'package:taskoteladmin/features/clients/presentation/widgets/client_form.dart';
+import 'package:taskoteladmin/features/clients/presentation/widgets/lost_clients_new.dart';
 
 enum ClientTab { active, lost }
 
@@ -21,7 +24,7 @@ class _ClientsPageState extends State<ClientsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<ClientCubit>().initializePagination();
+    // Initialization is now handled by individual widgets
   }
 
   @override
@@ -35,7 +38,27 @@ class _ClientsPageState extends State<ClientsPage> {
             heading: 'Clients',
             subHeading: 'Manage your clients',
             buttonText: 'Add Client',
-            onButtonPressed: () {},
+            onButtonPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return Dialog(
+                    backgroundColor: Color(0xffFAFAFA),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: BlocProvider(
+                      create: (context) =>
+                          ClientFormCubit(clientRepo: ClientFirebaseRepo()),
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: 600),
+                        child: ClientFormModal(),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
           ),
           const SizedBox(height: 20),
 
@@ -80,8 +103,8 @@ class _ClientsPageState extends State<ClientsPage> {
           SizedBox(
             height: 600, // Fixed height for better scroll behavior
             child: selectedTab == ClientTab.active
-                ? ActiveClients()
-                : LostClients(),
+                ? const ActiveClientsNew()
+                : const LostClientsNew(),
           ),
         ],
       ),

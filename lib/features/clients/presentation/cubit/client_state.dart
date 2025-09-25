@@ -1,70 +1,111 @@
 part of 'client_cubit.dart';
 
 class ClientState extends Equatable {
-  final List<List<ClientModel>> clients;
-  final List<ClientModel> filteredClients;
-  final Map<String, int>? stats;
-  final int currentPage;
-  final int totalPages;
+  // Active clients pagination
+  final List<List<ClientModel>> activeClients;
+  final List<ClientModel> filteredActiveClients;
+  final int activeCurrentPage;
+  final int activeTotalPages;
+  final DocumentSnapshot? activeLastFetchedDoc;
+
+  // Lost clients pagination
+  final List<List<ClientModel>> lostClients;
+  final List<ClientModel> filteredLostClients;
+  final int lostCurrentPage;
+  final int lostTotalPages;
+  final DocumentSnapshot? lostLastFetchedDoc;
+
+  // Common state
   final bool isLoading;
   final String? message;
-  DocumentSnapshot? lastFetchedDoc;
+  final Map<String, int>? stats;
+  final String searchQuery;
 
   ClientState({
-    required this.lastFetchedDoc,
-    required this.clients,
-    required this.filteredClients,
-    required this.currentPage,
-    required this.totalPages,
+    required this.activeClients,
+    required this.filteredActiveClients,
+    required this.activeCurrentPage,
+    required this.activeTotalPages,
+    this.activeLastFetchedDoc,
+    required this.lostClients,
+    required this.filteredLostClients,
+    required this.lostCurrentPage,
+    required this.lostTotalPages,
+    this.lostLastFetchedDoc,
     required this.isLoading,
     this.message,
     this.stats,
+    required this.searchQuery,
   });
 
   // Initial state
   factory ClientState.initial() {
     return ClientState(
-      lastFetchedDoc: null,
-      filteredClients: [],
+      activeClients: [],
+      filteredActiveClients: [],
+      activeCurrentPage: 1,
+      activeTotalPages: 1,
+      activeLastFetchedDoc: null,
+      lostClients: [],
+      filteredLostClients: [],
+      lostCurrentPage: 1,
+      lostTotalPages: 1,
+      lostLastFetchedDoc: null,
       isLoading: false,
-      clients: [],
-      currentPage: 1,
-      totalPages: 1,
       message: null,
       stats: null,
+      searchQuery: '',
     );
   }
   // Copy with method to update state
   ClientState copyWith({
+    List<List<ClientModel>>? activeClients,
+    List<ClientModel>? filteredActiveClients,
+    int? activeCurrentPage,
+    int? activeTotalPages,
+    DocumentSnapshot? activeLastFetchedDoc,
+    List<List<ClientModel>>? lostClients,
+    List<ClientModel>? filteredLostClients,
+    int? lostCurrentPage,
+    int? lostTotalPages,
+    DocumentSnapshot? lostLastFetchedDoc,
     bool? isLoading,
     String? message,
-    List<List<ClientModel>>? clients,
     Map<String, int>? stats,
-    int? currentPage,
-    int? totalPages,
-    List<ClientModel>? filteredClients,
-    DocumentSnapshot? lastFetchedDoc,
+    String? searchQuery,
   }) {
     return ClientState(
-      lastFetchedDoc: lastFetchedDoc ?? this.lastFetchedDoc,
-      filteredClients: filteredClients ?? this.filteredClients,
+      activeClients: activeClients ?? this.activeClients,
+      filteredActiveClients:
+          filteredActiveClients ?? this.filteredActiveClients,
+      activeCurrentPage: activeCurrentPage ?? this.activeCurrentPage,
+      activeTotalPages: activeTotalPages ?? this.activeTotalPages,
+      activeLastFetchedDoc: activeLastFetchedDoc ?? this.activeLastFetchedDoc,
+      lostClients: lostClients ?? this.lostClients,
+      filteredLostClients: filteredLostClients ?? this.filteredLostClients,
+      lostCurrentPage: lostCurrentPage ?? this.lostCurrentPage,
+      lostTotalPages: lostTotalPages ?? this.lostTotalPages,
+      lostLastFetchedDoc: lostLastFetchedDoc ?? this.lostLastFetchedDoc,
       isLoading: isLoading ?? this.isLoading,
       message: message ?? this.message,
-      clients: clients ?? this.clients,
       stats: stats ?? this.stats,
-      currentPage: currentPage ?? this.currentPage,
-      totalPages: totalPages ?? this.totalPages,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 
   @override
   List<Object?> get props => [
-    filteredClients,
+    activeClients,
+    filteredActiveClients,
+    activeCurrentPage,
+    activeTotalPages,
+    lostClients,
+    filteredLostClients,
+    lostCurrentPage,
+    lostTotalPages,
     isLoading,
     message,
-    clients,
     stats,
-    currentPage,
-    totalPages,
+    searchQuery,
   ];
 }
