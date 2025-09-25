@@ -79,6 +79,7 @@ class MasterhotelFormCubit extends Cubit<MasterhotelFormState> {
     print("File deleted:${state.selectedFile}");
   }
 
+  // Submit form
   Future<void> submitForm(
     BuildContext context,
     MasterHotelModel? editMasterHotel,

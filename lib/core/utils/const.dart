@@ -9,3 +9,11 @@ class ClientStatus {
 }
 
 final hotelTypes = ["Hotel", "Resort", "Motel", "Villa"];
+
+/// Map each hotel type to a color
+const hotelTypeColors = <String, Color>{
+  "Hotel": Color(0xFF1B75D0), // Blue
+  "Resort": Color.fromARGB(255, 255, 215, 95), // Yellow
+  "Motel": Color(0xFF4CAF50), // Green
+  "Villa": Color(0xFFFF9800), // Orange
+};

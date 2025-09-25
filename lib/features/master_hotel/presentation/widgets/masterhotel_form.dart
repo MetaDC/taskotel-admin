@@ -6,12 +6,28 @@ import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/custom_textfields.dart';
+import 'package:taskoteladmin/features/master_hotel/models/masterhotel_model.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/cubit/masterhotel_form_cubit.dart';
 
-class MasterHotelForm extends StatelessWidget {
-  MasterHotelForm({super.key});
+class MasterHotelForm extends StatefulWidget {
+  MasterHotelModel? editMasterHotel;
+  MasterHotelForm({super.key, this.editMasterHotel});
 
-  String? selectedPropertyType;
+  @override
+  State<MasterHotelForm> createState() => _MasterHotelFormState();
+}
+
+class _MasterHotelFormState extends State<MasterHotelForm> {
+  @override
+  void initState() {
+    super.initState();
+    if (widget.editMasterHotel != null) {
+      context.read<MasterhotelFormCubit>().initializeForm(
+        widget.editMasterHotel,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final masterHotelFormCubit = context.read<MasterhotelFormCubit>();
@@ -89,7 +105,7 @@ class MasterHotelForm extends StatelessWidget {
                               child: CustomDropDownField(
                                 title: "Property Type *",
                                 hintText: "Select Property Type",
-                                initialValue: selectedPropertyType,
+                                initialValue: state.selectedPropertyType,
                                 validatorText: "Please select a property type",
                                 items: hotelTypes.map((type) {
                                   return DropdownMenuItem(
@@ -189,7 +205,10 @@ class MasterHotelForm extends StatelessWidget {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () {
-                          masterHotelFormCubit.submitForm(context, null);
+                          masterHotelFormCubit.submitForm(
+                            context,
+                            widget.editMasterHotel,
+                          );
                         },
                         child: state.isLoading
                             ? SizedBox(

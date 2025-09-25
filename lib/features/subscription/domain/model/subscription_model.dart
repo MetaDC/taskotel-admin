@@ -70,8 +70,8 @@ class SubscriptionPlanModel {
       'totalSubScribers': totalSubScribers,
       'totalRevenue': totalRevenue,
       'forGeneral': forGeneral,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
+      'createdAt': createdAt.millisecondsSinceEpoch,
+      'updatedAt': updatedAt.millisecondsSinceEpoch,
     };
   }
 

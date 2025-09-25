@@ -7,9 +7,9 @@ import 'package:taskoteladmin/features/master_hotel/models/masterhotel_model.dar
 
 part 'masterhotel_state.dart';
 
-class MasterhotelCubit extends Cubit<MasterhotelState> {
+class MasterHotelCubit extends Cubit<MasterhotelState> {
   final MasterHotelFirebaseRepo masterHotelRepo;
-  MasterhotelCubit({required this.masterHotelRepo})
+  MasterHotelCubit({required this.masterHotelRepo})
     : super(MasterhotelState.initial());
 
   StreamSubscription<List<MasterHotelModel>>? masterHotelsStream;
@@ -28,7 +28,16 @@ class MasterhotelCubit extends Cubit<MasterhotelState> {
       emit(state.copyWith(isLoading: false, message: e.toString()));
     }
   }
-  
+
+  void updateStatusOfMasterHotel(String docId, bool isActive) {
+    masterHotelRepo.updateStatusOfMasterHotel(docId, isActive);
+  }
+
+  void deleteMasterHotel(String docId) {
+    emit(state.copyWith(isLoading: true, message: null));
+    masterHotelRepo.deleteMasterHotel(docId);
+    emit(state.copyWith(isLoading: false, message: "Hotel Deleted"));
+  }
 
   @override
   Future<void> close() {

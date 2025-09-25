@@ -21,4 +21,12 @@ class MasterHotelFirebaseRepo {
         .doc(masterHotel.docId)
         .update(masterHotel.toJson());
   }
+
+  Future<void> updateStatusOfMasterHotel(String docId, bool isActive) async {
+    await masterHotelCollectionRef.doc(docId).update({'isActive': isActive});
+  }
+
+  Future<void> deleteMasterHotel(String docId) async {
+    await masterHotelCollectionRef.doc(docId).delete();
+  }
 }
