@@ -9,6 +9,7 @@ import 'package:taskoteladmin/features/dashboard/presentation/pages/dashboard_pa
 import 'package:taskoteladmin/features/clients/presentation/page/clients_page.dart';
 import 'package:taskoteladmin/features/clients/presentation/page/client_detail_page.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/page/master_hotels_page.dart';
+import 'package:taskoteladmin/features/master_task/presentation/pages/master_task_page.dart';
 import 'package:taskoteladmin/features/report/presentation/pages/reports_page.dart';
 import 'package:taskoteladmin/features/subscription/presentation/pages/subscription_plans_page.dart';
 import 'package:taskoteladmin/features/transactions/presentation/pages/transactions_page.dart';
@@ -72,6 +73,19 @@ final GoRouter appRoute = GoRouter(
           path: Routes.masterHotels,
           pageBuilder: (context, state) =>
               const NoTransitionPage(child: MasterHotelsPage()),
+          routes: [
+            GoRoute(
+              path: ":hotelId/tasks",
+              pageBuilder: (context, state) {
+                final hotelId = state.pathParameters['hotelId']!;
+                final hotelName =
+                    state.uri.queryParameters['hotelName'] ?? 'Hotel';
+                return NoTransitionPage(
+                  child: MasterTaskPage(hotelId: hotelId, hotelName: hotelName),
+                );
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: Routes.subscriptionPlans,

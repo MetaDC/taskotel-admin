@@ -8,6 +8,10 @@ import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.d
 import 'package:taskoteladmin/features/dashboard/presentation/widgets/navbar.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/cubit/masterhotel_cubit.dart';
+import 'package:taskoteladmin/features/master_task/data/mastertask_firebaserepo.dart';
+import 'package:taskoteladmin/features/master_task/presentation/cubit/mastertask_cubit.dart';
+import 'package:taskoteladmin/features/subscription/data/subscription_firebaserepo.dart';
+import 'package:taskoteladmin/features/subscription/presentation/cubit/susbcription_cubit.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({super.key, required this.child});
@@ -26,6 +30,16 @@ class Dashboard extends StatelessWidget {
         BlocProvider(
           create: (context) =>
               MasterHotelCubit(masterHotelRepo: MasterHotelFirebaseRepo()),
+        ),
+        //master task cubit
+        BlocProvider(
+          create: (context) =>
+              MasterTaskCubit(masterTaskRepo: MasterTaskFirebaseRepo()),
+        ),
+        //subscription cubit
+        BlocProvider(
+          create: (context) =>
+              SubscriptionCubit(subscriptionRepo: SubscriptionFirebaserepo()),
         ),
       ],
       child: Scaffold(

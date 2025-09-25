@@ -10,6 +10,7 @@ class Routes {
   static const clients = '/clients';
   static const clientDetail = '/clients/:clientId';
   static const masterHotels = '/master-hotels';
+  static const masterTasks = '/master-hotels/:hotelId/tasks';
   static const subscriptionPlans = '/subscription-plans';
   static const transactions = '/transactions';
   static const reports = '/reports';

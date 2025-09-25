@@ -23,7 +23,7 @@ class MasterTaskModel {
   final String? dayOrDate; // specific day (Mon/Tue) or date (15th)
   final bool isActive;
 
-  MasterTaskModel({
+  const MasterTaskModel({
     required this.docId,
     required this.title,
     required this.desc,
@@ -44,12 +44,13 @@ class MasterTaskModel {
     this.serviceType,
     required this.frequency,
     this.dayOrDate,
-    this.isActive = true,
+    required this.isActive,
   });
 
-  /// Convert to JSON
+  // Convert to JSON for Firebase
   Map<String, dynamic> toJson() {
     return {
+      'docId': docId,
       'title': title,
       'desc': desc,
       'createdAt': createdAt.millisecondsSinceEpoch,
@@ -73,30 +74,77 @@ class MasterTaskModel {
     };
   }
 
-  /// From JSON
-  factory MasterTaskModel.fromJson(Map<String, dynamic> json, String docId) {
+  // Create from Firebase DocumentSnapshot
+  factory MasterTaskModel.fromDocSnap(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+
     return MasterTaskModel(
-      docId: docId,
+      docId: doc.id,
+      title: data['title'] ?? '',
+      desc: data['desc'] ?? '',
+      createdAt: data['createdAt'] is Timestamp
+          ? (data['createdAt'] as Timestamp).toDate()
+          : DateTime.parse(
+              data['createdAt'] ?? DateTime.now().toIso8601String(),
+            ),
+      createdByDocId: data['createdByDocId'] ?? '',
+      createdByName: data['createdByName'] ?? '',
+      updatedAt: data['updatedAt'] is Timestamp
+          ? (data['updatedAt'] as Timestamp).toDate()
+          : DateTime.parse(
+              data['updatedAt'] ?? DateTime.now().toIso8601String(),
+            ),
+      updatedBy: data['updatedBy'] ?? '',
+      updatedByName: data['updatedByName'] ?? '',
+      duration: data['duration'] ?? 30,
+      place: data['place'],
+      questions: List<Map<String, dynamic>>.from(data['questions'] ?? []),
+      departmentId: data['departmentId'] ?? '',
+      hotelId: data['hotelId'] ?? '',
+      assignedRole: data['assignedRole'] ?? '',
+      startedAt: data['startedAt'] != null
+          ? (data['startedAt'] is Timestamp
+                ? (data['startedAt'] as Timestamp).toDate()
+                : DateTime.parse(data['startedAt']))
+          : null,
+      endedAt: data['endedAt'] != null
+          ? (data['endedAt'] is Timestamp
+                ? (data['endedAt'] as Timestamp).toDate()
+                : DateTime.parse(data['endedAt']))
+          : null,
+      serviceType: data['serviceType'],
+      frequency: data['frequency'] ?? 'Daily',
+      dayOrDate: data['dayOrDate'],
+      isActive: data['isActive'] ?? true,
+    );
+  }
+
+  // Create from JSON (for API responses)
+  factory MasterTaskModel.fromJson(Map<String, dynamic> json) {
+    return MasterTaskModel(
+      docId: json['docId'] ?? '',
       title: json['title'] ?? '',
       desc: json['desc'] ?? '',
-      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
+      createdAt: DateTime.parse(
+        json['createdAt'] ?? DateTime.now().toIso8601String(),
+      ),
       createdByDocId: json['createdByDocId'] ?? '',
       createdByName: json['createdByName'] ?? '',
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updatedAt']),
+      updatedAt: DateTime.parse(
+        json['updatedAt'] ?? DateTime.now().toIso8601String(),
+      ),
       updatedBy: json['updatedBy'] ?? '',
       updatedByName: json['updatedByName'] ?? '',
-      duration: json['duration'] ?? 0,
+      duration: json['duration'] ?? 30,
       place: json['place'],
       questions: List<Map<String, dynamic>>.from(json['questions'] ?? []),
       departmentId: json['departmentId'] ?? '',
       hotelId: json['hotelId'] ?? '',
       assignedRole: json['assignedRole'] ?? '',
       startedAt: json['startedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['startedAt'])
+          ? DateTime.parse(json['startedAt'])
           : null,
-      endedAt: json['endedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['endedAt'])
-          : null,
+      endedAt: json['endedAt'] != null ? DateTime.parse(json['endedAt']) : null,
       serviceType: json['serviceType'],
       frequency: json['frequency'] ?? 'Daily',
       dayOrDate: json['dayOrDate'],
@@ -104,23 +152,7 @@ class MasterTaskModel {
     );
   }
 
-  /// From QueryDocumentSnapshot
-  factory MasterTaskModel.fromSnap(
-    QueryDocumentSnapshot<Map<String, dynamic>> snap,
-  ) {
-    final data = snap.data();
-    return MasterTaskModel.fromJson(data, snap.id);
-  }
-
-  /// From DocumentSnapshot
-  factory MasterTaskModel.fromDocSnap(
-    DocumentSnapshot<Map<String, dynamic>> snap,
-  ) {
-    final data = snap.data()!;
-    return MasterTaskModel.fromJson(data, snap.id);
-  }
-
-  /// CopyWith
+  // Copy with method for creating modified copies
   MasterTaskModel copyWith({
     String? docId,
     String? title,
@@ -168,117 +200,43 @@ class MasterTaskModel {
       isActive: isActive ?? this.isActive,
     );
   }
-}
 
-
-
-/* 
-/// Represents a schedulable task on the 24-hour timeline.
-class TaskModel {
-  final String id;
-  final String title;
-  final String staffId; // assignee (user doc id)
-  final String? hotelId;
-  final DateTime startAt;
-  final DateTime endAt;
-  final String priority; // low, medium, high
-  final String? notes;
-  final String? color; // hex color for UI
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
-  TaskModel({
-    required this.id,
-    required this.title,
-    required this.staffId,
-    this.hotelId,
-    required this.startAt,
-    required this.endAt,
-    required this.priority,
-    this.notes,
-    this.color,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-
-  Duration get duration => endAt.difference(startAt);
-
-  Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'staffId': staffId,
-      'hotelId': hotelId,
-      'startAt': Timestamp.fromDate(startAt),
-      'endAt': Timestamp.fromDate(endAt),
-      'priority': priority,
-      'notes': notes,
-      'color': color,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
-    };
+  @override
+  String toString() {
+    return 'MasterTaskModel(docId: $docId, title: $title, assignedRole: $assignedRole, hotelId: $hotelId)';
   }
 
-  factory TaskModel.fromSnap(DocumentSnapshot<Map<String, dynamic>> snap) {
-    final data = snap.data()!;
-    return TaskModel(
-      id: snap.id,
-      title: data['title'] ?? '',
-      staffId: data['staffId'] ?? '',
-      hotelId: data['hotelId'],
-      startAt: (data['startAt'] as Timestamp).toDate(),
-      endAt: (data['endAt'] as Timestamp).toDate(),
-      priority: data['priority'] ?? 'low',
-      notes: data['notes'],
-      color: data['color'],
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
-    );
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is MasterTaskModel && other.docId == docId;
   }
 
-  factory TaskModel.fromDocSnap(
-    QueryDocumentSnapshot<Map<String, dynamic>> snap,
-  ) {
-    final data = snap.data();
-    return TaskModel(
-      id: snap.id,
-      title: data['title'] ?? '',
-      staffId: data['staffId'] ?? '',
-      hotelId: data['hotelId'],
-      startAt: (data['startAt'] as Timestamp).toDate(),
-      endAt: (data['endAt'] as Timestamp).toDate(),
-      priority: data['priority'] ?? 'low',
-      notes: data['notes'],
-      color: data['color'],
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
-    );
+  @override
+  int get hashCode => docId.hashCode;
+
+  // Helper methods
+  bool get hasPlace => place != null && place!.isNotEmpty;
+  bool get hasServiceType => serviceType != null && serviceType!.isNotEmpty;
+  bool get hasSchedule => dayOrDate != null && dayOrDate!.isNotEmpty;
+  bool get hasQuestions => questions.isNotEmpty;
+  bool get isStarted => startedAt != null;
+  bool get isCompleted => endedAt != null;
+
+  String get durationText {
+    if (duration < 60) {
+      return '${duration}min';
+    } else {
+      final hours = duration ~/ 60;
+      final minutes = duration % 60;
+      return minutes > 0 ? '${hours}h ${minutes}min' : '${hours}h';
+    }
   }
 
-  TaskModel copyWith({
-    String? title,
-    String? staffId,
-    String? hotelId,
-    DateTime? startAt,
-    DateTime? endAt,
-    String? priority,
-    String? notes,
-    String? color,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) {
-    return TaskModel(
-      id: id,
-      title: title ?? this.title,
-      staffId: staffId ?? this.staffId,
-      hotelId: hotelId ?? this.hotelId,
-      startAt: startAt ?? this.startAt,
-      endAt: endAt ?? this.endAt,
-      priority: priority ?? this.priority,
-      notes: notes ?? this.notes,
-      color: color ?? this.color,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
+  String get scheduleText {
+    if (dayOrDate == null || dayOrDate!.isEmpty) {
+      return frequency;
+    }
+    return '$frequency - $dayOrDate';
   }
 }
- */

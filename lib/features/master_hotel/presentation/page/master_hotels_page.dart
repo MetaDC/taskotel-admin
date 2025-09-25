@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/helpers.dart';
@@ -243,7 +244,33 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                                     icon: Icon(Icons.more_horiz),
                                     itemBuilder: (context) => [
                                       PopupMenuItem(
-                                        child: Text('Edit'),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              CupertinoIcons.list_bullet,
+                                              size: 16,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text('View Tasks'),
+                                          ],
+                                        ),
+                                        onTap: () {
+                                          context.go(
+                                            '/master-hotels/${masterHotel.docId}/tasks?hotelName=${Uri.encodeComponent(masterHotel.franchiseName)}',
+                                          );
+                                        },
+                                      ),
+                                      PopupMenuItem(
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              CupertinoIcons.pencil,
+                                              size: 16,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text('Edit'),
+                                          ],
+                                        ),
                                         onTap: () {
                                           showDialog(
                                             context: context,
@@ -273,7 +300,22 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                                         },
                                       ),
                                       PopupMenuItem(
-                                        child: Text('Delete'),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              CupertinoIcons.delete,
+                                              size: 16,
+                                              color: Colors.red,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                         onTap: () {
                                           showConfirmDeletDialog(
                                             context,

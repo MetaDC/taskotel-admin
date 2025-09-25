@@ -31,35 +31,9 @@ class SubscriptionPlanModel {
     required this.updatedAt,
   });
 
-  factory SubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
-    return SubscriptionPlanModel(
-      docId: json['docId'] ?? '',
-      title: json['title'] ?? '',
-      desc: json['desc'] ?? '',
-      minRooms: (json['minRooms'] as num).toInt(),
-      maxRooms: (json['maxRooms'] as num).toInt(),
-      price: {
-        'monthly': (json['price']['monthly'] as num).toDouble(),
-        'yearly': (json['price']['yearly'] as num).toDouble(),
-      },
-      features: List<String>.from(json['features'] ?? []),
-      isActive: json['isActive'] ?? false,
-      totalSubScribers: (json['totalSubScribers'] as num).toInt(),
-      totalRevenue: (json['totalRevenue'] as num).toDouble(),
-      forGeneral: json['forGeneral'] ?? false,
-      createdAt: (json['createdAt'] as Timestamp).toDate(),
-      updatedAt: (json['updatedAt'] as Timestamp).toDate(),
-    );
-  }
-
-  factory SubscriptionPlanModel.fromDocSnap(DocumentSnapshot docSnap) {
-    final data = docSnap.data() as Map<String, dynamic>;
-    return SubscriptionPlanModel.fromJson({...data, 'docId': docSnap.id});
-  }
-
+  /// 🔹 Convert to JSON for Firestore
   Map<String, dynamic> toJson() {
     return {
-      'docId': docId,
       'title': title,
       'desc': desc,
       'minRooms': minRooms,
@@ -75,5 +49,44 @@ class SubscriptionPlanModel {
     };
   }
 
-  Map<String, dynamic> toMap() => toJson();
+  /// 🔹 Create model from JSON map
+  factory SubscriptionPlanModel.fromJson(
+    Map<String, dynamic> json,
+    String docId,
+  ) {
+    return SubscriptionPlanModel(
+      docId: docId,
+      title: json['title'] ?? '',
+      desc: json['desc'] ?? '',
+      minRooms: (json['minRooms'] as num?)?.toInt() ?? 0,
+      maxRooms: (json['maxRooms'] as num?)?.toInt() ?? 0,
+      price: {
+        'monthly': (json['price']?['monthly'] ?? 0).toDouble(),
+        'yearly': (json['price']?['yearly'] ?? 0).toDouble(),
+      },
+      features: List<String>.from(json['features'] ?? []),
+      isActive: json['isActive'] ?? false,
+      totalSubScribers: (json['totalSubScribers'] ?? 0).toInt(),
+      totalRevenue: (json['totalRevenue'] ?? 0).toDouble(),
+      forGeneral: json['forGeneral'] ?? false,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt']),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(json['updatedAt']),
+    );
+  }
+
+  /// 🔹 From Firestore DocumentSnapshot
+  factory SubscriptionPlanModel.fromSnap(
+    DocumentSnapshot<Map<String, dynamic>> snap,
+  ) {
+    final data = snap.data()!;
+    return SubscriptionPlanModel.fromJson(data, snap.id);
+  }
+
+  /// 🔹 From Firestore QueryDocumentSnapshot
+  factory SubscriptionPlanModel.fromDocSnap(
+    QueryDocumentSnapshot<Map<String, dynamic>> snap,
+  ) {
+    final data = snap.data();
+    return SubscriptionPlanModel.fromJson(data, snap.id);
+  }
 }
