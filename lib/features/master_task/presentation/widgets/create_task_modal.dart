@@ -1,12 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/features/master_task/domain/model/mastertask_model.dart';
-import 'package:taskoteladmin/features/master_task/presentation/cubit/mastertask_cubit.dart';
+import 'package:taskoteladmin/features/master_task/presentation/cubit/mastertask_form_cubit.dart';
+import 'package:taskoteladmin/features/master_task/data/mastertask_firebaserepo.dart';
 
-class CreateTaskModal extends StatefulWidget {
+class CreateTaskModal extends StatelessWidget {
   final String hotelId;
   final String assignedRole;
   final MasterTaskModel? taskToEdit;
@@ -19,277 +19,97 @@ class CreateTaskModal extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CreateTaskModal> createState() => _CreateTaskModalState();
-}
-
-class _CreateTaskModalState extends State<CreateTaskModal> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _durationController = TextEditingController();
-  final _placeController = TextEditingController();
-  final _departmentController = TextEditingController();
-  final _dayOrDateController = TextEditingController();
-
-  String _selectedFrequency = 'Daily';
-  String _selectedRole = 'rm';
-  bool _isActive = true;
-
-  final List<String> _frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-  final List<String> _departments = [
-    'Housekeeping',
-    'Front Office',
-    'Food & Beverage',
-    'Maintenance',
-    'Security',
-    'Management',
-    'Guest Services',
-    'HR',
-    'Finance',
-    'Kitchen',
-    'Laundry',
-    'Spa & Wellness',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedRole = widget.assignedRole;
-
-    if (widget.taskToEdit != null) {
-      _populateFields();
-    }
-  }
-
-  void _populateFields() {
-    final task = widget.taskToEdit!;
-    _titleController.text = task.title;
-    _descriptionController.text = task.desc;
-    _durationController.text = task.duration.toString();
-    _placeController.text = task.place ?? '';
-    _departmentController.text = task.departmentId;
-    _dayOrDateController.text = task.dayOrDate ?? '';
-    _selectedFrequency = task.frequency;
-    _selectedRole = task.assignedRole;
-    _isActive = task.isActive;
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _durationController.dispose();
-    _placeController.dispose();
-    _departmentController.dispose();
-    _dayOrDateController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.9,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(20),
+    return BlocProvider(
+      create: (context) {
+        final cubit = MasterTaskFormCubit(
+          masterTaskRepo: MasterTaskFirebaseRepo(),
+        );
+        if (taskToEdit != null) {
+          cubit.initializeForEdit(taskToEdit!);
+        } else {
+          cubit.initializeForCreate(hotelId, assignedRole);
+        }
+        return cubit;
+      },
+      child: BlocConsumer<MasterTaskFormCubit, MasterTaskFormState>(
+        listener: (context, state) {
+          if (state.successMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.successMessage!),
+                backgroundColor: Colors.green,
+              ),
+            );
+            Navigator.pop(context);
+          }
+          if (state.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.errorMessage!),
+                backgroundColor: Colors.red,
+              ),
+            );
+            context.read<MasterTaskFormCubit>().clearMessages();
+          }
+        },
+        builder: (context, state) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.9,
             decoration: const BoxDecoration(
-              color: AppColors.backgroundColor,
+              color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            child: Row(
+            child: Column(
               children: [
-                Icon(
-                  widget.taskToEdit != null
-                      ? CupertinoIcons.pencil
-                      : CupertinoIcons.add,
-                  color: AppColors.primary,
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  widget.taskToEdit != null
-                      ? 'Edit Master Task'
-                      : 'Create Master Task',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                _buildHeader(context, state),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: _buildForm(context, state),
                   ),
                 ),
-                const Spacer(),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(CupertinoIcons.xmark),
-                ),
+                _buildBottomActions(context, state),
               ],
             ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, MasterTaskFormState state) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF8F9FA),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              state.isEditMode ? Icons.edit : Icons.add,
+              color: Colors.blue,
+              size: 20,
+            ),
           ),
-          // Form
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTextField(
-                      controller: _titleController,
-                      label: 'Task Title',
-                      hint: 'Enter task title',
-                      isRequired: true,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
-                      controller: _descriptionController,
-                      label: 'Description',
-                      hint: 'Enter task description',
-                      maxLines: 3,
-                      isRequired: true,
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildTextField(
-                            controller: _durationController,
-                            label: 'Duration (minutes)',
-                            hint: '30',
-                            keyboardType: TextInputType.number,
-                            isRequired: true,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildDropdown(
-                            label: 'Frequency',
-                            value: _selectedFrequency,
-                            items: _frequencies,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedFrequency = value!;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildDropdown(
-                            label: 'Assigned Role',
-                            value: _selectedRole,
-                            items: roles.map((role) => role['key']!).toList(),
-                            itemLabels: roles
-                                .map((role) => role['name']!)
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedRole = value!;
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildDropdown(
-                            label: 'Department',
-                            value: _departmentController.text.isEmpty
-                                ? _departments[0]
-                                : _departmentController.text,
-                            items: _departments,
-                            onChanged: (value) {
-                              _departmentController.text = value!;
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildTextField(
-                            controller: _placeController,
-                            label: 'Place/Location',
-                            hint: 'Enter location (optional)',
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildTextField(
-                            controller: _dayOrDateController,
-                            label: 'Day/Date',
-                            hint: 'e.g., Monday or 15th',
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        const Text(
-                          'Active Status',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const Spacer(),
-                        Switch(
-                          value: _isActive,
-                          onChanged: (value) {
-                            setState(() {
-                              _isActive = value;
-                            });
-                          },
-                          activeColor: AppColors.primary,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    // Action Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.pop(context),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              side: const BorderSide(
-                                color: AppColors.borderGrey,
-                              ),
-                            ),
-                            child: const Text('Cancel'),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _saveTask,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                            ),
-                            child: Text(
-                              widget.taskToEdit != null
-                                  ? 'Update Task'
-                                  : 'Create Task',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+          const SizedBox(width: 12),
+          Text(
+            state.isEditMode ? 'Edit Master Task' : 'Create Master Task',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const Spacer(),
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.close),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.grey.withOpacity(0.1),
             ),
           ),
         ],
@@ -297,13 +117,143 @@ class _CreateTaskModalState extends State<CreateTaskModal> {
     );
   }
 
+  Widget _buildForm(BuildContext context, MasterTaskFormState state) {
+    final cubit = context.read<MasterTaskFormCubit>();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Basic Information
+        _buildSectionTitle('Basic Information'),
+        const SizedBox(height: 16),
+
+        _buildTextField(
+          label: 'Task Title',
+          value: state.title,
+          onChanged: cubit.updateTitle,
+          isRequired: true,
+          errorText: cubit.getFieldError('title'),
+        ),
+        const SizedBox(height: 16),
+
+        _buildTextField(
+          label: 'Description',
+          value: state.description,
+          onChanged: cubit.updateDescription,
+          maxLines: 3,
+          isRequired: true,
+          errorText: cubit.getFieldError('description'),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Task Details
+        _buildSectionTitle('Task Details'),
+        const SizedBox(height: 16),
+
+        Row(
+          children: [
+            Expanded(
+              child: _buildNumberField(
+                label: 'Duration (minutes)',
+                value: state.duration,
+                onChanged: cubit.updateDuration,
+                isRequired: true,
+                errorText: cubit.getFieldError('duration'),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildDropdown(
+                label: 'Frequency',
+                value: state.selectedFrequency,
+                items: cubit.getFrequencyOptions(),
+                onChanged: cubit.updateFrequency,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        Row(
+          children: [
+            Expanded(
+              child: _buildDropdown(
+                label: 'Assigned Role',
+                value: state.assignedRole,
+                items: roles.map((role) => role['key']!).toList(),
+                itemLabels: roles.map((role) => role['name']!).toList(),
+                onChanged: cubit.updateAssignedRole,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildDropdown(
+                label: 'Department',
+                value: state.department,
+                items: cubit.getCurrentDepartmentOptions(),
+                onChanged: cubit.updateDepartment,
+                isRequired: true,
+                errorText: cubit.getFieldError('department'),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 24),
+
+        // Optional Details
+        _buildSectionTitle('Optional Details'),
+        const SizedBox(height: 16),
+
+        Row(
+          children: [
+            Expanded(
+              child: _buildTextField(
+                label: 'Place/Location',
+                value: state.place,
+                onChanged: cubit.updatePlace,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildTextField(
+                label: 'Day/Date',
+                value: state.dayOrDate,
+                onChanged: cubit.updateDayOrDate,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        // Status Toggle
+        _buildStatusToggle(context, state, cubit),
+
+        const SizedBox(height: 30),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: Colors.black87,
+      ),
+    );
+  }
+
   Widget _buildTextField({
-    required TextEditingController controller,
     required String label,
-    required String hint,
+    required String value,
+    required ValueChanged<String> onChanged,
     int maxLines = 1,
-    TextInputType? keyboardType,
     bool isRequired = false,
+    String? errorText,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,36 +278,112 @@ class _CreateTaskModalState extends State<CreateTaskModal> {
         ),
         const SizedBox(height: 8),
         TextFormField(
-          controller: controller,
+          initialValue: value,
           maxLines: maxLines,
-          keyboardType: keyboardType,
           decoration: InputDecoration(
-            hintText: hint,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.borderGrey),
+              borderSide: BorderSide(
+                color: errorText != null
+                    ? Colors.red
+                    : Colors.grey.withOpacity(0.3),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.borderGrey),
+              borderSide: BorderSide(
+                color: errorText != null
+                    ? Colors.red
+                    : Colors.grey.withOpacity(0.3),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderSide: BorderSide(
+                color: errorText != null ? Colors.red : Colors.blue,
+              ),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 12,
             ),
+            filled: true,
+            fillColor: Colors.white,
+            errorText: errorText,
           ),
-          validator: isRequired
-              ? (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return '$label is required';
-                  }
-                  return null;
-                }
-              : null,
+          onChanged: onChanged,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNumberField({
+    required String label,
+    required int value,
+    required ValueChanged<int> onChanged,
+    bool isRequired = false,
+    String? errorText,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: TextSpan(
+            text: label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+            children: isRequired
+                ? [
+                    const TextSpan(
+                      text: ' *',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ]
+                : [],
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          initialValue: value.toString(),
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(
+                color: errorText != null
+                    ? Colors.red
+                    : Colors.grey.withOpacity(0.3),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(
+                color: errorText != null
+                    ? Colors.red
+                    : Colors.grey.withOpacity(0.3),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(
+                color: errorText != null ? Colors.red : Colors.blue,
+              ),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 12,
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            errorText: errorText,
+          ),
+          onChanged: (value) {
+            final intValue = int.tryParse(value) ?? 0;
+            onChanged(intValue);
+          },
         ),
       ],
     );
@@ -368,93 +394,177 @@ class _CreateTaskModalState extends State<CreateTaskModal> {
     required String value,
     required List<String> items,
     List<String>? itemLabels,
-    required ValueChanged<String?> onChanged,
+    required ValueChanged<String> onChanged,
+    bool isRequired = false,
+    String? errorText,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
+        RichText(
+          text: TextSpan(
+            text: label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+            children: isRequired
+                ? [
+                    const TextSpan(
+                      text: ' *',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ]
+                : [],
           ),
         ),
         const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: value,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.borderGrey),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: errorText != null
+                  ? Colors.red
+                  : Colors.grey.withOpacity(0.3),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.borderGrey),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: AppColors.primary),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 12,
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.white,
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: items.contains(value) ? value : items.first,
+              isExpanded: true,
+              items: items.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+                final displayText = itemLabels != null
+                    ? itemLabels[index]
+                    : item;
+
+                return DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(displayText),
+                );
+              }).toList(),
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  onChanged(newValue);
+                }
+              },
             ),
           ),
-          items: items.asMap().entries.map((entry) {
-            final index = entry.key;
-            final item = entry.value;
-            final displayText = itemLabels != null ? itemLabels[index] : item;
-
-            return DropdownMenuItem<String>(
-              value: item,
-              child: Text(displayText),
-            );
-          }).toList(),
-          onChanged: onChanged,
         ),
+        if (errorText != null) ...[
+          const SizedBox(height: 4),
+          Text(
+            errorText,
+            style: const TextStyle(color: Colors.red, fontSize: 12),
+          ),
+        ],
       ],
     );
   }
 
-  void _saveTask() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    final now = DateTime.now();
-    final task = MasterTaskModel(
-      docId: widget.taskToEdit?.docId ?? '',
-      title: _titleController.text.trim(),
-      desc: _descriptionController.text.trim(),
-      createdAt: widget.taskToEdit?.createdAt ?? now,
-      createdByDocId: 'admin', // TODO: Get from auth
-      createdByName: 'Admin',
-      updatedAt: now,
-      updatedBy: 'admin',
-      updatedByName: 'Admin',
-      duration: int.tryParse(_durationController.text) ?? 30,
-      place: _placeController.text.trim().isEmpty
-          ? null
-          : _placeController.text.trim(),
-      questions: [], // TODO: Add questions functionality
-      departmentId: _departmentController.text,
-      hotelId: widget.hotelId,
-      assignedRole: _selectedRole,
-      frequency: _selectedFrequency,
-      dayOrDate: _dayOrDateController.text.trim().isEmpty
-          ? null
-          : _dayOrDateController.text.trim(),
-      isActive: _isActive,
+  Widget _buildStatusToggle(
+    BuildContext context,
+    MasterTaskFormState state,
+    MasterTaskFormCubit cubit,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            state.isActive ? Icons.toggle_on : Icons.toggle_off,
+            color: state.isActive ? Colors.green : Colors.grey,
+            size: 28,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Task Status',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+                Text(
+                  state.isActive
+                      ? 'Task is active and will be assigned'
+                      : 'Task is inactive and will not be assigned',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: state.isActive,
+            onChanged: cubit.updateActiveStatus,
+            activeColor: Colors.green,
+          ),
+        ],
+      ),
     );
+  }
 
-    if (widget.taskToEdit != null) {
-      context.read<MasterTaskCubit>().updateTask(task);
-    } else {
-      context.read<MasterTaskCubit>().createTask(task);
-    }
+  Widget _buildBottomActions(BuildContext context, MasterTaskFormState state) {
+    final cubit = context.read<MasterTaskFormCubit>();
 
-    Navigator.pop(context);
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.05),
+        border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.2))),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: state.isSubmitting
+                  ? null
+                  : () => Navigator.pop(context),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                side: const BorderSide(color: Colors.grey),
+              ),
+              child: const Text('Cancel'),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: ElevatedButton(
+              onPressed: state.isSubmitting || !state.isFormValid
+                  ? null
+                  : cubit.saveTask,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                disabledBackgroundColor: Colors.grey.withOpacity(0.3),
+              ),
+              child: state.isSubmitting
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      state.isEditMode ? 'Update Task' : 'Create Task',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

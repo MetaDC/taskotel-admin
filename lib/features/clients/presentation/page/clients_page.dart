@@ -100,12 +100,9 @@ class _ClientsPageState extends State<ClientsPage> {
           ),
           const SizedBox(height: 20),
 
-          SizedBox(
-            height: 600, // Fixed height for better scroll behavior
-            child: selectedTab == ClientTab.active
-                ? const ActiveClientsNew()
-                : const LostClientsNew(),
-          ),
+          selectedTab == ClientTab.active
+              ? const ActiveClientsNew()
+              : const LostClientsNew(),
         ],
       ),
     );

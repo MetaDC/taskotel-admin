@@ -2,81 +2,81 @@ part of 'mastertask_cubit.dart';
 
 class MasterTaskState extends Equatable {
   final bool isLoading;
+  final String currentHotelId;
+  final String selectedRole;
+  final String selectedDepartment;
+  final String searchQuery;
   final List<MasterTaskModel> allTasks;
   final Map<String, List<MasterTaskModel>> tasksByRole;
   final List<MasterTaskModel> filteredTasks;
-  final Map<String, dynamic>? analytics;
   final String? message;
-  final String searchQuery;
-  final String selectedRole;
-  final String currentHotelId;
-  final String selectedDepartment;
+  final Map<String, dynamic>? analytics;
 
   const MasterTaskState({
     required this.isLoading,
+    required this.currentHotelId,
+    required this.selectedRole,
+    required this.selectedDepartment,
+    required this.searchQuery,
     required this.allTasks,
     required this.tasksByRole,
     required this.filteredTasks,
-    this.analytics,
     this.message,
-    required this.searchQuery,
-    required this.selectedRole,
-    required this.currentHotelId,
-    required this.selectedDepartment,
+    this.analytics,
   });
 
   factory MasterTaskState.initial() {
     return const MasterTaskState(
       isLoading: false,
+      currentHotelId: '',
+      selectedRole: 'rm', // Default to Regional Manager
+      selectedDepartment: 'All Departments',
+      searchQuery: '',
       allTasks: [],
       tasksByRole: {},
       filteredTasks: [],
-      analytics: null,
       message: null,
-      searchQuery: '',
-      selectedRole: 'rm', // Regional Manager
-      currentHotelId: '',
-      selectedDepartment: 'All Departments',
+      analytics: null,
     );
   }
 
   MasterTaskState copyWith({
     bool? isLoading,
+    String? currentHotelId,
+    String? selectedRole,
+    String? selectedDepartment,
+    String? searchQuery,
     List<MasterTaskModel>? allTasks,
     Map<String, List<MasterTaskModel>>? tasksByRole,
     List<MasterTaskModel>? filteredTasks,
-    Map<String, dynamic>? analytics,
     String? message,
-    String? searchQuery,
-    String? selectedRole,
-    String? currentHotelId,
-    String? selectedDepartment,
+    Map<String, dynamic>? analytics,
   }) {
     return MasterTaskState(
       isLoading: isLoading ?? this.isLoading,
+      currentHotelId: currentHotelId ?? this.currentHotelId,
+      selectedRole: selectedRole ?? this.selectedRole,
+      selectedDepartment: selectedDepartment ?? this.selectedDepartment,
+      searchQuery: searchQuery ?? this.searchQuery,
       allTasks: allTasks ?? this.allTasks,
       tasksByRole: tasksByRole ?? this.tasksByRole,
       filteredTasks: filteredTasks ?? this.filteredTasks,
+      message: message,
       analytics: analytics ?? this.analytics,
-      message: message ?? this.message,
-      searchQuery: searchQuery ?? this.searchQuery,
-      selectedRole: selectedRole ?? this.selectedRole,
-      currentHotelId: currentHotelId ?? this.currentHotelId,
-      selectedDepartment: selectedDepartment ?? this.selectedDepartment,
     );
   }
 
   @override
   List<Object?> get props => [
     isLoading,
+    currentHotelId,
+    selectedRole,
+    selectedDepartment,
+    searchQuery,
     allTasks,
     tasksByRole,
     filteredTasks,
-    analytics,
     message,
-    searchQuery,
-    selectedRole,
-    currentHotelId,
-    selectedDepartment,
+    analytics,
   ];
 }

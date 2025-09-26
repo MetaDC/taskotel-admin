@@ -5,6 +5,7 @@ import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.dart';
+import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
 import 'package:taskoteladmin/features/dashboard/presentation/widgets/navbar.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/cubit/masterhotel_cubit.dart';

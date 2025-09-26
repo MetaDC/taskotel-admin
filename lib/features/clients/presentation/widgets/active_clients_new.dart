@@ -1,7 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:go_router/go_router.dart';
+import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
+import 'package:taskoteladmin/core/theme/app_text_styles.dart';
+import 'package:taskoteladmin/core/utils/helpers.dart';
+import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
 import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
@@ -37,236 +43,232 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
   Widget build(BuildContext context) {
     return BlocBuilder<ClientCubit, ClientState>(
       builder: (context, state) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with search
-            Row(
-              children: [
-                const Text(
-                  "Active Clients List",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: "Search active clients...",
-                      prefixIcon: const Icon(CupertinoIcons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.slateGray),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      context.read<ClientCubit>().searchClients(value);
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Stats Cards
-            if (state.stats != null) ...[
-              Row(
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StaggeredGrid.extent(
+                maxCrossAxisExtent: 500,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
                 children: [
-                  Expanded(
-                    child: StatCardIconLeft(
-                      icon: CupertinoIcons.person_2,
-                      label: "Total Active",
-                      value: "${state.stats?['activeClients'] ?? 0}",
-                      iconColor: Colors.green,
-                    ),
+                  StatCardIconLeft(
+                    icon: CupertinoIcons.person_2,
+                    label: "Total Clients",
+                    value: "${state.stats?['totalClients'] ?? 0}",
+                    iconColor: Colors.blue,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: StatCardIconLeft(
-                      icon: CupertinoIcons.building_2_fill,
-                      label: "Active Hotels",
-                      value: "${state.stats?['activeHotels'] ?? 0}",
-                      iconColor: Colors.teal,
-                    ),
+                  StatCardIconLeft(
+                    icon: CupertinoIcons.circle_fill,
+                    label: "Active Clients",
+                    value: "${state.stats?['activeClients'] ?? 0}",
+                    iconColor: Colors.green,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: StatCardIconLeft(
-                      icon: CupertinoIcons.money_dollar,
-                      label: "Active Revenue",
-                      value: "\$${state.stats?['activeRevenue'] ?? 0}",
-                      iconColor: Colors.orange,
-                    ),
+                  StatCardIconLeft(
+                    icon: CupertinoIcons.building_2_fill,
+                    label: "Total Hotels",
+                    value: "${state.stats?['totalHotels'] ?? 0}",
+                    iconColor: Colors.teal,
+                  ),
+                  StatCardIconLeft(
+                    icon: CupertinoIcons.cube_box,
+                    label: "Total Revenue",
+                    value: "\$${state.stats?['totalActiveRevenue'] ?? 0}",
+                    iconColor: Colors.orange,
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-            ],
-
-            // Loading state
-            if (state.isLoading && state.activeClients.isEmpty)
-              const Expanded(child: Center(child: CircularProgressIndicator()))
-            // Error state
-            else if (state.message != null && state.activeClients.isEmpty)
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        CupertinoIcons.exclamationmark_triangle,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        state.message!,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => context
-                            .read<ClientCubit>()
-                            .initializeActiveClientsPagination(),
-                        child: const Text("Retry"),
-                      ),
-                    ],
-                  ),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade200),
                 ),
-              )
-            // Clients list
-            else if (state.filteredActiveClients.isEmpty)
-              const Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        CupertinoIcons.person_2,
-                        size: 64,
-                        color: Colors.grey,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        "No active clients found",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      // Table Header
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            topRight: Radius.circular(8),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          "Active Clients List",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
-                        child: const Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                "Client",
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                        const Spacer(),
+                        SizedBox(
+                          width: 300,
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: InputDecoration(
+                              hintText: "Search active clients...",
+                              prefixIcon: const Icon(CupertinoIcons.search),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: AppColors.slateGray,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
                               ),
                             ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                "Contact",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Hotels",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Revenue",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Status",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Actions",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Table Body
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: state.filteredActiveClients.length,
-                          itemBuilder: (context, index) {
-                            final client = state.filteredActiveClients[index];
-                            return _buildClientRow(client);
-                          },
-                        ),
-                      ),
-
-                      // Pagination
-                      if (state.activeTotalPages > 1)
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(color: Colors.grey[200]!),
-                            ),
-                          ),
-                          child: DynamicPagination(
-                            currentPage: state.activeCurrentPage,
-                            totalPages: state.activeTotalPages,
-                            onPageChanged: (page) {
-                              context
-                                  .read<ClientCubit>()
-                                  .fetchNextActiveClientsPage(page: page);
+                            onChanged: (value) {
+                              context.read<ClientCubit>().searchClients(value);
                             },
                           ),
                         ),
-                    ],
-                  ),
+                      ],
+                    ),
+
+                    if (state.isLoading && state.activeClients.isEmpty)
+                      Center(child: CircularProgressIndicator())
+                    // Error state
+                    else if (state.message != null &&
+                        state.activeClients.isEmpty)
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              CupertinoIcons.exclamationmark_triangle,
+                              size: 64,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              state.message!,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () => context
+                                  .read<ClientCubit>()
+                                  .initializeActiveClientsPagination(),
+                              child: const Text("Retry"),
+                            ),
+                          ],
+                        ),
+                      )
+                    // Clients list
+                    else if (state.filteredActiveClients.isEmpty)
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              CupertinoIcons.person_2,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "No active clients found",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 20),
+                          // Table Header
+                          Row(
+                            children: [
+                              SizedBox(width: 30),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  "Client",
+                                  style: AppTextStyles.tabelHeader,
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  "Contact",
+                                  style: AppTextStyles.tabelHeader,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Hotels",
+                                  style: AppTextStyles.tabelHeader,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Revenue",
+                                  style: AppTextStyles.tabelHeader,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Status",
+                                  style: AppTextStyles.tabelHeader,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 100,
+                                child: Text(
+                                  "View",
+                                  style: AppTextStyles.tabelHeader,
+                                ),
+                              ),
+                              SizedBox(
+                                width: 50,
+                                child: Text(
+                                  "Actions",
+                                  style: AppTextStyles.tabelHeader,
+                                ),
+                              ),
+
+                              SizedBox(width: 100),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          const Divider(
+                            color: AppColors.slateGray,
+                            thickness: 0.1,
+                          ),
+
+                          // Table Body
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: ClampingScrollPhysics(),
+                            itemCount: state.filteredActiveClients.length,
+                            itemBuilder: (context, index) {
+                              final client = state.filteredActiveClients[index];
+                              return _buildClientRow(client);
+                            },
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // Pagination
+                          if (state.activeTotalPages > 1)
+                            DynamicPagination(
+                              currentPage: state.activeCurrentPage,
+                              totalPages: state.activeTotalPages,
+                              onPageChanged: (page) {
+                                context
+                                    .read<ClientCubit>()
+                                    .fetchNextActiveClientsPage(page: page);
+                              },
+                            ),
+                        ],
+                      ),
+                  ],
                 ),
               ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -274,90 +276,124 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
 
   Widget _buildClientRow(ClientModel client) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
-      ),
-      child: Row(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Column(
         children: [
-          // Client Info
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  client.name,
+          Row(
+            children: [
+              SizedBox(width: 30),
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      client.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      "Joined ${client.createdAt.goodDayDate()}",
+                      style: TextStyle(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Contact
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(client.email, style: const TextStyle(fontSize: 14)),
+                    Text(
+                      client.phone,
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Hotels
+              Expanded(
+                child: Text(
+                  "${client.totalHotels}",
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
-                Text(
-                  "Joined ${_formatDate(client.createdAt)}",
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                ),
-              ],
-            ),
-          ),
+              ),
 
-          // Contact
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(client.email, style: const TextStyle(fontSize: 14)),
-                Text(
-                  client.phone,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              // Revenue
+              Expanded(
+                child: Text(
+                  "\$${client.totalRevenue.toStringAsFixed(0)}",
+                  style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          // Hotels
-          Expanded(
-            child: Text(
-              "${client.totalHotels}",
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-
-          // Revenue
-          Expanded(
-            child: Text(
-              "\$${client.totalRevenue.toStringAsFixed(0)}",
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-          ),
-
-          // Status
-          Expanded(child: _buildStatusBadge(client.status)),
-
-          // Actions
-          Expanded(
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(CupertinoIcons.eye, size: 18),
-                  onPressed: () => _viewClientDetails(client),
-                  tooltip: "View Details",
+              // Status
+              Expanded(
+                child: Row(
+                  children: [_buildStatusBadge(client.status), Spacer(flex: 3)],
                 ),
-                IconButton(
-                  icon: const Icon(CupertinoIcons.pencil, size: 18),
-                  onPressed: () => _editClient(client),
-                  tooltip: "Edit Client",
+              ),
+              SizedBox(
+                width: 100,
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(CupertinoIcons.eye),
+                      onPressed: () {
+                        context.go('${Routes.clients}/${client.docId}');
+                      },
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(
-                    CupertinoIcons.delete,
-                    size: 18,
-                    color: Colors.red,
-                  ),
-                  onPressed: () => _deleteClient(client),
-                  tooltip: "Delete Client",
+              ),
+              SizedBox(
+                width: 50,
+                child: PopupMenuButton(
+                  icon: Icon(Icons.more_horiz),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      child: Text('Edit'),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              backgroundColor: Color(0xffFAFAFA),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: BlocProvider(
+                                create: (context) => ClientFormCubit(
+                                  clientRepo: ClientFirebaseRepo(),
+                                ),
+                                child: Container(
+                                  constraints: BoxConstraints(maxWidth: 600),
+                                  child: ClientFormModal(clientToEdit: client),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                    PopupMenuItem(
+                      child: Text('Delete'),
+                      onTap: () {
+                        // Handle delete client
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+
+              SizedBox(width: 100),
+            ],
           ),
+          const SizedBox(height: 10),
+          const Divider(color: AppColors.slateGray, thickness: 0.1),
         ],
       ),
     );

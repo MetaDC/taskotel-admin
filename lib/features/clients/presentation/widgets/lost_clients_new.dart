@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
+import 'package:taskoteladmin/core/theme/app_text_styles.dart';
+import 'package:taskoteladmin/core/utils/helpers.dart';
+import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
 import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
@@ -37,236 +41,231 @@ class _LostClientsNewState extends State<LostClientsNew> {
   Widget build(BuildContext context) {
     return BlocBuilder<ClientCubit, ClientState>(
       builder: (context, state) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with search
-            Row(
-              children: [
-                const Text(
-                  "Lost Clients List",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: "Search lost clients...",
-                      prefixIcon: const Icon(CupertinoIcons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppColors.slateGray),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      context.read<ClientCubit>().searchClients(value);
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-
-            // Stats Cards
-            if (state.stats != null) ...[
-              Row(
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StaggeredGrid.extent(
+                maxCrossAxisExtent: 500,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
                 children: [
-                  Expanded(
-                    child: StatCardIconLeft(
-                      icon: CupertinoIcons.person_badge_minus,
-                      label: "Lost Clients",
-                      value: "${state.stats?['lostClients'] ?? 0}",
-                      iconColor: Colors.red,
-                    ),
+                  StatCardIconLeft(
+                    icon: CupertinoIcons.person_badge_minus,
+                    label: "Lost Clients",
+                    value: "${state.stats?['lostClients'] ?? 0}",
+                    iconColor: Colors.red,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: StatCardIconLeft(
-                      icon: CupertinoIcons.building_2_fill,
-                      label: "Lost Hotels",
-                      value: "${state.stats?['lostHotels'] ?? 0}",
-                      iconColor: Colors.orange,
-                    ),
+                  StatCardIconLeft(
+                    icon: CupertinoIcons.building_2_fill,
+                    label: "Lost Hotels",
+                    value: "${state.stats?['lostHotels'] ?? 0}",
+                    iconColor: Colors.orange,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: StatCardIconLeft(
-                      icon: CupertinoIcons.money_dollar,
-                      label: "Lost Revenue",
-                      value: "\$${state.stats?['lostRevenue'] ?? 0}",
-                      iconColor: Colors.grey,
-                    ),
+                  StatCardIconLeft(
+                    icon: CupertinoIcons.money_dollar,
+                    label: "Lost Revenue",
+                    value: "\$${state.stats?['lostRevenue'] ?? 0}",
+                    iconColor: Colors.grey,
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-            ],
-
-            // Loading state
-            if (state.isLoading && state.lostClients.isEmpty)
-              const Expanded(child: Center(child: CircularProgressIndicator()))
-            // Error state
-            else if (state.message != null && state.lostClients.isEmpty)
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        CupertinoIcons.exclamationmark_triangle,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        state.message!,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => context
-                            .read<ClientCubit>()
-                            .initializeLostClientsPagination(),
-                        child: const Text("Retry"),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            // Clients list
-            else if (state.filteredLostClients.isEmpty)
-              const Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        CupertinoIcons.person_badge_minus,
-                        size: 64,
-                        color: Colors.grey,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        "No lost clients found",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      // Table Header
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[50],
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            topRight: Radius.circular(8),
+              // Header with search
+              CustomContainer(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          "Lost Clients List",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
-                        child: const Row(
-                          children: [
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                "Client",
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                        const Spacer(),
+                        SizedBox(
+                          width: 300,
+                          child: TextField(
+                            controller: _searchController,
+                            decoration: InputDecoration(
+                              hintText: "Search lost clients...",
+                              prefixIcon: const Icon(CupertinoIcons.search),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: AppColors.slateGray,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
                               ),
                             ),
-                            Expanded(
-                              flex: 2,
-                              child: Text(
-                                "Contact",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Hotels",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Revenue",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Status",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Actions",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Table Body
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: state.filteredLostClients.length,
-                          itemBuilder: (context, index) {
-                            final client = state.filteredLostClients[index];
-                            return _buildClientRow(client);
-                          },
-                        ),
-                      ),
-
-                      // Pagination
-                      if (state.lostTotalPages > 1)
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(color: Colors.grey[200]!),
-                            ),
-                          ),
-                          child: DynamicPagination(
-                            currentPage: state.lostCurrentPage,
-                            totalPages: state.lostTotalPages,
-                            onPageChanged: (page) {
-                              context
-                                  .read<ClientCubit>()
-                                  .fetchNextLostClientsPage(page: page);
+                            onChanged: (value) {
+                              context.read<ClientCubit>().searchClients(value);
                             },
                           ),
                         ),
-                    ],
-                  ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Stats Cards
+
+                    // Loading state
+                    if (state.isLoading && state.lostClients.isEmpty)
+                      Center(child: CircularProgressIndicator())
+                    // Error state
+                    else if (state.message != null && state.lostClients.isEmpty)
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              CupertinoIcons.exclamationmark_triangle,
+                              size: 64,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              state.message!,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: () => context
+                                  .read<ClientCubit>()
+                                  .initializeLostClientsPagination(),
+                              child: const Text("Retry"),
+                            ),
+                          ],
+                        ),
+                      )
+                    // Clients list
+                    else if (state.filteredLostClients.isEmpty)
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              CupertinoIcons.person_badge_minus,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              "No lost clients found",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      Column(
+                        children: [
+                          // Table Header
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[50],
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                topRight: Radius.circular(8),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                SizedBox(width: 30),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    "Client",
+                                    style: AppTextStyles.tabelHeader,
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    "Contact",
+                                    style: AppTextStyles.tabelHeader,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "Hotels",
+                                    style: AppTextStyles.tabelHeader,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "Revenue",
+                                    style: AppTextStyles.tabelHeader,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    "Status",
+                                    style: AppTextStyles.tabelHeader,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 100,
+                                  child: Text(
+                                    "View",
+                                    style: AppTextStyles.tabelHeader,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 50,
+                                  child: Text(
+                                    "Actions",
+                                    style: AppTextStyles.tabelHeader,
+                                  ),
+                                ),
+
+                                SizedBox(width: 100),
+                              ],
+                            ),
+                          ),
+
+                          // Table Body
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: state.filteredLostClients.length,
+                            itemBuilder: (context, index) {
+                              final client = state.filteredLostClients[index];
+                              return _buildClientRow(client);
+                            },
+                          ),
+
+                          // Pagination
+                          if (state.lostTotalPages > 1)
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  top: BorderSide(color: Colors.grey[200]!),
+                                ),
+                              ),
+                              child: DynamicPagination(
+                                currentPage: state.lostCurrentPage,
+                                totalPages: state.lostTotalPages,
+                                onPageChanged: (page) {
+                                  context
+                                      .read<ClientCubit>()
+                                      .fetchNextLostClientsPage(page: page);
+                                },
+                              ),
+                            ),
+                        ],
+                      ),
+                  ],
                 ),
               ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -280,6 +279,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
       ),
       child: Row(
         children: [
+          SizedBox(width: 30),
           // Client Info
           Expanded(
             flex: 2,
@@ -288,10 +288,10 @@ class _LostClientsNewState extends State<LostClientsNew> {
               children: [
                 Text(
                   client.name,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  "Lost on ${_formatDate(client.updatedAt)}",
+                  "Lost on ${client.updatedAt.goodDayDate()}",
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                 ),
               ],
@@ -328,36 +328,67 @@ class _LostClientsNewState extends State<LostClientsNew> {
               style: const TextStyle(fontWeight: FontWeight.w500),
             ),
           ),
-
           // Status
-          Expanded(child: _buildStatusBadge(client.status)),
-
-          // Actions
           Expanded(
+            child: Row(
+              children: [_buildStatusBadge(client.status), Spacer(flex: 3)],
+            ),
+          ),
+          // Status
+          SizedBox(
+            width: 100,
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(CupertinoIcons.eye, size: 18),
-                  onPressed: () => _viewClientDetails(client),
-                  tooltip: "View Details",
-                ),
-                IconButton(
-                  icon: const Icon(CupertinoIcons.pencil, size: 18),
-                  onPressed: () => _editClient(client),
-                  tooltip: "Edit Client",
-                ),
-                IconButton(
-                  icon: const Icon(
-                    CupertinoIcons.arrow_clockwise,
-                    size: 18,
-                    color: Colors.green,
-                  ),
-                  onPressed: () => _reactivateClient(client),
-                  tooltip: "Reactivate Client",
+                  icon: Icon(CupertinoIcons.eye),
+                  onPressed: () {
+                    // Handle view client
+                  },
                 ),
               ],
             ),
           ),
+          SizedBox(
+            width: 50,
+            child: PopupMenuButton(
+              icon: Icon(Icons.more_horiz),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  child: Text('Edit'),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          backgroundColor: Color(0xffFAFAFA),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: BlocProvider(
+                            create: (context) => ClientFormCubit(
+                              clientRepo: ClientFirebaseRepo(),
+                            ),
+                            child: Container(
+                              constraints: BoxConstraints(maxWidth: 600),
+                              child: ClientFormModal(clientToEdit: client),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+                PopupMenuItem(
+                  child: Text('Delete'),
+                  onTap: () {
+                    // Handle delete client
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(width: 100),
         ],
       ),
     );

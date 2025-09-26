@@ -7,11 +7,18 @@ class Routes {
   static const noInternet = '/noInternet';
 
   //shell route
+
+  //--clients route
   static const clients = '/clients';
-  static const clientDetail = '/clients/:clientId';
+
+  //--master hotel route
   static const masterHotels = '/master-hotels';
   static const masterTasks = '/master-hotels/:hotelId/tasks';
+
+  //--subscription route
   static const subscriptionPlans = '/subscription-plans';
+
+  //--transactions route
   static const transactions = '/transactions';
   static const reports = '/reports';
   static const dashboard = '/';

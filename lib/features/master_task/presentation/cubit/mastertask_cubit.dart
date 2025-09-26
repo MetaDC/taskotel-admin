@@ -19,56 +19,7 @@ class MasterTaskCubit extends Cubit<MasterTaskState> {
     return super.close();
   }
 
-  // Set current hotel ID
-  void setHotelId(String hotelId) {
-    emit(state.copyWith(currentHotelId: hotelId));
-  }
-
-  // Load tasks by role
-  Future<void> loadTasksByRole(String role, String hotelId) async {
-    emit(
-      state.copyWith(
-        isLoading: true,
-        selectedRole: role,
-        currentHotelId: hotelId,
-      ),
-    );
-    _taskStream?.cancel();
-
-    try {
-      _taskStream = masterTaskRepo
-          .getTasksByRoleStream(role, hotelId)
-          .listen(
-            (tasks) {
-              final updatedTasksByRole =
-                  Map<String, List<MasterTaskModel>>.from(state.tasksByRole);
-              updatedTasksByRole[role] = tasks;
-
-              emit(
-                state.copyWith(
-                  tasksByRole: updatedTasksByRole,
-                  filteredTasks: _applyFilters(tasks),
-                  isLoading: false,
-                ),
-              );
-            },
-            onError: (error) {
-              emit(
-                state.copyWith(
-                  isLoading: false,
-                  message: 'Failed to load tasks: $error',
-                ),
-              );
-            },
-          );
-    } catch (e) {
-      emit(
-        state.copyWith(isLoading: false, message: 'Failed to load tasks: $e'),
-      );
-    }
-  }
-
-  // Load all tasks for a hotel
+  // Load all tasks for a hotel and initialize with first role
   Future<void> loadAllTasks(String hotelId) async {
     emit(state.copyWith(isLoading: true, currentHotelId: hotelId));
     _taskStream?.cancel();
@@ -80,20 +31,28 @@ class MasterTaskCubit extends Cubit<MasterTaskState> {
             (tasks) {
               // Group tasks by role
               final tasksByRole = <String, List<MasterTaskModel>>{};
-              for (final task in tasks) {
-                if (!tasksByRole.containsKey(task.assignedRole)) {
-                  tasksByRole[task.assignedRole] = [];
-                }
-                tasksByRole[task.assignedRole]!.add(task);
+
+              // Initialize all roles with empty lists
+              for (final role in ['rm', 'gm', 'dm', 'operator']) {
+                tasksByRole[role] = [];
               }
+
+              // Group actual tasks by role
+              for (final task in tasks) {
+                if (tasksByRole.containsKey(task.assignedRole)) {
+                  tasksByRole[task.assignedRole]!.add(task);
+                }
+              }
+
+              // Get current role tasks (default to first role 'rm')
+              final currentRoleTasks = tasksByRole[state.selectedRole] ?? [];
+              final filteredTasks = _applyFilters(currentRoleTasks);
 
               emit(
                 state.copyWith(
                   allTasks: tasks,
                   tasksByRole: tasksByRole,
-                  filteredTasks: _applyFilters(
-                    tasksByRole[state.selectedRole] ?? [],
-                  ),
+                  filteredTasks: filteredTasks,
                   isLoading: false,
                 ),
               );
@@ -218,30 +177,6 @@ class MasterTaskCubit extends Cubit<MasterTaskState> {
     final currentTasks = state.tasksByRole[role] ?? [];
     final filteredTasks = _applyFilters(currentTasks);
     emit(state.copyWith(filteredTasks: filteredTasks));
-
-    // Load tasks for this role if not already loaded
-    if (currentTasks.isEmpty && state.currentHotelId.isNotEmpty) {
-      loadTasksByRole(role, state.currentHotelId);
-    }
-  }
-
-  // Load analytics
-  Future<void> loadAnalytics() async {
-    if (state.currentHotelId.isEmpty) return;
-
-    try {
-      final analytics = await masterTaskRepo.getTaskAnalytics(
-        state.currentHotelId,
-      );
-      emit(state.copyWith(analytics: analytics));
-    } catch (e) {
-      emit(state.copyWith(message: 'Failed to load analytics: $e'));
-    }
-  }
-
-  // Clear message
-  void clearMessage() {
-    emit(state.copyWith(message: null));
   }
 
   // Change department filter
@@ -250,6 +185,11 @@ class MasterTaskCubit extends Cubit<MasterTaskState> {
     final currentTasks = state.tasksByRole[state.selectedRole] ?? [];
     final filteredTasks = _applyFilters(currentTasks);
     emit(state.copyWith(filteredTasks: filteredTasks));
+  }
+
+  // Clear message
+  void clearMessage() {
+    emit(state.copyWith(message: null));
   }
 
   // Apply filters helper method

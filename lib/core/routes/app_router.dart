@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/features/auth/presentation/pages/login_page.dart';
 import 'package:taskoteladmin/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
+import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
 import 'package:taskoteladmin/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:taskoteladmin/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:taskoteladmin/features/clients/presentation/page/clients_page.dart';
@@ -63,7 +65,12 @@ final GoRouter appRoute = GoRouter(
               pageBuilder: (context, state) {
                 final clientId = state.pathParameters['clientId']!;
                 return NoTransitionPage(
-                  child: ClientDetailPage(clientId: clientId),
+                  child: BlocProvider(
+                    create: (context) =>
+                        ClientDetailCubit(clientRepo: ClientFirebaseRepo())
+                          ..loadClientDetails(clientId), 
+                    child: ClientDetailPage(clientId: clientId),
+                  ),
                 );
               },
             ),

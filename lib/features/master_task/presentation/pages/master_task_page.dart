@@ -7,9 +7,10 @@ import 'package:taskoteladmin/core/widget/page_header.dart';
 import 'package:taskoteladmin/features/master_task/data/mastertask_firebaserepo.dart';
 import 'package:taskoteladmin/features/master_task/domain/model/mastertask_model.dart';
 import 'package:taskoteladmin/features/master_task/presentation/cubit/mastertask_cubit.dart';
+// Import clean modals that use MasterTaskFormCubit
+import 'package:taskoteladmin/core/utils/excel_utils.dart';
 import 'package:taskoteladmin/features/master_task/presentation/widgets/create_task_modal.dart';
 import 'package:taskoteladmin/features/master_task/presentation/widgets/import_excel_modal.dart';
-import 'package:taskoteladmin/core/utils/excel_utils.dart';
 
 class MasterTaskPage extends StatefulWidget {
   final String hotelId;
@@ -68,158 +69,88 @@ class _MasterTaskPageState extends State<MasterTaskPage>
           }
         },
         builder: (context, state) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-            child: Column(
+          return Scaffold(
+            backgroundColor: const Color(0xFFF8F9FA),
+            body: Column(
               children: [
-                // Page Header
-                PageHeader(
-                  heading: "Master Tasks - ${widget.hotelName}",
-                  subHeading: "Manage master tasks for hotel operations",
-                  buttonText: "Create Task",
-                  onButtonPressed: () => _showCreateTaskModal(context),
-                ),
-                const SizedBox(height: 20),
-
-                // Import/Export Buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () => _exportTasks(context),
-                      icon: const Icon(CupertinoIcons.cloud_download),
-                      label: const Text("Export to Excel"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton.icon(
-                      onPressed: () => _showImportExcelModal(context),
-                      icon: const Icon(CupertinoIcons.doc_on_doc),
-                      label: const Text("Import from Excel"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-
-                // Department Filter (only for Department Manager)
-                if (state.selectedRole == 'dm') ...[
-                  Row(
+                // Header Section
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Department:',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
+                      // Back button and title
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.arrow_back),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: AppColors.borderGrey),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: state.selectedDepartment,
-                              isExpanded: true,
-                              items:
-                                  [
-                                    'All Departments',
-                                    'Housekeeping',
-                                    'Front Office',
-                                    'Food & Beverage',
-                                    'Maintenance',
-                                    'Security',
-                                    'Management',
-                                    'Guest Services',
-                                    'HR',
-                                    'Finance',
-                                    'Kitchen',
-                                    'Laundry',
-                                    'Spa & Wellness',
-                                  ].map((department) {
-                                    return DropdownMenuItem<String>(
-                                      value: department,
-                                      child: Text(department),
-                                    );
-                                  }).toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  context
-                                      .read<MasterTaskCubit>()
-                                      .changeDepartment(value);
-                                }
-                              },
+                          const SizedBox(width: 16),
+                          Text(
+                            widget.hotelName,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
+                          const Spacer(),
+                          ElevatedButton.icon(
+                            onPressed: () => _showCreateTaskModal(context),
+                            icon: const Icon(Icons.add, color: Colors.white),
+                            label: const Text(
+                              'Create Master Task',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Manage master tasks and franchise details',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                ],
-
-                // Search Bar
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: "Search tasks...",
-                    prefixIcon: const Icon(CupertinoIcons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: AppColors.slateGray),
-                    ),
-                  ),
-                  onChanged: (value) {
-                    context.read<MasterTaskCubit>().searchTasks(value);
-                  },
                 ),
-                const SizedBox(height: 20),
 
                 // Tab Bar
                 Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
+                  color: Colors.white,
                   child: TabBar(
                     controller: _tabController,
+                    isScrollable: false,
+                    labelColor: Colors.blue,
+                    unselectedLabelColor: Colors.grey,
+                    indicatorColor: Colors.blue,
+                    indicatorWeight: 2,
                     tabs: roles.map((role) => Tab(text: role['name'])).toList(),
-                    labelColor: AppColors.primary,
-                    unselectedLabelColor: AppColors.slateGray,
-                    indicatorColor: AppColors.primary,
-                    indicatorWeight: 3,
                   ),
                 ),
-                const SizedBox(height: 20),
 
-                // Tab Content
-                SizedBox(
-                  height: 600, // Fixed height for the tab view
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: roles.map((role) {
-                      return _buildTaskTable(context, state, role['key']!);
-                    }).toList(),
+                // Content Area
+                Expanded(
+                  child: Container(
+                    color: const Color(0xFFF8F9FA),
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: roles.map((role) {
+                        return _buildRoleTasksView(context, state, role);
+                      }).toList(),
+                    ),
                   ),
                 ),
               ],
@@ -230,146 +161,434 @@ class _MasterTaskPageState extends State<MasterTaskPage>
     );
   }
 
-  Widget _buildTaskTable(
+  Widget _buildRoleTasksView(
     BuildContext context,
     MasterTaskState state,
-    String role,
+    Map<String, String> role,
   ) {
-    if (state.isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    final roleKey = role['key']!;
+    final roleName = role['name']!;
+    final tasks = state.tasksByRole[roleKey] ?? [];
+    final filteredTasks = _getFilteredTasks(tasks, state);
 
-    if (state.filteredTasks.isEmpty) {
-      return const Center(
-        child: Text(
-          "No tasks found for this role",
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+    return Container(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Role Title and Task Count
+          Row(
+            children: [
+              Text(
+                '$roleName Tasks',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${filteredTasks.length} tasks',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          // Controls Row
+          Row(
+            children: [
+              // Search Bar
+              Expanded(
+                flex: 3,
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search tasks...',
+                    prefixIcon: const Icon(Icons.search, size: 20),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                  onChanged: (value) {
+                    context.read<MasterTaskCubit>().searchTasks(value);
+                  },
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              // Department Filter (only for Department Manager)
+              if (roleKey == 'dm') ...[
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFFE0E0E0)),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: state.selectedDepartment,
+                        isExpanded: true,
+                        hint: const Text('All Departments'),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        items:
+                            [
+                              'All Departments',
+                              'Housekeeping',
+                              'Front Office',
+                              'Food & Beverage',
+                              'Maintenance',
+                              'Security',
+                              'Management',
+                              'Guest Services',
+                              'HR',
+                              'Finance',
+                              'Kitchen',
+                              'Laundry',
+                              'Spa & Wellness',
+                            ].map((department) {
+                              return DropdownMenuItem<String>(
+                                value: department,
+                                child: Text(department),
+                              );
+                            }).toList(),
+                        onChanged: (value) {
+                          if (value != null) {
+                            context.read<MasterTaskCubit>().changeDepartment(
+                              value,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+
+              // Import/Export Buttons
+              ElevatedButton.icon(
+                onPressed: () => _exportTasks(context, roleKey, roleName),
+                icon: const Icon(Icons.download, size: 16),
+                label: const Text('Export to Excel'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
+              ElevatedButton.icon(
+                onPressed: () => _showImportExcelModal(context, roleKey),
+                icon: const Icon(Icons.upload, size: 16),
+                label: const Text('Import from Excel'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          // Tasks Table
+          Expanded(child: _buildTasksTable(context, filteredTasks, roleKey)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTasksTable(
+    BuildContext context,
+    List<MasterTaskModel> tasks,
+    String roleKey,
+  ) {
+    if (tasks.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.task_alt, size: 48, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'No tasks found',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Create your first task to get started',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
         ),
       );
     }
 
-    return SingleChildScrollView(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Table Header
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF8F9FA),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
             ),
-          ],
-        ),
-        child: Column(
-          children: [
-            // Table Header
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: AppColors.backgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
-              ),
-              child: Row(
-                children: [
-                  const Expanded(
-                    flex: 2,
-                    child: Text(
-                      "Task Title",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+            child: Row(
+              children: [
+                const SizedBox(width: 60), // For Task ID
+                const Expanded(
+                  flex: 2,
+                  child: Text(
+                    'Task Title',
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  const Expanded(
-                    flex: 3,
-                    child: Text(
-                      "Description",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                ),
+                const Expanded(
+                  flex: 3,
+                  child: Text(
+                    'Description',
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
+                ),
+                const Expanded(
+                  flex: 1,
+                  child: Text(
+                    'Frequency',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                if (roleKey == 'dm') ...[
                   const Expanded(
                     flex: 1,
                     child: Text(
-                      "Frequency",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const Expanded(
-                    flex: 1,
-                    child: Text(
-                      "Duration",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const Expanded(
-                    flex: 1,
-                    child: Text(
-                      "Status",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const Expanded(
-                    flex: 1,
-                    child: Text(
-                      "Actions",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      'Department',
+                      style: TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
-              ),
-            ),
-            // Table Rows
-            ...state.filteredTasks.map(
-              (task) => Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: AppColors.borderGrey),
+                const Expanded(
+                  flex: 1,
+                  child: Text(
+                    'Priority',
+                    style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(flex: 2, child: Text(task.title)),
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        task.desc,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: _buildFrequencyBadge(task.frequency),
-                    ),
-                    Expanded(flex: 1, child: Text("${task.duration} min")),
-                    Expanded(flex: 1, child: _buildStatusBadge(task.isActive)),
-                    Expanded(
-                      flex: 1,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () => _showEditTaskModal(context, task),
-                            icon: const Icon(CupertinoIcons.pencil, size: 16),
-                          ),
-                          IconButton(
-                            onPressed: () =>
-                                _showDeleteConfirmation(context, task),
-                            icon: const Icon(
-                              CupertinoIcons.delete,
-                              size: 16,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                const Expanded(
+                  flex: 1,
+                  child: Text(
+                    'Est. Completion Time',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
-              ),
+                const Expanded(
+                  flex: 1,
+                  child: Text(
+                    'Status',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                const SizedBox(
+                  width: 80,
+                  child: Text(
+                    'Actions',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+
+          // Table Rows
+          Expanded(
+            child: ListView.builder(
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                final task = tasks[index];
+                final taskId = (index + 1).toString().padLeft(3, '0');
+
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.withOpacity(0.1)),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      // Task ID
+                      SizedBox(
+                        width: 60,
+                        child: Text(
+                          taskId,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
+
+                      // Task Title
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          task.title,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ),
+
+                      // Description
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          task.desc,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ),
+
+                      // Frequency
+                      Expanded(
+                        flex: 1,
+                        child: _buildFrequencyBadge(task.frequency),
+                      ),
+
+                      // Department (only for Department Manager)
+                      if (roleKey == 'dm') ...[
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            task.departmentId,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+
+                      // Priority (based on frequency for now)
+                      Expanded(
+                        flex: 1,
+                        child: _buildPriorityBadge(
+                          _getPriority(task.frequency),
+                        ),
+                      ),
+
+                      // Est. Completion Time
+                      Expanded(
+                        flex: 1,
+                        child: Text(
+                          _formatDuration(task.duration),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+
+                      // Status
+                      Expanded(flex: 1, child: _buildStatusToggle(task)),
+
+                      // Actions
+                      SizedBox(
+                        width: 80,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () =>
+                                  _showEditTaskModal(context, task),
+                              icon: const Icon(Icons.edit, size: 16),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(minWidth: 32),
+                            ),
+                            PopupMenuButton<String>(
+                              onSelected: (value) {
+                                if (value == 'delete') {
+                                  _showDeleteConfirmation(context, task);
+                                }
+                              },
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.delete,
+                                        size: 16,
+                                        color: Colors.red,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text('Delete'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              child: const Icon(Icons.more_horiz, size: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -378,13 +597,16 @@ class _MasterTaskPageState extends State<MasterTaskPage>
     Color color;
     switch (frequency.toLowerCase()) {
       case 'daily':
-        color = Colors.green;
+        color = Colors.blue;
         break;
       case 'weekly':
         color = Colors.blue;
         break;
       case 'monthly':
-        color = Colors.orange;
+        color = Colors.blue;
+        break;
+      case 'quarterly':
+        color = Colors.blue;
         break;
       default:
         color = Colors.grey;
@@ -395,38 +617,121 @@ class _MasterTaskPageState extends State<MasterTaskPage>
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color),
       ),
       child: Text(
         frequency,
         style: TextStyle(
           color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
 
-  Widget _buildStatusBadge(bool isActive) {
+  Widget _buildPriorityBadge(String priority) {
+    Color color;
+    switch (priority.toLowerCase()) {
+      case 'high':
+        color = Colors.red;
+        break;
+      case 'medium':
+        color = Colors.orange;
+        break;
+      case 'low':
+        color = Colors.green;
+        break;
+      default:
+        color = Colors.grey;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isActive
-            ? Colors.green.withOpacity(0.1)
-            : Colors.red.withOpacity(0.1),
+        color: color.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isActive ? Colors.green : Colors.red),
       ),
       child: Text(
-        isActive ? "Active" : "Inactive",
+        priority,
         style: TextStyle(
-          color: isActive ? Colors.green : Colors.red,
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
+  }
+
+  Widget _buildStatusToggle(MasterTaskModel task) {
+    return Switch(
+      value: task.isActive,
+      onChanged: (value) {
+        context.read<MasterTaskCubit>().toggleTaskStatus(task.docId, value);
+      },
+      activeColor: Colors.green,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    );
+  }
+
+  List<MasterTaskModel> _getFilteredTasks(
+    List<MasterTaskModel> tasks,
+    MasterTaskState state,
+  ) {
+    var filtered = tasks;
+
+    // Apply search filter
+    if (state.searchQuery.isNotEmpty) {
+      filtered = filtered
+          .where(
+            (task) =>
+                task.title.toLowerCase().contains(
+                  state.searchQuery.toLowerCase(),
+                ) ||
+                task.desc.toLowerCase().contains(
+                  state.searchQuery.toLowerCase(),
+                ),
+          )
+          .toList();
+    }
+
+    // Apply department filter (only for Department Manager)
+    if (state.selectedRole == 'dm' &&
+        state.selectedDepartment != 'All Departments') {
+      filtered = filtered
+          .where((task) => task.departmentId == state.selectedDepartment)
+          .toList();
+    }
+
+    return filtered;
+  }
+
+  String _getPriority(String frequency) {
+    switch (frequency.toLowerCase()) {
+      case 'daily':
+        return 'High';
+      case 'weekly':
+        return 'High';
+      case 'monthly':
+        return 'Medium';
+      case 'quarterly':
+        return 'Medium';
+      default:
+        return 'Low';
+    }
+  }
+
+  String _formatDuration(int minutes) {
+    if (minutes < 60) {
+      return '$minutes minutes';
+    } else {
+      final hours = (minutes / 60).floor();
+      final remainingMinutes = minutes % 60;
+      if (remainingMinutes == 0) {
+        return '$hours hour${hours > 1 ? 's' : ''}';
+      } else {
+        return '$hours.${remainingMinutes.toString().padLeft(2, '0')} hours';
+      }
+    }
   }
 
   void _showCreateTaskModal(BuildContext context) {
@@ -453,24 +758,24 @@ class _MasterTaskPageState extends State<MasterTaskPage>
     );
   }
 
-  void _showImportExcelModal(BuildContext context) {
-    final selectedRole = roles[_tabController.index]['key']!;
+  void _showImportExcelModal(BuildContext context, String userCategory) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) =>
-          ImportExcelModal(hotelId: widget.hotelId, userCategory: selectedRole),
+          ImportExcelModal(hotelId: widget.hotelId, userCategory: userCategory),
     );
   }
 
-  void _exportTasks(BuildContext context) async {
-    final selectedRole = roles[_tabController.index]['key']!;
-    final roleName = roles[_tabController.index]['name']!;
-
+  void _exportTasks(
+    BuildContext context,
+    String roleKey,
+    String roleName,
+  ) async {
     try {
       final tasks = await context.read<MasterTaskCubit>().exportTasksToExcel(
-        selectedRole,
+        roleKey,
       );
 
       if (tasks.isEmpty) {

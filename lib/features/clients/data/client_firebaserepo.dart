@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
-import 'package:taskoteladmin/features/clients/domain/entity/client_hotel_model.dart';
-import 'package:taskoteladmin/features/clients/domain/entity/client_task_model.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
+
 import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
 
 class ClientFirebaseRepo extends ClientRepo {
@@ -40,9 +40,7 @@ class ClientFirebaseRepo extends ClientRepo {
   @override
   Future<void> updateClient(ClientModel client) async {
     try {
-      print("Updating user -- : ${client.name}");
       await clientsCollectionRef.doc(client.docId).update(client.toJson());
-      print("Updating user -- : ${client.name}");
     } catch (e) {
       throw Exception("Failed to update client: $e");
     }
@@ -133,60 +131,28 @@ class ClientFirebaseRepo extends ClientRepo {
   }
 
   @override
-  Stream<List<ClientHotelModel>> getClientHotelsStream(String clientId) {
-    return FBFireStore.hotels
-        .where('clientId', isEqualTo: clientId)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => ClientHotelModel.fromDocSnap(doc))
-              .toList(),
-        );
-  }
-
-  @override
-  Future<ClientHotelModel> getClientHotel(String hotelId) async {
+  Future<ClientModel> getClient(String clientId) async {
     try {
-      final doc = await FBFireStore.hotels.doc(hotelId).get();
+      final doc = await clientsCollectionRef.doc(clientId).get();
       if (!doc.exists) {
-        throw Exception("Hotel not found");
+        throw Exception("Client not found");
       }
-      return ClientHotelModel.fromSnap(doc);
+      return ClientModel.fromSnap(doc);
     } catch (e) {
-      throw Exception("Failed to get hotel: $e");
+      throw Exception("Failed to get client: $e");
     }
   }
 
   @override
-  Stream<List<ClientTaskModel>> getClientHotelTasksStream(String hotelId) {
-    return FBFireStore.tasks
-        .where('hotelId', isEqualTo: hotelId)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => ClientTaskModel.fromDocSnap(doc))
-              .toList(),
-        );
-  }
-
-  @override
-  Future<List<ClientTaskModel>> getClientHotelTasks(
-    String hotelId,
-    String role,
-  ) async {
+  Future<List<HotelModel>> getClientHotels(String clientId) async {
     try {
-      final snapshot = await FBFireStore.tasks
-          .where('hotelId', isEqualTo: hotelId)
-          .where('assignedRole', isEqualTo: role)
+      final snapshot = await FBFireStore.hotels
+          .where('clientId', isEqualTo: clientId)
           .get();
 
-      return snapshot.docs
-          .map((doc) => ClientTaskModel.fromDocSnap(doc))
-          .toList();
+      return snapshot.docs.map((doc) => HotelModel.fromDocSnap(doc)).toList();
     } catch (e) {
-      throw Exception("Failed to get tasks: $e");
+      throw Exception("Failed to get client hotels: $e");
     }
   }
 }
