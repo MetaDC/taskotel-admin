@@ -16,4 +16,5 @@ abstract class ClientRepo {
   //Client Details Page
   Future<ClientModel> getClient(String clientId);
   Future<List<HotelModel>> getClientHotels(String clientId);
+  // Future<HotelModel> getHotelDetails(String hotelId);
 }

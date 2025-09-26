@@ -130,6 +130,7 @@ class ClientFirebaseRepo extends ClientRepo {
     }
   }
 
+  // Client Details Cubit Functions
   @override
   Future<ClientModel> getClient(String clientId) async {
     try {
@@ -155,4 +156,17 @@ class ClientFirebaseRepo extends ClientRepo {
       throw Exception("Failed to get client hotels: $e");
     }
   }
+
+  // @override
+  // Future<HotelModel> getHotelDetails(String clientId) async {
+  //   try {
+  //     final doc = await clientsCollectionRef.doc(clientId).get();
+  //     if (!doc.exists) {
+  //       throw Exception("Client not found");
+  //     }
+  //     return ClientModel.fromSnap(doc);
+  //   } catch (e) {
+  //     throw Exception("Failed to get client: $e");
+  //   }
+  // }
 }

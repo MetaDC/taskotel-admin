@@ -21,7 +21,7 @@ class FBFireStore {
   static final serviceContractors = fb.collection('serviceContractors');
   static final subscriptionPurchases = fb.collection('subscriptionPurchases');
   static final subscriptions = fb.collection('subscriptions');
-  static final tasks = fb.collection('tasks');
+  static final tasks = fb.collection('commonTask');
   static final transactions = fb.collection('transactions');
   static final users = fb.collection('users');
 

@@ -10,6 +10,11 @@ class Routes {
 
   //--clients route
   static const clients = '/clients';
+  // Inside Routes class
+
+  static String clientDetail(String clientId) => '/clients/$clientId';
+  static String hotelDetail(String clientId, String hotelId) =>
+      '/clients/$clientId/hotels/$hotelId';
 
   //--master hotel route
   static const masterHotels = '/master-hotels';

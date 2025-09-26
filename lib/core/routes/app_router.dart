@@ -6,6 +6,7 @@ import 'package:taskoteladmin/features/auth/presentation/pages/login_page.dart';
 import 'package:taskoteladmin/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
+import 'package:taskoteladmin/features/clients/presentation/page/hotel_detail_page.dart';
 import 'package:taskoteladmin/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:taskoteladmin/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:taskoteladmin/features/clients/presentation/page/clients_page.dart';
@@ -60,19 +61,45 @@ final GoRouter appRoute = GoRouter(
           pageBuilder: (context, state) =>
               const NoTransitionPage(child: ClientsPage()),
           routes: [
-            GoRoute(
-              path: ":clientId",
-              pageBuilder: (context, state) {
-                final clientId = state.pathParameters['clientId']!;
-                return NoTransitionPage(
-                  child: BlocProvider(
+            // Use ShellRoute to maintain cubit across nested routes
+            ShellRoute(
+              builder: (context, state, child) {
+                final clientId = state.pathParameters['clientId'];
+                if (clientId != null) {
+                  return BlocProvider(
                     create: (context) =>
                         ClientDetailCubit(clientRepo: ClientFirebaseRepo())
-                          ..loadClientDetails(clientId), 
-                    child: ClientDetailPage(clientId: clientId),
-                  ),
-                );
+                          ..loadClientDetails(clientId),
+                    child: child,
+                  );
+                }
+                return child;
               },
+              routes: [
+                GoRoute(
+                  path: ":clientId",
+                  pageBuilder: (context, state) {
+                    final clientId = state.pathParameters['clientId']!;
+                    return NoTransitionPage(
+                      child: ClientDetailPage(clientId: clientId),
+                    );
+                  },
+                ),
+                GoRoute(
+                  path: ":clientId/hotels/:hotelId",
+                  pageBuilder: (context, state) {
+                    final clientId = state.pathParameters['clientId']!;
+                    final hotelId = state.pathParameters['hotelId']!;
+
+                    return NoTransitionPage(
+                      child: HotelDetailPage(
+                        hotelId: hotelId,
+                        clientId: clientId,
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),

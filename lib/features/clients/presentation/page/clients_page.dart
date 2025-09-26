@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
+import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
 import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
 
@@ -58,6 +59,8 @@ class _ClientsPageState extends State<ClientsPage> {
                   );
                 },
               );
+              // sendTasksToFirestore();
+              // print("---");
             },
           ),
           const SizedBox(height: 20),

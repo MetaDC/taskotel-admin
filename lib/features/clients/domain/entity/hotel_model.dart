@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'department_model.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/address_model.dart';
+
 class HotelModel {
   final String docId;
   final String name;
   final String clientId;
-  final Map<int, int> floors; // e.g., {1: 10, 2: 10, 3: 8}
+  final Map<int, int> floors;
   final DateTime createdAt;
   final DateTime updatedAt;
   final String? masterHotelId;
@@ -17,8 +18,11 @@ class HotelModel {
   final String logoUrl;
   final DateTime? lastSync;
   final String hotelImageUrl;
-  final Map<String, String> addressModel; // Can be structured better if needed
-  final Map<String, String> otherDocuments; // documentName → documentLink
+  final AddressModel addressModel;
+  final Map<String, String> otherDocuments;
+  final int totalUser;
+  final int totaltask;
+  final int totalRevenue;
 
   HotelModel({
     required this.docId,
@@ -39,9 +43,12 @@ class HotelModel {
     required this.hotelImageUrl,
     required this.addressModel,
     required this.otherDocuments,
+    required this.totalUser,
+    required this.totaltask,
+    required this.totalRevenue,
   });
 
-  /// 🔹 Convert to JSON for Firestore
+  /// 🔄 Convert to JSON for Firestore
   Map<String, dynamic> toJson() {
     return {
       "name": name,
@@ -59,16 +66,19 @@ class HotelModel {
       "logoUrl": logoUrl,
       "lastSync": lastSync?.millisecondsSinceEpoch,
       "hotelImageUrl": hotelImageUrl,
-      "addressModel": addressModel,
+      "addressModel": addressModel.toMap(),
       "otherDocuments": otherDocuments,
+      "totalUser": totalUser,
+      "totaltask": totaltask,
+      "totalRevenue": totalRevenue,
     };
   }
 
-  /// 🔹 From QueryDocumentSnapshot
   factory HotelModel.fromDocSnap(
     QueryDocumentSnapshot<Map<String, dynamic>> snap,
   ) {
     final data = snap.data();
+
     return HotelModel(
       docId: snap.id,
       name: data['name'],
@@ -83,7 +93,6 @@ class HotelModel {
       masterHotelId: data['masterHotelId'],
       propertyType: data['propertyType'],
       isActive: data['isActive'],
-
       subscriptionPurchaseId: data['subscriptionPurchaseId'],
       subscriptionName: data['subscriptionName'],
       subscriptionStart: DateTime.fromMillisecondsSinceEpoch(
@@ -93,25 +102,26 @@ class HotelModel {
         data['subscriptionEnd'],
       ),
       logoUrl: data['logoUrl'],
-      lastSync:
-          data['lastSync'] != null
-              ? DateTime.fromMillisecondsSinceEpoch(data['lastSync'])
-              : null,
+      lastSync: data['lastSync'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(data['lastSync'])
+          : null,
       hotelImageUrl: data['hotelImageUrl'],
-      addressModel: Map<String, String>.from(data['addressModel']),
+      addressModel: AddressModel.fromMap(
+        Map<String, dynamic>.from(data['addressModel']),
+      ),
       otherDocuments: Map<String, String>.from(data['otherDocuments']),
+      totalUser: data['totalUser'] ?? 0,
+      totaltask: data['totaltask'] ?? 0,
+      totalRevenue: data['totalRevenue'] ?? 0,
     );
   }
 
-  /// 🔹 From DocumentSnapshot (Single doc fetch)
   factory HotelModel.fromSnap(DocumentSnapshot<Map<String, dynamic>> snap) {
-    // final data = snap.data()!;
     return HotelModel.fromDocSnap(
       snap as QueryDocumentSnapshot<Map<String, dynamic>>,
     );
   }
 
-  /// 🔹 CopyWith method
   HotelModel copyWith({
     String? name,
     String? clientId,
@@ -121,18 +131,18 @@ class HotelModel {
     String? masterHotelId,
     String? propertyType,
     bool? isActive,
-    List<DepartmentModel>? departments,
-    // List<TaskModel>? tasks,
     String? subscriptionPurchaseId,
     String? subscriptionName,
     DateTime? subscriptionStart,
     DateTime? subscriptionEnd,
-    List<String>? otherPlanBenefits,
     String? logoUrl,
     DateTime? lastSync,
     String? hotelImageUrl,
-    Map<String, String>? addressModel,
+    AddressModel? addressModel,
     Map<String, String>? otherDocuments,
+    int? totalUser,
+    int? totaltask,
+    int? totalRevenue,
   }) {
     return HotelModel(
       docId: docId,
@@ -144,7 +154,6 @@ class HotelModel {
       masterHotelId: masterHotelId ?? this.masterHotelId,
       propertyType: propertyType ?? this.propertyType,
       isActive: isActive ?? this.isActive,
-
       subscriptionPurchaseId:
           subscriptionPurchaseId ?? this.subscriptionPurchaseId,
       subscriptionName: subscriptionName ?? this.subscriptionName,
@@ -155,6 +164,9 @@ class HotelModel {
       hotelImageUrl: hotelImageUrl ?? this.hotelImageUrl,
       addressModel: addressModel ?? this.addressModel,
       otherDocuments: otherDocuments ?? this.otherDocuments,
+      totalUser: totalUser ?? this.totalUser,
+      totaltask: totaltask ?? this.totaltask,
+      totalRevenue: totalRevenue ?? this.totalRevenue,
     );
   }
 }

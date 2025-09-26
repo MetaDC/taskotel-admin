@@ -343,7 +343,8 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                     IconButton(
                       icon: Icon(CupertinoIcons.eye),
                       onPressed: () {
-                        context.go('${Routes.clients}/${client.docId}');
+                        // context.go('${Routes.clients}/${client.docId}');
+                        context.go(Routes.clientDetail(client.docId));
                       },
                     ),
                   ],
