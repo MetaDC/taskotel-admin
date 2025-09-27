@@ -1,22 +1,15 @@
-// ClientDetailState
-part of 'client_detail_cubit.dart';
+part of 'masterhotel_task_cubit.dart';
 
-class ClientDetailState extends Equatable {
-  final ClientModel? client;
-  final List<HotelModel> hotels;
-  final HotelModel? hotelDetail;
+class MasterhotelTaskState extends Equatable {
+  final MasterHotelModel? hotelDetail;
   final bool isLoading;
   final bool isLoadingTasks;
   final String? message;
   final RoleTab selectedTab;
   final List<CommonTaskModel> allTasks; // Keep all tasks here
   final String searchQuery;
-  final ClientDetailAnalytics? clientAnalytics;
-  final HotelDetailAnalytics? hotelAnalytics;
 
-  const ClientDetailState({
-    required this.client,
-    required this.hotels,
+  const MasterhotelTaskState({
     required this.hotelDetail,
     required this.isLoading,
     required this.isLoadingTasks,
@@ -24,42 +17,30 @@ class ClientDetailState extends Equatable {
     required this.selectedTab,
     required this.allTasks,
     required this.searchQuery,
-    this.clientAnalytics,
-    this.hotelAnalytics,
   });
 
-  factory ClientDetailState.initial() {
-    return const ClientDetailState(
-      client: null,
+  factory MasterhotelTaskState.initial() {
+    return const MasterhotelTaskState(
       hotelDetail: null,
-      hotels: [],
       isLoading: false,
       isLoadingTasks: false,
       message: null,
       selectedTab: RoleTab.regionalManager,
       allTasks: [],
       searchQuery: '',
-      clientAnalytics: null,
-      hotelAnalytics: null,
     );
   }
 
-  ClientDetailState copyWith({
-    ClientModel? client,
-    List<HotelModel>? hotels,
-    HotelModel? hotelDetail,
+  MasterhotelTaskState copyWith({
+    MasterHotelModel? hotelDetail,
     bool? isLoading,
     bool? isLoadingTasks,
     String? message,
     RoleTab? selectedTab,
     List<CommonTaskModel>? allTasks,
     String? searchQuery,
-    ClientDetailAnalytics? clientAnalytics,
-    HotelDetailAnalytics? hotelAnalytics,
   }) {
-    return ClientDetailState(
-      client: client ?? this.client,
-      hotels: hotels ?? this.hotels,
+    return MasterhotelTaskState(
       hotelDetail: hotelDetail ?? this.hotelDetail,
       isLoading: isLoading ?? this.isLoading,
       isLoadingTasks: isLoadingTasks ?? this.isLoadingTasks,
@@ -67,8 +48,6 @@ class ClientDetailState extends Equatable {
       selectedTab: selectedTab ?? this.selectedTab,
       allTasks: allTasks ?? this.allTasks,
       searchQuery: searchQuery ?? this.searchQuery,
-      clientAnalytics: clientAnalytics ?? this.clientAnalytics,
-      hotelAnalytics: hotelAnalytics ?? this.hotelAnalytics,
     );
   }
 
@@ -132,8 +111,6 @@ class ClientDetailState extends Equatable {
 
   @override
   List<Object?> get props => [
-    client,
-    hotels,
     hotelDetail,
     isLoading,
     isLoadingTasks,
@@ -141,7 +118,5 @@ class ClientDetailState extends Equatable {
     selectedTab,
     allTasks,
     searchQuery,
-    clientAnalytics,
-    hotelAnalytics,
   ];
 }

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
-import 'package:taskoteladmin/features/master_hotel/models/masterhotel_model.dart';
+import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
 
 part 'masterhotel_state.dart';
 

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 
 abstract class ClientRepo {
   //Cients Page
@@ -14,7 +15,8 @@ abstract class ClientRepo {
   Future<Map<String, dynamic>> getClientAnalytics();
 
   //Client Details Page
-  Future<ClientModel> getClient(String clientId);
+  Future<ClientModel> getClientDetials(String clientId);
   Future<List<HotelModel>> getClientHotels(String clientId);
+  Future<List<CommonTaskModel>> getHotelTasks(String hotelId);
   // Future<HotelModel> getHotelDetails(String hotelId);
 }

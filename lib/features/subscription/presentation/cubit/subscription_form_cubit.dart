@@ -125,13 +125,9 @@ class SubscriptionFormCubit extends Cubit<SubscriptionFormState> {
   }
 
   // Submit form (create or update based on mode)
-  Future<void> submitForm(
-    BuildContext context,
-    SubscriptionPlanModel? editPlan,
-  ) async {
-    if (state.isSubmitting) {
-      return;
-    }
+  // Add this method to SubscriptionFormCubit
+  Future<void> submitForm(SubscriptionPlanModel? editPlan) async {
+    if (state.isSubmitting) return;
 
     if (formKey.currentState?.validate() ?? false) {
       if (state.features.isEmpty) {
@@ -177,8 +173,7 @@ class SubscriptionFormCubit extends Cubit<SubscriptionFormState> {
                 'Subscription Plan ${editPlan == null ? 'Created' : 'Updated'} Successfully!',
           ),
         );
-
-        Navigator.pop(context);
+        // Don't navigate here - let the parent handle it
       } catch (e) {
         emit(state.copyWith(isSubmitting: false, submitError: 'Error: $e'));
       }

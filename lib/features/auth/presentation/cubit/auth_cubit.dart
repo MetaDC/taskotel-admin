@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:taskoteladmin/features/auth/domain/auth_repo.dart';
+import 'package:taskoteladmin/features/auth/domain/repo/auth_repo.dart';
 
 part 'auth_state.dart';
 

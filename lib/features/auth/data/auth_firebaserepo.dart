@@ -1,5 +1,5 @@
 import 'package:taskoteladmin/core/services/firebase.dart';
-import 'package:taskoteladmin/features/auth/domain/auth_repo.dart';
+import 'package:taskoteladmin/features/auth/domain/repo/auth_repo.dart';
 
 class AuthFirebaseRepo extends AuthRepo {
   final firebaseAuth = FBAuth.auth;

@@ -11,7 +11,7 @@ class CommonTaskModel {
   final String updatedBy;
   final String updatedByName;
 
-  final String? hotelId;
+  final String hotelId;
   final String assignedRole;
   final String? assignedDepartmentId;
   final String? serviceType;
@@ -35,7 +35,7 @@ class CommonTaskModel {
     required this.updatedAt,
     required this.updatedBy,
     required this.updatedByName,
-    this.hotelId,
+    required this.hotelId,
     required this.assignedRole,
     this.assignedDepartmentId,
     this.serviceType,

@@ -11,6 +11,7 @@ import 'package:taskoteladmin/features/dashboard/presentation/pages/dashboard.da
 import 'package:taskoteladmin/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:taskoteladmin/features/clients/presentation/page/clients_page.dart';
 import 'package:taskoteladmin/features/clients/presentation/page/client_detail_page.dart';
+import 'package:taskoteladmin/features/master_hotel/presentation/page/master_hotel_task_page.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/page/master_hotels_page.dart';
 import 'package:taskoteladmin/features/master_task/presentation/pages/master_task_page.dart';
 import 'package:taskoteladmin/features/report/presentation/pages/reports_page.dart';
@@ -70,6 +71,7 @@ final GoRouter appRoute = GoRouter(
                     create: (context) =>
                         ClientDetailCubit(clientRepo: ClientFirebaseRepo())
                           ..loadClientDetails(clientId),
+
                     child: child,
                   );
                 }
@@ -115,7 +117,10 @@ final GoRouter appRoute = GoRouter(
                 final hotelName =
                     state.uri.queryParameters['hotelName'] ?? 'Hotel';
                 return NoTransitionPage(
-                  child: MasterTaskPage(hotelId: hotelId, hotelName: hotelName),
+                  child: MasterHotelTaskPage(
+                    hotelId: hotelId,
+                    HotelName: hotelName,
+                  ),
                 );
               },
             ),

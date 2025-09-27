@@ -12,21 +12,8 @@ import 'package:taskoteladmin/features/subscription/presentation/cubit/susbcript
 import 'package:taskoteladmin/features/subscription/presentation/widgets/subscription_plan_card.dart';
 import 'package:taskoteladmin/features/subscription/presentation/widgets/create_plan_form.dart';
 
-class SubscriptionPlansPage extends StatefulWidget {
+class SubscriptionPlansPage extends StatelessWidget {
   const SubscriptionPlansPage({super.key});
-
-  @override
-  State<SubscriptionPlansPage> createState() => _SubscriptionPlansPageState();
-}
-
-class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
-  @override
-  void initState() {
-    super.initState();
-    // Initialize subscription cubit and load data
-    context.read<SubscriptionCubit>().loadSubscriptionPlans();
-    context.read<SubscriptionCubit>().loadAnalytics();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,20 +22,42 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
           SubscriptionCubit(subscriptionRepo: SubscriptionFirebaserepo())
             ..loadSubscriptionPlans()
             ..loadAnalytics(),
-      child: BlocConsumer<SubscriptionCubit, SubscriptionState>(
-        listener: (context, state) {
-          if (state.message != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message!),
-                backgroundColor: state.message!.contains('success')
-                    ? Colors.green
-                    : Colors.red,
-              ),
-            );
-            context.read<SubscriptionCubit>().clearMessage();
-          }
-        },
+      child: const _SubscriptionPlansView(),
+    );
+  }
+}
+
+class _SubscriptionPlansView extends StatefulWidget {
+  const _SubscriptionPlansView();
+
+  @override
+  State<_SubscriptionPlansView> createState() => _SubscriptionPlansViewState();
+}
+
+class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<SubscriptionCubit, SubscriptionState>(
+      listenWhen: (previous, current) {
+        // Only listen when message actually changes and is not null
+        return previous.message != current.message && current.message != null;
+      },
+      listener: (context, state) {
+        if (state.message != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message!),
+              backgroundColor: state.message!.contains('success')
+                  ? Colors.green
+                  : Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+          // Clear message immediately to prevent multiple triggers
+          context.read<SubscriptionCubit>().clearMessage();
+        }
+      },
+      child: BlocBuilder<SubscriptionCubit, SubscriptionState>(
         builder: (context, state) {
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
@@ -100,41 +109,6 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
                   const SizedBox(height: 30),
                 ],
 
-                // Search and Filter Row
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: TextField(
-                //         decoration: InputDecoration(
-                //           hintText: "Search plans...",
-                //           prefixIcon: const Icon(CupertinoIcons.search),
-                //           border: OutlineInputBorder(
-                //             borderRadius: BorderRadius.circular(8),
-                //             borderSide: BorderSide(color: AppColors.slateGray),
-                //           ),
-                //         ),
-                //         onChanged: (value) {
-                //           context.read<Subscription1Cubit>().searchPlans(value);
-                //         },
-                //       ),
-                //     ),
-                //     const SizedBox(width: 16),
-                //     DropdownButton<bool?>(
-                //       value: state.statusFilter,
-                //       hint: const Text("Filter by Status"),
-                //       items: const [
-                //         DropdownMenuItem(value: null, child: Text("All")),
-                //         DropdownMenuItem(value: true, child: Text("Active")),
-                //         DropdownMenuItem(value: false, child: Text("Inactive")),
-                //       ],
-                //       onChanged: (value) {
-                //         context.read<Subscription1Cubit>().filterByStatus(value);
-                //       },
-                //     ),
-                //   ],
-                // ),
-                // const SizedBox(height: 30),
-
                 // Subscription Plans Grid
                 if (state.isLoading)
                   const Center(child: CircularProgressIndicator())
@@ -169,51 +143,75 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
     );
   }
 
-  void _showCreatePlanModal(
-    BuildContext context, {
-    SubscriptionPlanModel? planToEdit,
-  }) {
+  void _showCreatePlanModal(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return Dialog(
-          backgroundColor: Color(0xffFAFAFA),
+          backgroundColor: const Color(0xffFAFAFA),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: BlocProvider(
             create: (context) => SubscriptionFormCubit(
               subscriptionRepo: SubscriptionFirebaserepo(),
             ),
-            child: Container(
-              constraints: BoxConstraints(maxWidth: 600),
-              child: CreatePlanForm(planToEdit: planToEdit),
+            child: BlocListener<SubscriptionFormCubit, SubscriptionFormState>(
+              listener: (formContext, formState) {
+                if (formState.isSubmitted && formState.successMessage != null) {
+                  // Success - close dialog and refresh main cubit
+                  Navigator.of(dialogContext).pop();
+                  context.read<SubscriptionCubit>().loadSubscriptionPlans();
+                  context.read<SubscriptionCubit>().loadAnalytics();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(formState.successMessage!),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              },
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: const CreatePlanForm(planToEdit: null),
+              ),
             ),
           ),
         );
       },
     );
-
-    // showModalBottomSheet(
-    //   context: context,
-    //   isScrollControlled: true,
-    //   backgroundColor: Colors.transparent,
-    //   builder: (context) => CreatePlanForm(),
-    // );
   }
 
   void _showEditPlanModal(BuildContext context, SubscriptionPlanModel plan) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return Dialog(
-          backgroundColor: Color(0xffFAFAFA),
+          backgroundColor: const Color(0xffFAFAFA),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: BlocProvider(
             create: (context) => SubscriptionFormCubit(
               subscriptionRepo: SubscriptionFirebaserepo(),
             ),
-            child: Container(
-              constraints: BoxConstraints(maxWidth: 600),
-              child: CreatePlanForm(planToEdit: plan),
+            child: BlocListener<SubscriptionFormCubit, SubscriptionFormState>(
+              listener: (formContext, formState) {
+                if (formState.isSubmitted && formState.successMessage != null) {
+                  // Success - close dialog and refresh main cubit
+                  Navigator.of(dialogContext).pop();
+                  context.read<SubscriptionCubit>().loadSubscriptionPlans();
+                  context.read<SubscriptionCubit>().loadAnalytics();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(formState.successMessage!),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              },
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: CreatePlanForm(planToEdit: plan),
+              ),
             ),
           ),
         );
@@ -227,20 +225,22 @@ class _SubscriptionPlansPageState extends State<SubscriptionPlansPage> {
   ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text("Delete Plan"),
         content: Text("Are you sure you want to delete '${plan.title}'?"),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text("Cancel"),
           ),
           TextButton(
-            onPressed: () {
-              context.read<SubscriptionCubit>().deleteSubscriptionPlan(
+            onPressed: () async {
+              // Close dialog first
+              Navigator.of(dialogContext).pop();
+              // Then perform delete operation
+              await context.read<SubscriptionCubit>().deleteSubscriptionPlan(
                 plan.docId,
               );
-              Navigator.pop(context);
             },
             child: const Text("Delete", style: TextStyle(color: Colors.red)),
           ),

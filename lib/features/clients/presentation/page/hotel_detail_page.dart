@@ -5,6 +5,8 @@ import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/utils/helpers.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
 
 class HotelDetailPage extends StatefulWidget {
@@ -30,11 +32,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
     _searchController = TextEditingController();
 
     // Load hotel details and initial tab data
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cubit = context.read<ClientDetailCubit>();
-      cubit.loadHotelDetails(widget.hotelId);
-      cubit.switchTab(RoleTab.regionalManager);
-    });
+
+    final cubit = context.read<ClientDetailCubit>();
+    cubit.loadHotelDetails(widget.hotelId);
+    cubit.switchTab(RoleTab.regionalManager);
   }
 
   @override
@@ -56,86 +57,89 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
           return const Center(child: Text('Hotel not found'));
         }
 
-        return Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with back button
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(hotel.name, style: AppTextStyles.headerHeading),
-                        Text(
-                          "Hotel Management Dashboard",
-                          style: AppTextStyles.headerSubheading,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with back button
+              Row(
+                children: [
+                  // IconButton(
+                  //   icon: const Icon(Icons.arrow_back),
+                  //   onPressed: () => Navigator.of(context).pop(),
+                  // ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(hotel.name, style: AppTextStyles.headerHeading),
+                      Text(
+                        "Hotel Management Dashboard",
+                        style: AppTextStyles.headerSubheading,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
 
-                // Hotel Information Card
-                _buildHotelInformationCard(hotel),
-                const SizedBox(height: 20),
+              // Hotel Information Card
+              _buildHotelInformationCard(hotel),
+              const SizedBox(height: 20),
 
-                // Metrics Cards Row
-                // _buildMetricsRow(),
-                const SizedBox(height: 20),
+              // Metrics Cards Row
+              // _buildMetricsRow(),
+              const SizedBox(height: 20),
 
-                // Task Management Section
-                Expanded(
-                  child: CustomContainer(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Task Management",
-                          style: AppTextStyles.dialogHeading,
-                        ),
-                        const SizedBox(height: 20),
+              // Task Management Section
+              Expanded(
+                child: CustomContainer(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Task Management",
+                        style: AppTextStyles.dialogHeading,
+                      ),
+                      const SizedBox(height: 20),
 
-                        // Role Tabs
-                        _buildRoleTabs(state),
-                        const SizedBox(height: 20),
+                      // Role Tabs
+                      _buildRoleTabs(state),
+                      const SizedBox(height: 20),
 
-                        // Search Bar
-                        _buildSearchBar(),
-                        const SizedBox(height: 20),
+                      // Search Bar
+                      _buildSearchBar(),
+                      const SizedBox(height: 20),
 
-                        // Task Table
-                        _buildTaskTable(state),
-                      ],
-                    ),
+                      // Task Table
+                      _buildTaskTable(state),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
     );
   }
 
-  Widget _buildHotelInformationCard(hotel) {
+  Widget _buildHotelInformationCard(HotelModel hotel) {
     return CustomContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+
             children: [
-              const Icon(CupertinoIcons.info_circle),
+              const Icon(CupertinoIcons.building_2_fill),
               const SizedBox(width: 8),
-              Text("Hotel Information", style: AppTextStyles.dialogHeading),
+              Text(
+                "Hotel Information",
+                style: AppTextStyles.headerHeading.copyWith(fontSize: 22),
+              ),
             ],
           ),
           const SizedBox(height: 20),
@@ -197,46 +201,30 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
+            color: AppColors.slateGray,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 4),
-        if (isChip)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: chipColor?.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              value,
-              style: TextStyle(
-                color: chipColor,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
-              ),
-            ),
-          )
-        else
-          Row(
-            children: [
-              if (icon != null) ...[
-                Icon(icon, size: 16, color: Colors.grey),
-                const SizedBox(width: 4),
-              ],
-              Expanded(
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11,
-                  ),
+
+        Row(
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 16, color: Colors.grey),
+              const SizedBox(width: 4),
+            ],
+            Expanded(
+              child: Text(
+                value,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -326,7 +314,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
             context.read<ClientDetailCubit>().switchTab(value);
           }
         },
-        backgroundColor: Colors.grey.shade100,
+        backgroundColor: AppColors.slateLightGray,
         thumbColor: Colors.white,
         padding: const EdgeInsets.all(4),
       ),
@@ -371,13 +359,13 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
             children: [
               _buildTableHeader("Task ID", flex: 1),
               _buildTableHeader("Task Title", flex: 2),
-              _buildTableHeader("Description", flex: 3),
+              _buildTableHeader("Description", flex: 2),
               _buildTableHeader("Frequency", flex: 1),
-              _buildTableHeader("Priority", flex: 1),
+              // _buildTableHeader("Priority", flex: 1),
               _buildTableHeader("Est. Completion Time", flex: 2),
               _buildTableHeader("Status", flex: 1),
               _buildTableHeader("Active", flex: 1),
-              _buildTableHeader("Actions", flex: 1),
+              // _buildTableHeader("Actions", flex: 1),
             ],
           ),
           const Divider(thickness: 0.5),
@@ -385,13 +373,16 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
           // Task Rows
           if (state.isLoadingTasks)
             const Expanded(child: Center(child: CircularProgressIndicator()))
+          else if (state.filteredTasks.isEmpty)
+            const Expanded(child: Center(child: Text("No tasks found")))
           else
             Expanded(
               child: ListView.builder(
                 itemCount: state.filteredTasks.length,
                 itemBuilder: (context, index) {
                   final task = state.filteredTasks[index];
-                  return _buildTaskRow(task);
+
+                  return _buildTaskRow(task, index);
                 },
               ),
             ),
@@ -400,15 +391,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
     );
   }
 
-  Widget _buildTaskRow(TaskModel2 task) {
-    Color priorityColor = task.priority == "High"
-        ? Colors.red
-        : task.priority == "Medium"
-        ? Colors.orange
-        : Colors.green;
-
-    Color statusColor = task.status == "created" ? Colors.grey : Colors.orange;
-
+  Widget _buildTaskRow(CommonTaskModel task, int index) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
@@ -418,7 +401,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
               Expanded(
                 flex: 1,
                 child: Text(
-                  task.id,
+                  "${task.assignedRole.toUpperCase()} ${index + 1}",
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
               ),
@@ -430,13 +413,15 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                 ),
               ),
               Expanded(
-                flex: 3,
+                flex: 2,
                 child: Text(
-                  task.description,
+                  task.desc,
                   style: TextStyle(color: Colors.grey[600]),
                 ),
               ),
               Expanded(flex: 1, child: Text(task.frequency)),
+
+              Expanded(flex: 2, child: Text(task.duration)),
               Expanded(
                 flex: 1,
                 child: Container(
@@ -445,35 +430,13 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: priorityColor.withOpacity(0.1),
+                    // color: statusColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    task.priority,
+                    task.fromMasterHotel ? "Imported" : "Created",
                     style: TextStyle(
-                      color: priorityColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(flex: 2, child: Text(task.estimatedTime)),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    task.status,
-                    style: TextStyle(
-                      color: statusColor,
+                      // color: statusColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
                     ),
@@ -484,40 +447,43 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                 flex: 1,
                 child: GestureDetector(
                   onTap: () {
-                    context.read<ClientDetailCubit>().toggleTaskStatus(task.id);
+                    context.read<ClientDetailCubit>().toggleTaskStatus(
+                      task.docId,
+                    );
                   },
                   child: Text(
                     task.isActive ? "ON" : "OFF",
                     style: TextStyle(
-                      color: task.isActive ? Colors.green : Colors.red,
+                      color: task.isActive ? Colors.green : AppColors.slateGray,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(CupertinoIcons.pencil, size: 16),
-                      onPressed: () {
-                        // Edit task functionality
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Edit task: ${task.id}')),
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(CupertinoIcons.delete, size: 16),
-                      onPressed: () {
-                        // Delete task with confirmation
-                        _showDeleteConfirmation(task);
-                      },
-                    ),
-                  ],
-                ),
-              ),
+
+              // Expanded(
+              //   flex: 1,
+              //   child: Row(
+              //     children: [
+              //       IconButton(
+              //         icon: const Icon(CupertinoIcons.pencil, size: 16),
+              //         onPressed: () {
+              //           // Edit task functionality
+              //           ScaffoldMessenger.of(context).showSnackBar(
+              //             SnackBar(content: Text('Edit task: ${task.docId}')),
+              //           );
+              //         },
+              //       ),
+              //       IconButton(
+              //         icon: const Icon(CupertinoIcons.delete, size: 16),
+              //         onPressed: () {
+              //           // Delete task with confirmation
+              //           _showDeleteConfirmation(task);
+              //         },
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 8),
@@ -554,7 +520,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
     );
   }
 
-  void _showDeleteConfirmation(TaskModel2 task) {
+  void _showDeleteConfirmation(CommonTaskModel task) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -570,10 +536,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
             ),
             TextButton(
               onPressed: () {
-                context.read<ClientDetailCubit>().deleteTask(task.id);
+                context.read<ClientDetailCubit>().deleteTask(task.docId);
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Task ${task.id} deleted')),
+                  SnackBar(content: Text('Task ${task.title} deleted')),
                 );
               },
               child: const Text('Delete', style: TextStyle(color: Colors.red)),

@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/%20analytics_models.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 
 import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
 
@@ -132,7 +134,7 @@ class ClientFirebaseRepo extends ClientRepo {
 
   // Client Details Cubit Functions
   @override
-  Future<ClientModel> getClient(String clientId) async {
+  Future<ClientModel> getClientDetials(String clientId) async {
     try {
       final doc = await clientsCollectionRef.doc(clientId).get();
       if (!doc.exists) {
@@ -157,16 +159,19 @@ class ClientFirebaseRepo extends ClientRepo {
     }
   }
 
-  // @override
-  // Future<HotelModel> getHotelDetails(String clientId) async {
-  //   try {
-  //     final doc = await clientsCollectionRef.doc(clientId).get();
-  //     if (!doc.exists) {
-  //       throw Exception("Client not found");
-  //     }
-  //     return ClientModel.fromSnap(doc);
-  //   } catch (e) {
-  //     throw Exception("Failed to get client: $e");
-  //   }
-  // }
+  @override
+  Future<List<CommonTaskModel>> getHotelTasks(String hotelId) async {
+    try {
+      final snapshot = await FBFireStore.tasks
+          .where('hotelId', isEqualTo: hotelId)
+          .get();
+      print("snapshot.docs.length: ${snapshot.docs.length}");
+      return snapshot.docs.map((doc) => CommonTaskModel.fromSnap(doc)).toList();
+    } catch (e) {
+      throw Exception("Failed to get hotel tasks: $e");
+    }
+  }
+
+  // analytics
+
 }

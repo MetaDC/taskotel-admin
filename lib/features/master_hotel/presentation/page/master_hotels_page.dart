@@ -9,8 +9,8 @@ import 'package:taskoteladmin/core/utils/helpers.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
-import 'package:taskoteladmin/features/master_hotel/presentation/cubit/masterhotel_cubit.dart';
-import 'package:taskoteladmin/features/master_hotel/presentation/cubit/masterhotel_form_cubit.dart';
+import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-hotel/masterhotel_cubit.dart';
+import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-hotel/masterhotel_form_cubit.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/widgets/masterhotel_form.dart';
 
 class MasterHotelsPage extends StatefulWidget {

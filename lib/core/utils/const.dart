@@ -54,6 +54,18 @@ final List<Map<String, String>> roles = [
   {'key': 'staff', 'name': 'Operators'},
 ];
 
+// Client Hotel Task Constants
+
+class TaskStatus {
+  static const String created = 'created';
+  static const String imported = 'imported';
+}
+
+class ActiveStatus {
+  static const String active = 'active';
+  static const String inactive = 'inactive';
+}
+
 /// dummmy things
 List<Map<String, dynamic>> dummyHotels = [
   {
@@ -304,7 +316,7 @@ final List<String> hotelIds = [
   "vEypYc3dGDBps8bzScmt",
 ];
 
-final List<String> roles1 = ["Admin", "Manager", "Supervisor", "Staff"];
+final List<String> roles1 = ["rm", "gm", "dm", "staff"];
 
 final List<String> serviceTypes = ["Cleaning", "Check-in", "Repair", "Cooking"];
 

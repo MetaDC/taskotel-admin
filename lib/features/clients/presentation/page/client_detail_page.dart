@@ -37,27 +37,6 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // PageHeader(
-              //   heading: "heading",
-              //   subHeading: "subHeading",
-              //   buttonText: "buttonText",
-              //   onButtonPressed: () {
-              //     print("ONTAO");
-              //     Future<void> seedDummyHotels() async {
-              //       print("RUN");
-              //       final hotelsCollection = FBFireStore.hotels;
-
-              //       for (final hotel in dummyHotels) {
-              //         final docRef = hotelsCollection.doc(); // auto-generate ID
-              //         await docRef.set(hotel);
-              //         print("Added hotel: ${hotel['name']} (${docRef.id})");
-              //       }
-              //     }
-
-              //     seedDummyHotels();
-              //     print("--- Added");
-              //   },
-              // ),
               Text(
                 state.client?.name ?? '',
                 style: AppTextStyles.headerHeading,
@@ -68,32 +47,41 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
               ),
               const SizedBox(height: 20),
               StaggeredGrid.extent(
-                maxCrossAxisExtent: 500,
+                maxCrossAxisExtent: 400,
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 16,
                 children: [
                   StatCardIconLeft(
                     icon: CupertinoIcons.building_2_fill,
                     label: "Total Hotels",
-                    value: "20",
+                    value: "${state.clientAnalytics?.totalHotels ?? 0}",
                     iconColor: Colors.blue,
                   ),
-                  StatCardIconLeft(
-                    icon: CupertinoIcons.person_2,
-                    label: "Total Users",
-                    value: "30",
-                    iconColor: Colors.green,
-                  ),
+
                   StatCardIconLeft(
                     icon: Icons.checklist,
                     label: "Total Tasks",
-                    value: "40",
+                    value: "${state.clientAnalytics?.totalTasks ?? 0}",
                     iconColor: Colors.orange,
                   ),
                   StatCardIconLeft(
                     icon: CupertinoIcons.money_dollar,
                     label: "Total Revenue",
-                    value: "50",
+                    value: "\$${state.clientAnalytics?.totalRevenue ?? 0}",
+                    iconColor: Colors.green,
+                  ),
+
+                  StatCardIconLeft(
+                    icon: CupertinoIcons.person_2,
+                    label: "Active Subscriptions",
+                    value: "${state.clientAnalytics?.activeSubscriptions ?? 0}",
+                    iconColor: Colors.green,
+                  ),
+
+                  StatCardIconLeft(
+                    icon: CupertinoIcons.star_fill,
+                    label: "Average Hotel Rating",
+                    value: "${state.clientAnalytics?.averageHotelRating ?? 0}",
                     iconColor: Colors.green,
                   ),
                   const SizedBox(height: 20),

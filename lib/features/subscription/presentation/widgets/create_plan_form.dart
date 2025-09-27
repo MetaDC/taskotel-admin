@@ -22,16 +22,7 @@ class CreatePlanForm extends StatelessWidget {
 
     return BlocConsumer<SubscriptionFormCubit, SubscriptionFormState>(
       listener: (context, state) {
-        if (state.isSubmitted && state.successMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.successMessage!),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.pop(context);
-        }
-
+        // Handle validation and submit errors here, not navigation
         if (state.submitError != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -77,7 +68,12 @@ class CreatePlanForm extends StatelessWidget {
                       style: AppTextStyles.dialogHeading,
                     ),
                     IconButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () {
+                        // Safe navigation close
+                        if (Navigator.canPop(context)) {
+                          Navigator.of(context).pop();
+                        }
+                      },
                       icon: const Icon(CupertinoIcons.xmark),
                     ),
                   ],
@@ -321,7 +317,12 @@ class CreatePlanForm extends StatelessWidget {
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                // Safe navigation close
+                if (Navigator.canPop(context)) {
+                  Navigator.of(context).pop();
+                }
+              },
               child: const Text("Cancel"),
             ),
           ),
@@ -330,7 +331,7 @@ class CreatePlanForm extends StatelessWidget {
             child: ElevatedButton(
               onPressed: state.isSubmitting
                   ? null
-                  : () => cubit.submitForm(context, planToEdit),
+                  : () => cubit.submitForm(planToEdit),
               child: state.isSubmitting
                   ? const CircularProgressIndicator(color: Colors.white)
                   : Text(state.isEditMode ? "Update" : "Create"),

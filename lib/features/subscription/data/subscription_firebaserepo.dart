@@ -31,6 +31,7 @@ class SubscriptionFirebaserepo extends SubscriptionRepo {
 
   @override
   Future<void> deleteSubscriptionPlan(String planId) async {
+    print("deleting plan:-${planId}");
     await subscriptionCollectionRef.doc(planId).delete();
   }
 

@@ -6,8 +6,8 @@ import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/custom_textfields.dart';
-import 'package:taskoteladmin/features/master_hotel/models/masterhotel_model.dart';
-import 'package:taskoteladmin/features/master_hotel/presentation/cubit/masterhotel_form_cubit.dart';
+import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
+import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-hotel/masterhotel_form_cubit.dart';
 
 class MasterHotelForm extends StatefulWidget {
   MasterHotelModel? editMasterHotel;

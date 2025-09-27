@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:taskoteladmin/core/services/image_picker.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
-import 'package:taskoteladmin/features/master_hotel/models/masterhotel_model.dart';
+import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
 import 'package:taskoteladmin/features/stroage/data/firebase_storage_repo.dart';
 
 part 'masterhotel_form_state.dart';
