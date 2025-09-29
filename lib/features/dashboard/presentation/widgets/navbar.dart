@@ -37,6 +37,7 @@ class Navbar extends StatelessWidget {
       backgroundColor: const Color(0xFF1C1C1E),
       elevation: 0,
       titleSpacing: 20,
+
       title: Row(
         children: [
           logo(),
@@ -131,15 +132,15 @@ class Navbar extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? Colors.blue : Colors.transparent,
+          color: isActive ? Color(0xff3c83f6) : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(
           item.label,
           style: TextStyle(
             color: Colors.white,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            fontSize: 15,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.bold,
+            fontSize: isActive ? 15 : 14.5,
           ),
         ),
       ),

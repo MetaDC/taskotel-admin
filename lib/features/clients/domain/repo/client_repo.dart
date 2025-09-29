@@ -9,8 +9,8 @@ abstract class ClientRepo {
   Future<void> createAndRegisterClient(ClientModel client, String password);
   Future<void> updateClient(ClientModel client);
   Future<void> deleteClient(String clientId);
-  Stream<List<ClientModel>> getActiveClientsStream();
-  Stream<List<ClientModel>> getLostClientsStream();
+  // Stream<List<ClientModel>> getActiveClientsStream();
+  // Stream<List<ClientModel>> getLostClientsStream();
   Future<List<ClientModel>> searchClients(String query);
   Future<Map<String, dynamic>> getClientAnalytics();
 

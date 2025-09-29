@@ -20,6 +20,7 @@ class ClientState extends Equatable {
   final String? message;
   final Map<String, int>? stats;
   final String searchQuery;
+  final ClientTab selectedTab;
 
   ClientState({
     required this.activeClients,
@@ -36,6 +37,7 @@ class ClientState extends Equatable {
     this.message,
     this.stats,
     required this.searchQuery,
+    required this.selectedTab,
   });
 
   // Initial state
@@ -55,6 +57,7 @@ class ClientState extends Equatable {
       message: null,
       stats: null,
       searchQuery: '',
+      selectedTab: ClientTab.active,
     );
   }
   // Copy with method to update state
@@ -73,6 +76,7 @@ class ClientState extends Equatable {
     String? message,
     Map<String, int>? stats,
     String? searchQuery,
+    ClientTab? selectedTab,
   }) {
     return ClientState(
       activeClients: activeClients ?? this.activeClients,
@@ -90,6 +94,7 @@ class ClientState extends Equatable {
       message: message ?? this.message,
       stats: stats ?? this.stats,
       searchQuery: searchQuery ?? this.searchQuery,
+      selectedTab: selectedTab ?? this.selectedTab,
     );
   }
 
@@ -107,5 +112,6 @@ class ClientState extends Equatable {
     message,
     stats,
     searchQuery,
+    selectedTab,
   ];
 }

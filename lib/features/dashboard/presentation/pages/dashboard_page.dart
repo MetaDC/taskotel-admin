@@ -10,7 +10,7 @@ class DashboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
       child: Column(
         children: [
           // Stats Cards Grid
@@ -61,18 +61,18 @@ class DashboardPage extends StatelessWidget {
               children: [
                 const Text(
                   "Revenue Overview",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 1),
                 const Text(
                   "Monthly revenue performance",
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  style: TextStyle(fontSize: 14, color: Color(0xff64748b)),
                 ),
                 const SizedBox(height: 16),
                 Container(
                   height: 300,
                   width: double.infinity,
-                  color: Colors.grey[200],
+                  // color: Colors.grey[200],
                   child: const Center(child: Text("Revenue Chart Here")),
                 ),
               ],
@@ -90,36 +90,81 @@ class DashboardPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
-                      Text(
-                        "Unsubscribed / Not Renewed",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(
+                            CupertinoIcons.person_2,
+                            color: Color(0xff64748b),
+                            size: 24,
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Unsubscribed / Not Renewed",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                // SizedBox(height: 4),
+                                Text(
+                                  "Clients who registered but haven't subscribed or renewed",
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xff64748b),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  softWrap: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 4),
-                      Text(
-                        "Clients who registered but haven't subscribed or renewed",
-                        style: TextStyle(fontSize: 13, color: Colors.grey),
-                        softWrap: true,
-                      ),
-                      SizedBox(height: 12),
+                      SizedBox(height: 18),
                       Text(
                         "147 clients",
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 25,
                           fontWeight: FontWeight.bold,
                           color: Colors.red,
                         ),
                       ),
                       Text(
                         "Lost clients this month",
-                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xff64748b),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                TextButton(onPressed: () {}, child: const Text("View All")),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xfafafa),
+                    foregroundColor: Color(0xff020817),
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 18,
+                    ),
+                    side: const BorderSide(color: Color(0xffe2e8f0)),
+                    textStyle: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
+                  onPressed: () {},
+                  child: const Text("View All"),
+                ),
               ],
             ),
           ),

@@ -20,7 +20,7 @@ class StatCardIconRight extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -34,7 +34,7 @@ class StatCardIconRight extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: AppTextStyles.statCardLabel),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(value, style: AppTextStyles.statCardValue),
               ],
             ),

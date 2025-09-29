@@ -6,6 +6,7 @@ import 'package:taskoteladmin/core/services/firebase.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:taskoteladmin/features/clients/presentation/page/clients_page.dart';
 
 part 'client_state.dart';
 
@@ -17,9 +18,13 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Fetch active clients page
   Future<void> fetchActiveClientsPage() async {
+    print("Fetching active clients page");
     try {
+      print("Active current page: ${state.activeCurrentPage}");
       int pageZeroIndex = state.activeCurrentPage - 1;
+      print("Page zero index: $pageZeroIndex");
 
+      // Check if we already have this page
       if (pageZeroIndex < state.activeClients.length &&
           state.activeClients[pageZeroIndex].isNotEmpty) {
         return;
@@ -54,12 +59,26 @@ class ClientCubit extends Cubit<ClientState> {
         }
         updatedActiveClients[pageZeroIndex] = clients;
 
+        // Update total pages based on whether we have more data
+        int newTotalPages = state.activeTotalPages;
+        if (snap.docs.length == _pageSize) {
+          // If we got a full page, there might be more pages
+          newTotalPages = state.activeCurrentPage + 1;
+        } else {
+          // If we got less than a full page, this is the last page
+          newTotalPages = state.activeCurrentPage;
+        }
+
         emit(
           state.copyWith(
             activeClients: updatedActiveClients,
             activeLastFetchedDoc: newActiveLastFetchedDoc,
+            activeTotalPages: newTotalPages,
           ),
         );
+      } else {
+        // No more data, current page is the last page
+        emit(state.copyWith(activeTotalPages: state.activeCurrentPage - 1));
       }
     } on Exception catch (e) {
       print('Error fetching active clients page: $e');
@@ -71,6 +90,7 @@ class ClientCubit extends Cubit<ClientState> {
     try {
       int pageZeroIndex = state.lostCurrentPage - 1;
 
+      // Check if we already have this page
       if (pageZeroIndex < state.lostClients.length &&
           state.lostClients[pageZeroIndex].isNotEmpty) {
         return;
@@ -105,12 +125,26 @@ class ClientCubit extends Cubit<ClientState> {
         }
         updatedLostClients[pageZeroIndex] = clients;
 
+        // Update total pages based on whether we have more data
+        int newTotalPages = state.lostTotalPages;
+        if (snap.docs.length == _pageSize) {
+          // If we got a full page, there might be more pages
+          newTotalPages = state.lostCurrentPage + 1;
+        } else {
+          // If we got less than a full page, this is the last page
+          newTotalPages = state.lostCurrentPage;
+        }
+
         emit(
           state.copyWith(
             lostClients: updatedLostClients,
             lostLastFetchedDoc: newLostLastFetchedDoc,
+            lostTotalPages: newTotalPages,
           ),
         );
+      } else {
+        // No more data, current page is the last page
+        emit(state.copyWith(lostTotalPages: state.lostCurrentPage - 1));
       }
     } on Exception catch (e) {
       print('Error fetching lost clients page: $e');
@@ -119,11 +153,23 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Initialize active clients pagination
   Future<void> initializeActiveClientsPagination() async {
-    final userCountSnap = await FBFireStore.clients
-        .where('status', whereIn: ['active', 'trial'])
-        .count()
-        .get();
-    int totalItems = userCountSnap.count ?? 0;
+    // Don't re-initialize if we already have data and we're on the active tab
+    if (state.activeClients.isNotEmpty &&
+        state.selectedTab == ClientTab.active) {
+      // Just update the filtered clients to show the current page
+      final currentPageIndex = state.activeCurrentPage - 1;
+      if (currentPageIndex < state.activeClients.length) {
+        emit(
+          state.copyWith(
+            filteredActiveClients: state.activeClients[currentPageIndex],
+            isLoading: false,
+          ),
+        );
+      }
+      return;
+    }
+
+    print("Initializing active clients pagination - fetching first page only");
 
     emit(
       state.copyWith(
@@ -132,7 +178,8 @@ class ClientCubit extends Cubit<ClientState> {
         filteredActiveClients: [],
         activeLastFetchedDoc: null,
         activeCurrentPage: 1,
-        activeTotalPages: (totalItems / _pageSize).ceil(),
+        activeTotalPages: 1, // Start with 1, will update as we paginate
+        message: null, // Clear any previous error messages
       ),
     );
 
@@ -156,11 +203,22 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Initialize lost clients pagination
   Future<void> initializeLostClientsPagination() async {
-    final userCountSnap = await FBFireStore.clients
-        .where('status', whereIn: ['churned', 'inactive', 'suspended'])
-        .count()
-        .get();
-    int totalItems = userCountSnap.count ?? 0;
+    // Don't re-initialize if we already have data and we're on the lost tab
+    if (state.lostClients.isNotEmpty && state.selectedTab == ClientTab.lost) {
+      // Just update the filtered clients to show the current page
+      final currentPageIndex = state.lostCurrentPage - 1;
+      if (currentPageIndex < state.lostClients.length) {
+        emit(
+          state.copyWith(
+            filteredLostClients: state.lostClients[currentPageIndex],
+            isLoading: false,
+          ),
+        );
+      }
+      return;
+    }
+
+    print("Initializing lost clients pagination - fetching first page only");
 
     emit(
       state.copyWith(
@@ -169,7 +227,8 @@ class ClientCubit extends Cubit<ClientState> {
         filteredLostClients: [],
         lostLastFetchedDoc: null,
         lostCurrentPage: 1,
-        lostTotalPages: (totalItems / _pageSize).ceil(),
+        lostTotalPages: 1, // Start with 1, will update as we paginate
+        message: null, // Clear any previous error messages
       ),
     );
 
@@ -371,6 +430,100 @@ class ClientCubit extends Cubit<ClientState> {
       }
     }
   }
- 
-  // 
+
+  // Tab management methods - FIXED VERSION
+  void switchTab(ClientTab tab) {
+    if (state.selectedTab != tab) {
+      // Only update the selected tab and clear error messages
+      // Don't clear the cached data or reset pagination
+      emit(
+        state.copyWith(
+          selectedTab: tab,
+          message: null, // Clear any error messages
+          searchQuery: '', // Clear search when switching tabs
+        ),
+      );
+
+      // Update the filtered lists based on current page for the selected tab
+      if (tab == ClientTab.active && state.activeClients.isNotEmpty) {
+        final currentPageIndex = state.activeCurrentPage - 1;
+        if (currentPageIndex < state.activeClients.length) {
+          emit(
+            state.copyWith(
+              filteredActiveClients: state.activeClients[currentPageIndex],
+            ),
+          );
+        }
+      } else if (tab == ClientTab.lost && state.lostClients.isNotEmpty) {
+        final currentPageIndex = state.lostCurrentPage - 1;
+        if (currentPageIndex < state.lostClients.length) {
+          emit(
+            state.copyWith(
+              filteredLostClients: state.lostClients[currentPageIndex],
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  // Helper methods to check if data needs to be loaded
+  bool get shouldLoadActiveClients {
+    return state.activeClients.isEmpty && state.selectedTab == ClientTab.active;
+  }
+
+  bool get shouldLoadLostClients {
+    return state.lostClients.isEmpty && state.selectedTab == ClientTab.lost;
+  }
+
+  // Method to refresh current tab data (useful for pull-to-refresh)
+  Future<void> refreshCurrentTab() async {
+    if (state.selectedTab == ClientTab.active) {
+      emit(
+        state.copyWith(
+          activeClients: [],
+          activeLastFetchedDoc: null,
+          activeCurrentPage: 1,
+        ),
+      );
+      await initializeActiveClientsPagination();
+    } else {
+      emit(
+        state.copyWith(
+          lostClients: [],
+          lostLastFetchedDoc: null,
+          lostCurrentPage: 1,
+        ),
+      );
+      await initializeLostClientsPagination();
+    }
+  }
+
+  // Optional: Get total count only when needed (e.g., for analytics)
+  Future<int> getTotalActiveClientsCount() async {
+    try {
+      final userCountSnap = await FBFireStore.clients
+          .where('status', whereIn: ['active', 'trial'])
+          .count()
+          .get();
+      return userCountSnap.count ?? 0;
+    } catch (e) {
+      print('Error getting total active clients count: $e');
+      return 0;
+    }
+  }
+
+  // Optional: Get total count only when needed (e.g., for analytics)
+  Future<int> getTotalLostClientsCount() async {
+    try {
+      final userCountSnap = await FBFireStore.clients
+          .where('status', whereIn: ['churned', 'inactive', 'suspended'])
+          .count()
+          .get();
+      return userCountSnap.count ?? 0;
+    } catch (e) {
+      print('Error getting total lost clients count: $e');
+      return 0;
+    }
+  }
 }

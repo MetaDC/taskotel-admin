@@ -10,7 +10,7 @@ class AppTheme {
       primary: AppColors.primary,
       secondary: AppColors.secondary,
     ),
-    textTheme: GoogleFonts.albertSansTextTheme(),
+    // textTheme: GoogleFonts.albertSansTextTheme(),
     appBarTheme: AppBarTheme(
       backgroundColor: AppColors.secondary,
       foregroundColor: AppColors.primary,

@@ -57,36 +57,36 @@ class ClientFirebaseRepo extends ClientRepo {
     }
   }
 
-  @override
-  Stream<List<ClientModel>> getActiveClientsStream() {
-    return clientsCollectionRef
-        .where('status', isEqualTo: ClientStatus.active)
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) =>
-              snapshot.docs.map((doc) => ClientModel.fromDocSnap(doc)).toList(),
-        );
-  }
+  // @override
+  // Stream<List<ClientModel>> getActiveClientsStream() {
+  //   return clientsCollectionRef
+  //       .where('status', isEqualTo: ClientStatus.active)
+  //       .orderBy('createdAt', descending: true)
+  //       .snapshots()
+  //       .map(
+  //         (snapshot) =>
+  //             snapshot.docs.map((doc) => ClientModel.fromDocSnap(doc)).toList(),
+  //       );
+  // }
 
-  @override
-  Stream<List<ClientModel>> getLostClientsStream() {
-    return clientsCollectionRef
-        .where(
-          'status',
-          whereIn: [
-            ClientStatus.inactive,
-            ClientStatus.suspended,
-            ClientStatus.churned,
-          ],
-        )
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .map(
-          (snapshot) =>
-              snapshot.docs.map((doc) => ClientModel.fromDocSnap(doc)).toList(),
-        );
-  }
+  // @override
+  // Stream<List<ClientModel>> getLostClientsStream() {
+  //   return clientsCollectionRef
+  //       .where(
+  //         'status',
+  //         whereIn: [
+  //           ClientStatus.inactive,
+  //           ClientStatus.suspended,
+  //           ClientStatus.churned,
+  //         ],
+  //       )
+  //       .orderBy('createdAt', descending: true)
+  //       .snapshots()
+  //       .map(
+  //         (snapshot) =>
+  //             snapshot.docs.map((doc) => ClientModel.fromDocSnap(doc)).toList(),
+  //       );
+  // }
 
   @override
   Future<List<ClientModel>> searchClients(String query) async {

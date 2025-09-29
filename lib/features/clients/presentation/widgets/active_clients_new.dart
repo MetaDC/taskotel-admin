@@ -28,6 +28,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
 
   @override
   void initState() {
+    print("Active Clients New");
     super.initState();
     // Initialize active clients pagination
     context.read<ClientCubit>().initializeActiveClientsPagination();
@@ -417,57 +418,6 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
           fontSize: 10,
           fontWeight: FontWeight.bold,
         ),
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    return "${date.day}/${date.month}/${date.year}";
-  }
-
-  void _viewClientDetails(ClientModel client) {
-    // Navigate to client details
-  }
-
-  void _editClient(ClientModel client) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => BlocProvider(
-        create: (context) => ClientFormCubit(clientRepo: ClientFirebaseRepo()),
-        child: ClientFormModal(clientToEdit: client),
-      ),
-    ).then((result) {
-      if (result == true) {
-        // Refresh the current page
-        context.read<ClientCubit>().fetchNextActiveClientsPage(
-          page: context.read<ClientCubit>().state.activeCurrentPage,
-        );
-      }
-    });
-  }
-
-  void _deleteClient(ClientModel client) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Delete Client"),
-        content: Text("Are you sure you want to delete ${client.name}?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () {
-              // Delete client logic here
-              Navigator.pop(context);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text("Delete"),
-          ),
-        ],
       ),
     );
   }

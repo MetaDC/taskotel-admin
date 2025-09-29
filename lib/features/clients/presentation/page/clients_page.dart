@@ -5,6 +5,7 @@ import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
 import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
+import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.dart';
 
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_form_cubit.dart';
 import 'package:taskoteladmin/features/clients/presentation/widgets/active_clients_new.dart';
@@ -37,7 +38,7 @@ class _ClientsPageState extends State<ClientsPage> {
         children: [
           PageHeader(
             heading: 'Clients',
-            subHeading: 'Manage your clients',
+            subHeading: 'Manage your hotel clients and their subscriptions',
             buttonText: 'Add Client',
             onButtonPressed: () {
               showDialog(
@@ -63,14 +64,16 @@ class _ClientsPageState extends State<ClientsPage> {
               // print("---");
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
 
           Row(
             children: [
               CupertinoSlidingSegmentedControl<ClientTab>(
-                backgroundColor: AppColors.slateLightGray,
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                groupValue: selectedTab,
+                backgroundColor: true
+                    ? Color(0xfff1f5f9)
+                    : AppColors.slateLightGray,
+                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                groupValue: context.watch<ClientCubit>().state.selectedTab,
                 children: {
                   ClientTab.active: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -78,8 +81,6 @@ class _ClientsPageState extends State<ClientsPage> {
                       Icon(CupertinoIcons.person_2),
                       SizedBox(width: 15),
                       Text("Active Clients"),
-
-                      //serach bar and filter
                     ],
                   ),
                   ClientTab.lost: Row(
@@ -93,17 +94,15 @@ class _ClientsPageState extends State<ClientsPage> {
                 },
                 onValueChanged: (val) {
                   if (val != null) {
-                    setState(() {
-                      selectedTab = val;
-                    });
+                    context.read<ClientCubit>().switchTab(val);
                   }
                 },
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 25),
 
-          selectedTab == ClientTab.active
+          context.watch<ClientCubit>().state.selectedTab == ClientTab.active
               ? const ActiveClientsNew()
               : const LostClientsNew(),
         ],

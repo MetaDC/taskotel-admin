@@ -7,8 +7,6 @@ import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taskoteladmin/features/auth/data/auth_firebaserepo.dart';
 import 'package:taskoteladmin/features/auth/presentation/cubit/auth_cubit.dart';
-import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
-import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
