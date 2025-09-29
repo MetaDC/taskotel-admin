@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-task/master_task_form_cubit.dart';
-import 'package:taskoteladmin/features/master_task/data/mastertask_firebaserepo.dart';
-import 'package:taskoteladmin/features/master_task/presentation/cubit/mastertask_form_cubit.dart';
 
 class MasterTaskFormScreen extends StatelessWidget {
   @override
@@ -13,10 +11,9 @@ class MasterTaskFormScreen extends StatelessWidget {
         builder: (context, state) {
           return Center(
             child: Container(
-              constraints: BoxConstraints(maxWidth: 600),
+              constraints: BoxConstraints(maxWidth: 800),
               margin: EdgeInsets.all(20),
               child: Card(
-                color: Color(0xFF2D2D2D),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -29,12 +26,11 @@ class MasterTaskFormScreen extends StatelessWidget {
                       // Header
                       Row(
                         children: [
-                          Icon(Icons.business, color: Colors.white, size: 24),
+                          Icon(Icons.business, size: 24),
                           SizedBox(width: 12),
                           Text(
                             'Create Master Tasks - Marriott International',
                             style: TextStyle(
-                              color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
@@ -52,7 +48,6 @@ class MasterTaskFormScreen extends StatelessWidget {
                       Text(
                         'Step 1: Select User Category',
                         style: TextStyle(
-                          color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -67,10 +62,7 @@ class MasterTaskFormScreen extends StatelessWidget {
                               children: [
                                 TextSpan(
                                   text: 'User Category ',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
+                                  style: TextStyle(fontSize: 14),
                                 ),
                                 TextSpan(
                                   text: '*',
@@ -87,7 +79,6 @@ class MasterTaskFormScreen extends StatelessWidget {
                             width: double.infinity,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: Color(0xFF404040),
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
                                 color: Color(0xFF4A90E2),
@@ -114,7 +105,7 @@ class MasterTaskFormScreen extends StatelessWidget {
                                     color: Colors.grey[400],
                                   ),
                                 ),
-                                dropdownColor: Color(0xFF404040),
+
                                 items:
                                     [
                                       'Regional Manager',
@@ -130,9 +121,7 @@ class MasterTaskFormScreen extends StatelessWidget {
                                           ),
                                           child: Text(
                                             value,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            ),
+                                            style: TextStyle(),
                                           ),
                                         ),
                                       );
@@ -155,7 +144,6 @@ class MasterTaskFormScreen extends StatelessWidget {
                       Text(
                         'Step 2: Import Tasks',
                         style: TextStyle(
-                          color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -166,7 +154,6 @@ class MasterTaskFormScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Color(0xFF404040),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: Color(0xFF4A90E2),
@@ -184,11 +171,7 @@ class MasterTaskFormScreen extends StatelessWidget {
                                     color: Color(0xFF22C55E),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
-                                  child: Icon(
-                                    Icons.table_chart,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
+                                  child: Icon(Icons.table_chart, size: 20),
                                 ),
                                 SizedBox(width: 12),
                                 Column(
@@ -197,7 +180,6 @@ class MasterTaskFormScreen extends StatelessWidget {
                                     Text(
                                       'Import tasks from Excel',
                                       style: TextStyle(
-                                        color: Colors.white,
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -221,7 +203,7 @@ class MasterTaskFormScreen extends StatelessWidget {
                                             .downloadTemplate(),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Color(0xFF4A90E2),
-                                    foregroundColor: Colors.white,
+
                                     elevation: 0,
                                     padding: EdgeInsets.symmetric(
                                       horizontal: 16,
@@ -234,7 +216,6 @@ class MasterTaskFormScreen extends StatelessWidget {
                                           height: 16,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2,
-                                            color: Colors.white,
                                           ),
                                         )
                                       : Icon(Icons.download, size: 16),
@@ -262,7 +243,6 @@ class MasterTaskFormScreen extends StatelessWidget {
                               width: double.infinity,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: Color(0xFF2D2D2D),
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(color: Color(0xFF555555)),
                               ),
@@ -306,7 +286,6 @@ class MasterTaskFormScreen extends StatelessWidget {
                                         // }
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xFF555555),
                                         foregroundColor: Colors.white,
                                         elevation: 0,
                                         shape: RoundedRectangleBorder(

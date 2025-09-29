@@ -2,7 +2,6 @@ import 'package:taskoteladmin/core/services/firebase.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
 import 'package:taskoteladmin/features/master_hotel/domain/repo/mastertask_repo.dart';
-import 'package:taskoteladmin/features/master_task/domain/model/mastertask_model.dart';
 
 class MasterHotelFirebaseRepo extends MasterHotelTaskRepo {
   final masterHotelCollectionRef = FBFireStore.masterHotels;
