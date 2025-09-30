@@ -76,6 +76,9 @@ class ClientCubit extends Cubit<ClientState> {
             activeTotalPages: newTotalPages,
           ),
         );
+        // print(
+        //   "Active clients fetched: ${state.activeClients.length} -- ${state.activeClients[pageZeroIndex]}",
+        // );
       } else {
         // No more data, current page is the last page
         emit(state.copyWith(activeTotalPages: state.activeCurrentPage - 1));

@@ -19,4 +19,8 @@ class AppColors {
   //warning
   static const Color today = Color(0xFF499B21);
   static const Color overDue = Color(0xFFC37B34);
+
+  // zaid
+  static const Color blueGreyBorder = Color(0xffe2e8f0);
+  static const Color textBlackColor = Color(0xff020817);
 }

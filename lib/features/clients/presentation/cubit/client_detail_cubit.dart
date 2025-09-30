@@ -1,6 +1,7 @@
 // ClientDetailCubit
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/%20analytics_models.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
@@ -8,8 +9,6 @@ import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dar
 import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
 
 part 'client_detail_state.dart';
-
-enum RoleTab { regionalManager, generalManager, departmentManager, operators }
 
 class ClientDetailCubit extends Cubit<ClientDetailState> {
   final ClientRepo clientRepo;
@@ -69,7 +68,6 @@ class ClientDetailCubit extends Cubit<ClientDetailState> {
 
   // Tab management methods
   void switchTab(RoleTab tab) {
-
     if (state.selectedTab != tab) {
       emit(state.copyWith(selectedTab: tab));
     }

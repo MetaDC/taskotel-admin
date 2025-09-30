@@ -16,6 +16,7 @@ import 'package:taskoteladmin/features/master_hotel/presentation/page/master_hot
 import 'package:taskoteladmin/features/report/presentation/pages/reports_page.dart';
 import 'package:taskoteladmin/features/subscription/presentation/pages/subscription_plans_page.dart';
 import 'package:taskoteladmin/features/transactions/presentation/pages/transactions_page.dart';
+import 'package:taskoteladmin/features/transactions/presentation/cubit/transaction_cubit.dart';
 
 final GoRouter appRoute = GoRouter(
   debugLogDiagnostics: true,
@@ -132,8 +133,12 @@ final GoRouter appRoute = GoRouter(
         ),
         GoRoute(
           path: Routes.transactions,
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: TransactionsPage()),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: BlocProvider(
+              create: (context) => TransactionCubit(),
+              child: const TransactionsPage(),
+            ),
+          ),
         ),
         GoRoute(
           path: Routes.reports,

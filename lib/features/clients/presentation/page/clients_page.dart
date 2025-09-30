@@ -75,21 +75,33 @@ class _ClientsPageState extends State<ClientsPage> {
                 padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                 groupValue: context.watch<ClientCubit>().state.selectedTab,
                 children: {
-                  ClientTab.active: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(CupertinoIcons.person_2),
-                      SizedBox(width: 15),
-                      Text("Active Clients"),
-                    ],
+                  ClientTab.active: Padding(
+                    padding: EdgeInsetsGeometry.symmetric(
+                      horizontal: 20,
+                      vertical: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(CupertinoIcons.person_2, size: 20),
+                        SizedBox(width: 15),
+                        Text("Active Clients"),
+                      ],
+                    ),
                   ),
-                  ClientTab.lost: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(CupertinoIcons.person_crop_circle_badge_xmark),
-                      SizedBox(width: 15),
-                      Text("Lost Clients"),
-                    ],
+                  ClientTab.lost: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          CupertinoIcons.person_crop_circle_badge_xmark,
+                          size: 20,
+                        ),
+                        SizedBox(width: 15),
+                        Text("Lost Clients"),
+                      ],
+                    ),
                   ),
                 },
                 onValueChanged: (val) {

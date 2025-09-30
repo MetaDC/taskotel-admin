@@ -39,8 +39,8 @@ class AppTextStyles {
 
   //stat cards styles
   static final statCardLabel = GoogleFonts.albertSans(
-    fontSize: 15,
-    fontWeight: FontWeight.bold,
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
     color: AppColors.slateGray,
   );
   static final statCardValue = GoogleFonts.albertSans(

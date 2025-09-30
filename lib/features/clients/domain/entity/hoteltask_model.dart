@@ -22,7 +22,7 @@ class CommonTaskModel {
   final List<Map<String, dynamic>> questions; // or List<QuestionModel>
   final DateTime? startDate; // null for master hotel
   final DateTime? endDate; // null if not to end this
-  final bool fromMasterHotel;
+  final bool? fromMasterHotel;
   final bool isActive;
 
   CommonTaskModel({
@@ -46,7 +46,7 @@ class CommonTaskModel {
     required this.questions,
     this.startDate,
     this.endDate,
-    required this.fromMasterHotel,
+    this.fromMasterHotel,
     required this.isActive,
   });
 
@@ -83,7 +83,7 @@ class CommonTaskModel {
       endDate: json["endDate"] != null
           ? DateTime.fromMillisecondsSinceEpoch(json["endDate"])
           : null,
-      fromMasterHotel: json["fromMasterHotel"] ?? false,
+      fromMasterHotel: json["fromMasterHotel"],
       isActive: json["isActive"] ?? true,
     );
   }

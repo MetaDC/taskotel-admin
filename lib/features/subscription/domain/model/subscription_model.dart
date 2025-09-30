@@ -89,4 +89,10 @@ class SubscriptionPlanModel {
     final data = snap.data();
     return SubscriptionPlanModel.fromJson(data, snap.id);
   }
+
+  // toMap
+  Map<String, dynamic> toMap() => toJson();
+
+  /// 🔹 CopyWith for updating specific fields
+  
 }

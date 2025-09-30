@@ -43,9 +43,11 @@ class StatCardIconRight extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.slateGray.withOpacity(0.1),
+              color: true
+                  ? Color(0xfff1f5f9)
+                  : AppColors.slateGray.withOpacity(0.1),
             ),
-            child: Icon(icon, color: iconColor, size: 28),
+            child: Icon(icon, color: iconColor, size: 25),
           ),
         ],
       ),
@@ -74,7 +76,7 @@ class StatCardIconLeft extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.blueGreyBorder),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,13 +86,19 @@ class StatCardIconLeft extends StatelessWidget {
             decoration: BoxDecoration(shape: BoxShape.circle),
             child: Icon(icon, color: iconColor, size: 28),
           ),
-
+          SizedBox(width: 5),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: AppTextStyles.statCardLabel),
+              Text(
+                label,
+                style: AppTextStyles.statCardLabel.copyWith(height: 0),
+              ),
 
-              Text(value, style: AppTextStyles.statCardValue),
+              Text(
+                value,
+                style: AppTextStyles.statCardValue.copyWith(height: 0),
+              ),
             ],
           ),
         ],

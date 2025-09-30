@@ -1,12 +1,17 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskoteladmin/core/utils/const.dart';
+import 'package:taskoteladmin/core/widget/custom_textfields.dart';
+import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-task/master_task_form_cubit.dart';
 
 class MasterTaskFormScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => MasterTaskFormCubit(),
+      create: (context) =>
+          MasterTaskFormCubit(masterHotelRepo: MasterHotelFirebaseRepo()),
       child: BlocBuilder<MasterTaskFormCubit, MasterTaskFormState>(
         builder: (context, state) {
           return Center(
@@ -57,85 +62,81 @@ class MasterTaskFormScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'User Category ',
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                TextSpan(
-                                  text: '*',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Container(
-                            width: double.infinity,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                color: Color(0xFF4A90E2),
-                                width: 1,
-                              ),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: state.selectedCategory,
-                                hint: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 12),
-                                  child: Text(
-                                    'Select user category for these tasks',
-                                    style: TextStyle(
-                                      color: Colors.grey[400],
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                                icon: Padding(
-                                  padding: EdgeInsets.only(right: 12),
-                                  child: Icon(
-                                    Icons.keyboard_arrow_down,
-                                    color: Colors.grey[400],
-                                  ),
-                                ),
-
-                                items:
-                                    [
-                                      'Regional Manager',
-                                      'Operations Manager',
-                                      'General Manager',
-                                      'Department Head',
-                                    ].map((String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                          ),
-                                          child: Text(
-                                            value,
-                                            style: TextStyle(),
-                                          ),
+                          true
+                              ? CustomDropDownField(
+                                  title: "User Category",
+                                  hintText: "Select user category",
+                                  initialValue: state.selectedCategory,
+                                  validatorText:
+                                      "Please select a user category",
+                                  items: roles.map((item) {
+                                    return DropdownMenuItem(
+                                      value: item['key'],
+                                      child: Text(item['name'] ?? ''),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    print("value: $value");
+                                    if (value != null) {
+                                      context
+                                          .read<MasterTaskFormCubit>()
+                                          .selectUserCategory(value);
+                                    }
+                                  },
+                                )
+                              : DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: state.selectedCategory,
+                                    hint: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      child: Text(
+                                        'Select user category for these tasks',
+                                        style: TextStyle(
+                                          color: Colors.grey[400],
+                                          fontSize: 14,
                                         ),
-                                      );
-                                    }).toList(),
-                                onChanged: (String? newValue) {
-                                  if (newValue != null) {
-                                    context
-                                        .read<MasterTaskFormCubit>()
-                                        .selectUserCategory(newValue);
-                                  }
-                                },
-                              ),
-                            ),
-                          ),
+                                      ),
+                                    ),
+                                    icon: Padding(
+                                      padding: EdgeInsets.only(right: 12),
+                                      child: Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: Colors.grey[400],
+                                      ),
+                                    ),
+
+                                    items:
+                                        [
+                                          'Regional Manager',
+                                          'Operations Manager',
+                                          'General Manager',
+                                          'Department Head',
+                                        ].map((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                              ),
+                                              child: Text(
+                                                value,
+                                                style: TextStyle(),
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                    onChanged: (String? newValue) {
+                                      print("newValue: $newValue");
+                                      if (newValue != null) {
+                                        context
+                                            .read<MasterTaskFormCubit>()
+                                            .selectUserCategory(newValue);
+                                      }
+                                    },
+                                  ),
+                                ),
                         ],
                       ),
                       SizedBox(height: 32),
@@ -269,16 +270,40 @@ class MasterTaskFormScreen extends StatelessWidget {
                                     height: 48,
                                     child: ElevatedButton(
                                       onPressed: () async {
-                                        // FilePickerResult? result =
-                                        //     await FilePicker.platform
-                                        //         .pickFiles(
-                                        //           type: FileType.custom,
-                                        //           allowedExtensions: [
-                                        //             'xlsx',
-                                        //             'xls',
-                                        //           ],
-                                        //         );
-
+                                        FilePickerResult? result =
+                                            await FilePicker.platform.pickFiles(
+                                              type: FileType.custom,
+                                              allowedExtensions: [
+                                                'xlsx',
+                                                'xls',
+                                              ],
+                                            );
+                                        print(
+                                          'result!=null: ${result != null}',
+                                        );
+                                        if (result != null) {
+                                          print(
+                                            'result.files.first.name: ${result.files.first.name}',
+                                          );
+                                          // context
+                                          //     .read<MasterTaskFormCubit>()
+                                          //     .selectFile(result.files.first);
+                                          state.selectedFile =
+                                              result.files.first;
+                                          print("Creating tasks...");
+                                          print(
+                                            'state.selectedCategory!=null : ${state.selectedCategory != null}',
+                                          );
+                                          await Future.delayed(
+                                            Duration(seconds: 2),
+                                          );
+                                          await context
+                                              .read<MasterTaskFormCubit>()
+                                              .createMasterTasks(
+                                                context,
+                                                'random docId',
+                                              );
+                                        }
                                         // if (result != null) {
                                         //   context
                                         //       .read<MasterTaskFormCubit>()

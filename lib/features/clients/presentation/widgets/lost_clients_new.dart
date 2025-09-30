@@ -72,7 +72,13 @@ class _LostClientsNewState extends State<LostClientsNew> {
               ),
               const SizedBox(height: 20),
               // Header with search
-              CustomContainer(
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.blueGreyBorder),
+                ),
                 child: Column(
                   children: [
                     Row(
@@ -80,28 +86,70 @@ class _LostClientsNewState extends State<LostClientsNew> {
                         const Text(
                           "Lost Clients List",
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 21,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
                         const Spacer(),
                         SizedBox(
                           width: 300,
+                          height: 43,
                           child: TextField(
                             controller: _searchController,
+                            cursorHeight: 20,
+                            // decoration: InputDecoration(
+                            //   hintText: "Search lost clients...",
+                            //   prefixIcon: const Icon(CupertinoIcons.search),
+                            //   border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8),
+                            //     borderSide: BorderSide(
+                            //       color: AppColors.slateGray,
+                            //     ),
+                            //   ),
+                            //   contentPadding: const EdgeInsets.symmetric(
+                            //     horizontal: 12,
+                            //     vertical: 8,
+                            //   ),
+                            // ),
                             decoration: InputDecoration(
+                              fillColor: Color(0xfffafafa),
+                              filled: true,
                               hintText: "Search lost clients...",
-                              prefixIcon: const Icon(CupertinoIcons.search),
+                              prefixIcon: const Icon(
+                                CupertinoIcons.search,
+                                color: AppColors.slateGray,
+                                size: 20,
+                              ),
+                              hoverColor: Colors.transparent,
+
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(6),
                                 borderSide: BorderSide(
-                                  color: AppColors.slateGray,
+                                  color: AppColors.blueGreyBorder,
                                 ),
                               ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6),
+                                borderSide: BorderSide(
+                                  color: AppColors.blueGreyBorder,
+                                ),
                               ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6),
+                                borderSide: BorderSide(
+                                  color: AppColors.blueGreyBorder,
+                                ),
+                              ),
+
+                              hintStyle: TextStyle(
+                                color: AppColors.slateGray,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              // contentPadding: const EdgeInsets.symmetric(
+                              //   horizontal: 12,
+                              //   vertical: 8,
+                              // ),
                             ),
                             onChanged: (value) {
                               context.read<ClientCubit>().searchClients(value);
@@ -110,7 +158,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    // const SizedBox(height: 20),
 
                     // Stats Cards
 
@@ -164,75 +212,78 @@ class _LostClientsNewState extends State<LostClientsNew> {
                       )
                     else
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           // Table Header
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                topRight: Radius.circular(8),
+                          SizedBox(height: 40),
+                          Row(
+                            children: [
+                              SizedBox(width: 30),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  "Client",
+                                  style: AppTextStyles.tabelHeader,
+                                ),
                               ),
-                            ),
-                            child: Row(
-                              children: [
-                                SizedBox(width: 30),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "Client",
-                                    style: AppTextStyles.tabelHeader,
-                                  ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  "Contact",
+                                  style: AppTextStyles.tabelHeader,
                                 ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    "Contact",
-                                    style: AppTextStyles.tabelHeader,
-                                  ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Hotels",
+                                  style: AppTextStyles.tabelHeader,
                                 ),
-                                Expanded(
-                                  child: Text(
-                                    "Hotels",
-                                    style: AppTextStyles.tabelHeader,
-                                  ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Revenue",
+                                  style: AppTextStyles.tabelHeader,
                                 ),
-                                Expanded(
-                                  child: Text(
-                                    "Revenue",
-                                    style: AppTextStyles.tabelHeader,
-                                  ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  "Status",
+                                  style: AppTextStyles.tabelHeader,
                                 ),
-                                Expanded(
-                                  child: Text(
-                                    "Status",
-                                    style: AppTextStyles.tabelHeader,
-                                  ),
+                              ),
+                              SizedBox(
+                                width: 100,
+                                child: Text(
+                                  "View",
+                                  style: AppTextStyles.tabelHeader,
                                 ),
-                                SizedBox(
-                                  width: 100,
-                                  child: Text(
-                                    "View",
-                                    style: AppTextStyles.tabelHeader,
-                                  ),
+                              ),
+                              SizedBox(
+                                width: 50,
+                                child: Text(
+                                  "Actions",
+                                  style: AppTextStyles.tabelHeader,
                                 ),
-                                SizedBox(
-                                  width: 50,
-                                  child: Text(
-                                    "Actions",
-                                    style: AppTextStyles.tabelHeader,
-                                  ),
-                                ),
+                              ),
 
-                                SizedBox(width: 100),
-                              ],
-                            ),
+                              SizedBox(width: 100),
+                            ],
                           ),
-
+                          const SizedBox(height: 13),
+                          const Divider(
+                            color: AppColors.slateGray,
+                            thickness: 0.07,
+                            height: 0,
+                          ),
                           // Table Body
-                          ListView.builder(
+                          ListView.separated(
                             shrinkWrap: true,
+                            separatorBuilder: (context, index) => Divider(
+                              color: AppColors.slateGray,
+                              thickness: 0.07,
+                              height: 0,
+                            ),
                             itemCount: state.filteredLostClients.length,
                             itemBuilder: (context, index) {
                               final client = state.filteredLostClients[index];
@@ -272,11 +323,9 @@ class _LostClientsNewState extends State<LostClientsNew> {
   }
 
   Widget _buildClientRow(ClientModel client) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 15),
+
       child: Row(
         children: [
           SizedBox(width: 30),
@@ -288,11 +337,16 @@ class _LostClientsNewState extends State<LostClientsNew> {
               children: [
                 Text(
                   client.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+
+                    fontSize: 15,
+                    color: AppColors.textBlackColor,
+                  ),
                 ),
                 Text(
                   "Lost on ${client.updatedAt.goodDayDate()}",
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  style: TextStyle(fontSize: 13.5, color: AppColors.slateGray),
                 ),
               ],
             ),
@@ -304,10 +358,43 @@ class _LostClientsNewState extends State<LostClientsNew> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(client.email, style: const TextStyle(fontSize: 14)),
-                Text(
-                  client.phone,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                Row(
+                  children: [
+                    Icon(
+                      CupertinoIcons.mail,
+                      size: 15,
+                      color: AppColors.slateGray,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      client.email,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textBlackColor,
+
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(
+                      CupertinoIcons.phone,
+                      size: 15,
+                      color: AppColors.slateGray,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      client.phone,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textBlackColor,
+
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -317,7 +404,10 @@ class _LostClientsNewState extends State<LostClientsNew> {
           Expanded(
             child: Text(
               "${client.totalHotels}",
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBlackColor,
+              ),
             ),
           ),
 
@@ -325,22 +415,26 @@ class _LostClientsNewState extends State<LostClientsNew> {
           Expanded(
             child: Text(
               "\$${client.totalRevenue.toStringAsFixed(0)}",
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+
+                color: AppColors.textBlackColor,
+              ),
             ),
           ),
           // Status
-          Expanded(
-            child: Row(
-              children: [_buildStatusBadge(client.status), Spacer(flex: 3)],
-            ),
-          ),
+          Expanded(child: Row(children: [_buildStatusBadge(client.status)])),
           // Status
           SizedBox(
             width: 100,
             child: Row(
               children: [
                 IconButton(
-                  icon: Icon(CupertinoIcons.eye),
+                  icon: Icon(
+                    Icons.remove_red_eye_outlined,
+                    size: 20,
+                    color: AppColors.textBlackColor,
+                  ),
                   onPressed: () {
                     // Handle view client
                   },
@@ -351,7 +445,11 @@ class _LostClientsNewState extends State<LostClientsNew> {
           SizedBox(
             width: 50,
             child: PopupMenuButton(
-              icon: Icon(Icons.more_horiz),
+              icon: Icon(
+                Icons.more_horiz,
+                size: 20,
+                color: AppColors.textBlackColor,
+              ),
               itemBuilder: (context) => [
                 PopupMenuItem(
                   child: Text('Edit'),
@@ -411,17 +509,18 @@ class _LostClientsNewState extends State<LostClientsNew> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color),
+        border: Border.all(color: color, width: .8),
       ),
       child: Text(
         status.toUpperCase(),
         style: TextStyle(
           color: color,
           fontSize: 10,
+          letterSpacing: .5,
           fontWeight: FontWeight.bold,
         ),
       ),

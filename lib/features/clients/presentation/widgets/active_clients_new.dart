@@ -72,7 +72,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                     iconColor: Colors.teal,
                   ),
                   StatCardIconLeft(
-                    icon: CupertinoIcons.cube_box,
+                    icon: CupertinoIcons.money_dollar,
                     label: "Total Revenue",
                     value: "\$${state.stats?['totalActiveRevenue'] ?? 0}",
                     iconColor: Colors.orange,
@@ -85,7 +85,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: AppColors.blueGreyBorder),
                 ),
                 child: Column(
                   children: [
@@ -94,28 +94,56 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                         const Text(
                           "Active Clients List",
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 21,
                             fontWeight: FontWeight.w900,
                           ),
                         ),
                         const Spacer(),
                         SizedBox(
                           width: 300,
+                          height: 43,
                           child: TextField(
                             controller: _searchController,
+                            cursorHeight: 20,
                             decoration: InputDecoration(
+                              fillColor: Color(0xfffafafa),
+                              filled: true,
                               hintText: "Search active clients...",
-                              prefixIcon: const Icon(CupertinoIcons.search),
+                              prefixIcon: const Icon(
+                                CupertinoIcons.search,
+                                color: AppColors.slateGray,
+                                size: 20,
+                              ),
+                              hoverColor: Colors.transparent,
+
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(6),
                                 borderSide: BorderSide(
-                                  color: AppColors.slateGray,
+                                  color: AppColors.blueGreyBorder,
                                 ),
                               ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6),
+                                borderSide: BorderSide(
+                                  color: AppColors.blueGreyBorder,
+                                ),
                               ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(6),
+                                borderSide: BorderSide(
+                                  color: AppColors.blueGreyBorder,
+                                ),
+                              ),
+
+                              hintStyle: TextStyle(
+                                color: AppColors.slateGray,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              // contentPadding: const EdgeInsets.symmetric(
+                              //   horizontal: 12,
+                              //   vertical: 8,
+                              // ),
                             ),
                             onChanged: (value) {
                               context.read<ClientCubit>().searchClients(value);
@@ -178,7 +206,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 40),
                           // Table Header
                           Row(
                             children: [
@@ -233,15 +261,21 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                               SizedBox(width: 100),
                             ],
                           ),
-                          const SizedBox(height: 5),
+                          const SizedBox(height: 13),
                           const Divider(
                             color: AppColors.slateGray,
-                            thickness: 0.1,
+                            thickness: 0.07,
+                            height: 0,
                           ),
 
                           // Table Body
-                          ListView.builder(
+                          ListView.separated(
                             shrinkWrap: true,
+                            separatorBuilder: (context, index) => Divider(
+                              color: AppColors.slateGray,
+                              thickness: 0.07,
+                              height: 0,
+                            ),
                             physics: ClampingScrollPhysics(),
                             itemCount: state.filteredActiveClients.length,
                             itemBuilder: (context, index) {
@@ -276,126 +310,168 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
   }
 
   Widget _buildClientRow(ClientModel client) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 15.0),
+      child: Row(
         children: [
-          Row(
-            children: [
-              SizedBox(width: 30),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          SizedBox(width: 30),
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  client.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: AppColors.textBlackColor,
+                  ),
+                ),
+                Text(
+                  "Joined ${client.createdAt.convertToDDMMYY()}",
+                  style: TextStyle(fontSize: 13.5, color: AppColors.slateGray),
+                ),
+              ],
+            ),
+          ),
+
+          // Contact
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Text(
-                      client.name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    Icon(
+                      CupertinoIcons.mail,
+                      size: 15,
+                      color: AppColors.slateGray,
                     ),
+                    SizedBox(width: 4),
                     Text(
-                      "Joined ${client.createdAt.goodDayDate()}",
-                      style: TextStyle(),
+                      client.email,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textBlackColor,
+
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
-              ),
-
-              // Contact
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                SizedBox(height: 3),
+                Row(
                   children: [
-                    Text(client.email, style: const TextStyle(fontSize: 14)),
+                    Icon(
+                      CupertinoIcons.phone,
+                      size: 15,
+                      color: AppColors.slateGray,
+                    ),
+                    SizedBox(width: 4),
                     Text(
                       client.phone,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textBlackColor,
+
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
-              ),
+              ],
+            ),
+          ),
 
-              // Hotels
-              Expanded(
-                child: Text(
-                  "${client.totalHotels}",
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
+          // Hotels
+          Expanded(
+            child: Text(
+              "${client.totalHotels}",
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBlackColor,
               ),
+            ),
+          ),
 
-              // Revenue
-              Expanded(
-                child: Text(
-                  "\$${client.totalRevenue.toStringAsFixed(0)}",
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
+          // Revenue
+          Expanded(
+            child: Text(
+              "\$${client.totalRevenue.toStringAsFixed(0)}",
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textBlackColor,
               ),
+            ),
+          ),
 
-              // Status
-              Expanded(
-                child: Row(
-                  children: [_buildStatusBadge(client.status), Spacer(flex: 3)],
+          // Status
+          Expanded(child: Row(children: [_buildStatusBadge(client.status)])),
+          SizedBox(
+            width: 100,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.remove_red_eye_outlined,
+                    size: 20,
+                    color: AppColors.textBlackColor,
+                  ),
+                  onPressed: () {
+                    // context.go('${Routes.clients}/${client.docId}');
+                    context.go(Routes.clientDetail(client.docId));
+                  },
                 ),
+              ],
+            ),
+          ),
+          SizedBox(
+            width: 50,
+            child: PopupMenuButton(
+              icon: Icon(
+                Icons.more_horiz,
+                size: 20,
+                color: AppColors.textBlackColor,
               ),
-              SizedBox(
-                width: 100,
-                child: Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(CupertinoIcons.eye),
-                      onPressed: () {
-                        // context.go('${Routes.clients}/${client.docId}');
-                        context.go(Routes.clientDetail(client.docId));
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                width: 50,
-                child: PopupMenuButton(
-                  icon: Icon(Icons.more_horiz),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      child: Text('Edit'),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return Dialog(
-                              backgroundColor: Color(0xffFAFAFA),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: BlocProvider(
-                                create: (context) => ClientFormCubit(
-                                  clientRepo: ClientFirebaseRepo(),
-                                ),
-                                child: Container(
-                                  constraints: BoxConstraints(maxWidth: 600),
-                                  child: ClientFormModal(clientToEdit: client),
-                                ),
-                              ),
-                            );
-                          },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  child: Text('Edit'),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          backgroundColor: Color(0xffFAFAFA),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: BlocProvider(
+                            create: (context) => ClientFormCubit(
+                              clientRepo: ClientFirebaseRepo(),
+                            ),
+                            child: Container(
+                              constraints: BoxConstraints(maxWidth: 600),
+                              child: ClientFormModal(clientToEdit: client),
+                            ),
+                          ),
                         );
                       },
-                    ),
-                    PopupMenuItem(
-                      child: Text('Delete'),
-                      onTap: () {
-                        // Handle delete client
-                      },
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              ),
-
-              SizedBox(width: 100),
-            ],
+                PopupMenuItem(
+                  child: Text('Delete'),
+                  onTap: () {
+                    // Handle delete client
+                  },
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 10),
-          const Divider(color: AppColors.slateGray, thickness: 0.1),
+
+          SizedBox(width: 100),
         ],
       ),
     );
@@ -405,17 +481,18 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
     Color color = status == 'active' ? Colors.green : Colors.blue;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color),
+        border: Border.all(color: color, width: .8),
       ),
       child: Text(
         status.toUpperCase(),
         style: TextStyle(
           color: color,
           fontSize: 10,
+          letterSpacing: .5,
           fontWeight: FontWeight.bold,
         ),
       ),

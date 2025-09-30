@@ -47,12 +47,21 @@ const hotelTypeColors = <String, Color>{
   "Villa": Color(0xFFFF9800), // Orange
 };
 
+class UserRoles {
+  static const String rm = 'rm';
+  static const String gm = 'gm';
+  static const String dm = 'dm';
+  static const String operators = 'operators';
+}
+
 final List<Map<String, String>> roles = [
-  {'key': 'rm', 'name': 'Regional Manager'},
-  {'key': 'gm', 'name': 'General Manager'},
-  {'key': 'dm', 'name': 'Department Manager'},
-  {'key': 'staff', 'name': 'Operators'},
+  {'key': UserRoles.rm, 'name': 'Regional Manager'},
+  {'key': UserRoles.gm, 'name': 'General Manager'},
+  {'key': UserRoles.dm, 'name': 'Department Manager'},
+  {'key': UserRoles.operators, 'name': 'Operators'},
 ];
+
+enum RoleTab { regionalManager, generalManager, departmentManager, operators }
 
 // Client Hotel Task Constants
 

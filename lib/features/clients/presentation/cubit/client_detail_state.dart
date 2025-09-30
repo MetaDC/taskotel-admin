@@ -1,7 +1,7 @@
 // ClientDetailState
 part of 'client_detail_cubit.dart';
 
-class ClientDetailState extends Equatable {
+class ClientDetailState {
   final ClientModel? client;
   final List<HotelModel> hotels;
   final HotelModel? hotelDetail;
@@ -129,19 +129,4 @@ class ClientDetailState extends Equatable {
         return "Operators";
     }
   }
-
-  @override
-  List<Object?> get props => [
-    client,
-    hotels,
-    hotelDetail,
-    isLoading,
-    isLoadingTasks,
-    message,
-    selectedTab,
-    allTasks,
-    searchQuery,
-    clientAnalytics,
-    hotelAnalytics,
-  ];
 }

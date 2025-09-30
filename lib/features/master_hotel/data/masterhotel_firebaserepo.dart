@@ -40,11 +40,13 @@ class MasterHotelFirebaseRepo extends MasterHotelTaskRepo {
 
   //Master Task Cubit Functions
   @override
-  Stream<List<CommonTaskModel>> getTaskOfHotel(String hotelId) {
+  Stream<List<CommonTaskModel>> getTaskOfHotel(String hotelId, String role) {
     return FBFireStore.masterTasks
         .where('hotelId', isEqualTo: hotelId)
+        .where('assignedRole', isEqualTo: role)
         .snapshots()
         .map((querySnapshot) {
+          print("querySnapshot.docs.length: ${querySnapshot.docs.length}");
           return querySnapshot.docs
               .map((doc) => CommonTaskModel.fromSnap(doc))
               .toList();

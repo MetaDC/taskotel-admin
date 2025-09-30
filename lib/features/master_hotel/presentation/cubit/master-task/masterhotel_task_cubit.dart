@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
@@ -34,11 +35,13 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
     emit(state.copyWith(hotelDetail: hotelDetail));
   }
 
-  void loadTasksForHotel(String hotelId) async {
+  void loadTasksForHotel(String hotelId, String roleId) async {
     emit(state.copyWith(isLoadingTasks: true));
     taskStream?.cancel();
     try {
-      taskStream = masterHotelRepo.getTaskOfHotel(hotelId).listen((tasks) {
+      taskStream = masterHotelRepo.getTaskOfHotel(hotelId, roleId).listen((
+        tasks,
+      ) {
         emit(state.copyWith(allTasks: tasks, isLoadingTasks: false));
       });
     } catch (e) {

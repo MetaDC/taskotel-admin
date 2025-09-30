@@ -9,7 +9,6 @@ class AuthFirebaseRepo extends AuthRepo {
       email: email,
       password: password,
     );
-    print('User logged in : ${user}');
   }
 
   @override

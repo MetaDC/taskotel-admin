@@ -1,13 +1,13 @@
 part of 'master_task_form_cubit.dart';
 
-class MasterTaskFormState extends Equatable {
+class MasterTaskFormState {
   final String? selectedCategory;
-  final PlatformFile? selectedFile;
+  PlatformFile? selectedFile;
   final bool isDownloadingTemplate;
   final bool isCreating;
   final bool isSuccess;
 
-  const MasterTaskFormState({
+  MasterTaskFormState({
     this.selectedCategory,
     this.selectedFile,
     required this.isDownloadingTemplate,
@@ -15,7 +15,7 @@ class MasterTaskFormState extends Equatable {
     required this.isSuccess,
   });
   factory MasterTaskFormState.initial() {
-    return const MasterTaskFormState(
+    return MasterTaskFormState(
       selectedCategory: null,
       selectedFile: null,
       isDownloadingTemplate: false,
@@ -39,13 +39,4 @@ class MasterTaskFormState extends Equatable {
       isSuccess: isSuccess ?? this.isSuccess,
     );
   }
-
-  @override
-  List<Object> get props => [
-    selectedCategory!,
-    selectedFile!,
-    isDownloadingTemplate,
-    isCreating,
-    isSuccess,
-  ];
 }

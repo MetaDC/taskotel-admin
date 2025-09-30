@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
+import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/utils/helpers.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
@@ -434,7 +435,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    task.fromMasterHotel ? "Imported" : "Created",
+                    task.fromMasterHotel ?? false ? "Imported" : "Created",
                     style: TextStyle(
                       // color: statusColor,
                       fontWeight: FontWeight.w600,

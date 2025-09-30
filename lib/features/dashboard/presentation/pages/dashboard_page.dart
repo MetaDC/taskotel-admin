@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
 
@@ -147,13 +148,13 @@ class DashboardPage extends StatelessWidget {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xfafafa),
-                    foregroundColor: Color(0xff020817),
+                    foregroundColor: AppColors.textBlackColor,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 18,
                       vertical: 18,
                     ),
-                    side: const BorderSide(color: Color(0xffe2e8f0)),
+                    side: BorderSide(color: AppColors.blueGreyBorder),
                     textStyle: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
