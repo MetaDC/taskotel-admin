@@ -9,6 +9,7 @@ import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/helpers.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
+import 'package:taskoteladmin/core/widget/tabel_widgets.dart';
 import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.dart';
@@ -311,88 +312,41 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
 
   Widget _buildClientRow(ClientModel client) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 15.0),
+      padding: TableConfig.rowPadding,
       child: Row(
         children: [
-          SizedBox(width: 30),
+          SizedBox(width: TableConfig.horizontalSpacing),
+
+          // Client Name & Join Date
+          Expanded(
+            flex: 2,
+            child: TableTwoLineContent(
+              primaryText: client.name,
+              secondaryText: "Joined ${client.createdAt.convertToDDMMYY()}",
+            ),
+          ),
+
+          // Contact (Email & Phone)
           Expanded(
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  client.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: AppColors.textBlackColor,
-                  ),
-                ),
-                Text(
-                  "Joined ${client.createdAt.convertToDDMMYY()}",
-                  style: TextStyle(fontSize: 13.5, color: AppColors.slateGray),
+                TableIconTextRow(icon: CupertinoIcons.mail, text: client.email),
+                SizedBox(height: TableConfig.verticalSpacing),
+                TableIconTextRow(
+                  icon: CupertinoIcons.phone,
+                  text: client.phone,
                 ),
               ],
             ),
           ),
 
-          // Contact
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      CupertinoIcons.mail,
-                      size: 15,
-                      color: AppColors.slateGray,
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      client.email,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textBlackColor,
-
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 3),
-                Row(
-                  children: [
-                    Icon(
-                      CupertinoIcons.phone,
-                      size: 15,
-                      color: AppColors.slateGray,
-                    ),
-                    SizedBox(width: 4),
-                    Text(
-                      client.phone,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textBlackColor,
-
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // Hotels
+          // Hotels Count
           Expanded(
             child: Text(
               "${client.totalHotels}",
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                color: AppColors.textBlackColor,
-              ),
+              style: AppTextStyles.tableRowBoldValue,
             ),
           ),
 
@@ -400,39 +354,31 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
           Expanded(
             child: Text(
               "\$${client.totalRevenue.toStringAsFixed(0)}",
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                color: AppColors.textBlackColor,
-              ),
+              style: AppTextStyles.tableRowBoldValue,
             ),
           ),
 
-          // Status
+          // Status Badge
           Expanded(child: Row(children: [_buildStatusBadge(client.status)])),
+
+          // View Button
           SizedBox(
-            width: 100,
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.remove_red_eye_outlined,
-                    size: 20,
-                    color: AppColors.textBlackColor,
-                  ),
-                  onPressed: () {
-                    // context.go('${Routes.clients}/${client.docId}');
-                    context.go(Routes.clientDetail(client.docId));
-                  },
-                ),
-              ],
+            width: TableConfig.viewColumnWidth,
+            child: TableActionButton(
+              icon: Icons.remove_red_eye_outlined,
+              onPressed: () {
+                context.go(Routes.clientDetail(client.docId));
+              },
             ),
           ),
+
+          // Actions Menu
           SizedBox(
-            width: 50,
+            width: TableConfig.actionColumnWidth,
             child: PopupMenuButton(
               icon: Icon(
                 Icons.more_horiz,
-                size: 20,
+                size: TableConfig.mediumIconSize,
                 color: AppColors.textBlackColor,
               ),
               itemBuilder: (context) => [
@@ -471,7 +417,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
             ),
           ),
 
-          SizedBox(width: 100),
+          SizedBox(width: TableConfig.viewColumnWidth),
         ],
       ),
     );

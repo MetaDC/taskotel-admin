@@ -6,11 +6,11 @@ import 'app_colors.dart';
 class AppTextStyles {
   static final headerHeading = TextStyle(
     fontSize: 28,
-    fontWeight: FontWeight.bold,
-    color: AppColors.primary,
+    fontWeight: FontWeight.w900,
+    color: Colors.black,
   );
   static final headerSubheading = TextStyle(
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: FontWeight.w500,
     color: AppColors.slateGray,
   );
@@ -52,5 +52,46 @@ class AppTextStyles {
     fontSize: 16,
     color: AppColors.slateGray,
     fontWeight: FontWeight.w400,
+  );
+
+  // ============ TABLE STYLES ============
+
+  // Table Row Primary Text (Bold text like names, IDs)
+  static final tableRowPrimary = TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 15,
+    color: AppColors.textBlackColor,
+  );
+
+  // Table Row Secondary Text (Smaller, gray text)
+  static final tableRowSecondary = TextStyle(
+    fontSize: 13.5,
+    color: AppColors.slateGray,
+  );
+
+  // Table Row Normal Text (Regular data)
+  static final tableRowNormal = TextStyle(
+    fontSize: 14,
+    color: AppColors.textBlackColor,
+    fontWeight: FontWeight.w500,
+  );
+
+  // Table Row Bold Numbers/Values
+  static final tableRowBoldValue = TextStyle(
+    fontWeight: FontWeight.w600,
+    fontSize: 15,
+    color: AppColors.textBlackColor,
+  );
+
+  // Table Row Regular Text
+  static final tableRowRegular = TextStyle(
+    fontSize: 14,
+    color: AppColors.textBlackColor,
+  );
+
+  // Table Row Date Text
+  static final tableRowDate = TextStyle(
+    fontSize: 15,
+    color: AppColors.textBlackColor,
   );
 }

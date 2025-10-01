@@ -44,7 +44,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PageHeader(
+              PageHeaderWithButton(
                 heading: widget.HotelName,
                 subHeading: "Manage master tasks and franchise details",
                 buttonText: "Create Task",

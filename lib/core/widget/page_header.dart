@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 
-class PageHeader extends StatelessWidget {
+class PageHeaderWithButton extends StatelessWidget {
   String heading;
   String subHeading;
   String buttonText;
   VoidCallback onButtonPressed;
-  PageHeader({
+  PageHeaderWithButton({
     super.key,
     required this.heading,
     required this.subHeading,
@@ -23,26 +23,8 @@ class PageHeader extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              heading,
-              style: true
-                  ? TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.black,
-                    )
-                  : AppTextStyles.headerHeading,
-            ),
-            Text(
-              subHeading,
-              style: true
-                  ? TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xff64748b),
-                    )
-                  : AppTextStyles.headerSubheading,
-            ),
+            Text(heading, style: AppTextStyles.headerHeading),
+            Text(subHeading, style: AppTextStyles.headerSubheading),
           ],
         ),
         ElevatedButton.icon(
@@ -66,6 +48,28 @@ class PageHeader extends StatelessWidget {
           icon: const Icon(Icons.add, size: 16, color: Colors.white),
           label: Text(buttonText),
         ),
+      ],
+    );
+  }
+}
+
+class PageHeaderWithTitle extends StatelessWidget {
+  String heading;
+  String subHeading;
+
+  PageHeaderWithTitle({
+    super.key,
+    required this.heading,
+    required this.subHeading,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(heading, style: AppTextStyles.headerHeading),
+        Text(subHeading, style: AppTextStyles.headerSubheading),
       ],
     );
   }

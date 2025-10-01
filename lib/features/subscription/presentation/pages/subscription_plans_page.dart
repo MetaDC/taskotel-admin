@@ -64,7 +64,7 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
             child: Column(
               children: [
                 // Page Header
-                PageHeader(
+                PageHeaderWithButton(
                   heading: "Subscription Plans",
                   subHeading: "Manage subscription plans and pricing",
                   buttonText: "Create Plan",

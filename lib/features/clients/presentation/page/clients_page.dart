@@ -36,7 +36,7 @@ class _ClientsPageState extends State<ClientsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PageHeader(
+          PageHeaderWithButton(
             heading: 'Clients',
             subHeading: 'Manage your hotel clients and their subscriptions',
             buttonText: 'Add Client',

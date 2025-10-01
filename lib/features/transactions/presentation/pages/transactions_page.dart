@@ -4,9 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:intl/intl.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
+import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
-import 'package:taskoteladmin/dummy/dummy.dart';
+import 'package:taskoteladmin/core/widget/tabel_widgets.dart';
 import 'package:taskoteladmin/features/transactions/domain/entity/transactions_model.dart';
 import 'package:taskoteladmin/features/transactions/presentation/cubit/transaction_cubit.dart';
 
@@ -38,29 +39,48 @@ class _TransactionsPageState extends State<TransactionsPage> {
   Widget build(BuildContext context) {
     return BlocBuilder<TransactionCubit, TransactionState>(
       builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-          child: Column(
-            children: [
-              // Header with search and filter
-              _buildHeader(state),
-              const SizedBox(height: 30),
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+            child: Column(
+              children: [
+                // Header with search and filter
+                _buildHeader(state),
+                const SizedBox(height: 30),
 
-              // Analytics Cards
-              _buildAnalyticsCards(state),
-              const SizedBox(height: 30),
+                // Analytics Cards
+                _buildAnalyticsCards(state),
+                const SizedBox(height: 30),
 
-              // Filters and Search Bar
-              _buildFiltersAndSearch(state),
-              const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.blueGreyBorder),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildFiltersAndSearch(state),
 
-              // Transactions List
-              Expanded(child: _buildTransactionsList(state)),
+                      const SizedBox(height: 20),
 
-              // Pagination
-              if (!state.isSearching && state.searchQuery.isEmpty)
-                _buildPagination(state),
-            ],
+                      _buildTransactionsList(state),
+                      if (!state.isSearching && state.searchQuery.isEmpty)
+                        _buildPagination(state),
+                    ],
+                  ),
+                ),
+
+                // Filters and Search Bar
+                const SizedBox(height: 20),
+
+                // Transactions List
+                // Expanded(child: _buildTransactionsList(state)),
+
+                // Pagination
+              ],
+            ),
           ),
         );
       },
@@ -71,13 +91,9 @@ class _TransactionsPageState extends State<TransactionsPage> {
     return Row(
       children: [
         Expanded(
-          child: PageHeader(
+          child: PageHeaderWithTitle(
             heading: "Transactions",
             subHeading: "Manage and view all transactions",
-            buttonText: "Refresh",
-            onButtonPressed: () {
-              // context.read<TransactionCubit>().initialize();
-            },
           ),
         ),
       ],
@@ -123,8 +139,66 @@ class _TransactionsPageState extends State<TransactionsPage> {
   Widget _buildFiltersAndSearch(TransactionState state) {
     return Row(
       children: [
+        const Text(
+          "Transactions",
+          style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900),
+        ),
+        const Spacer(),
+
+        // Search Bar
+        SizedBox(
+          width: 300,
+          height: 43,
+
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: "Search by transaction ID, name, email, amount...",
+              suffixIcon: state.searchQuery.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(CupertinoIcons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        context.read<TransactionCubit>().searchTransactions('');
+                      },
+                    )
+                  : null,
+              prefixIcon: const Icon(
+                CupertinoIcons.search,
+                color: AppColors.slateGray,
+                size: 20,
+              ),
+              hoverColor: Colors.transparent,
+
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide(color: AppColors.blueGreyBorder),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide(color: AppColors.blueGreyBorder),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide(color: AppColors.blueGreyBorder),
+              ),
+
+              hintStyle: TextStyle(
+                color: AppColors.slateGray,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            onChanged: (value) {
+              context.read<TransactionCubit>().searchTransactions(value);
+            },
+          ),
+        ),
+
+        const SizedBox(width: 16),
         // Filter Dropdown
         Container(
+          height: 43,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -165,66 +239,13 @@ class _TransactionsPageState extends State<TransactionsPage> {
             },
           ),
         ),
-
         const SizedBox(width: 16),
-
-        // Search Bar
-        Expanded(
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: "Search by transaction ID, name, email, amount...",
-              prefixIcon: const Icon(CupertinoIcons.search),
-              suffixIcon: state.searchQuery.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(CupertinoIcons.clear),
-                      onPressed: () {
-                        _searchController.clear();
-                        context.read<TransactionCubit>().searchTransactions('');
-                      },
-                    )
-                  : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-            ),
-            onChanged: (value) {
-              context.read<TransactionCubit>().searchTransactions(value);
-            },
-          ),
-        ),
-
-        const SizedBox(width: 16),
-
         // Search Within Filter Switch
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey[300]!),
-          ),
-          child: Row(
-            children: [
-              const Text("Search within filter"),
-              const SizedBox(width: 8),
-              Switch(
-                value: state.searchWithinFilter,
-                onChanged: (value) {
-                  context.read<TransactionCubit>().toggleSearchWithinFilter(
-                    value,
-                  );
-                },
-              ),
-            ],
-          ),
+        Switch(
+          value: state.searchWithinFilter,
+          onChanged: (value) {
+            context.read<TransactionCubit>().toggleSearchWithinFilter(value);
+          },
         ),
       ],
     );
@@ -300,131 +321,78 @@ class _TransactionsPageState extends State<TransactionsPage> {
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 3,
-            offset: const Offset(0, 1),
+    return Column(
+      children: [
+        // Table Header
+        _buildTableHeader(),
+        const SizedBox(height: 13),
+        const Divider(color: AppColors.slateGray, thickness: 0.07, height: 0),
+        // Table Body
+        ListView.separated(
+          shrinkWrap: true,
+          separatorBuilder: (context, index) => const Divider(
+            color: AppColors.slateGray,
+            thickness: 0.07,
+            height: 0,
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Table Header
-          _buildTableHeader(),
-
-          // Table Body
-          Expanded(
-            child: ListView.builder(
-              itemCount: transactions.length,
-              itemBuilder: (context, index) {
-                return _buildTransactionRow(transactions[index]);
-              },
-            ),
-          ),
-        ],
-      ),
+          itemCount: transactions.length,
+          itemBuilder: (context, index) {
+            return _buildTransactionRow(transactions[index]);
+          },
+        ),
+      ],
     );
   }
 
   Widget _buildTableHeader() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Text("Transaction ID", style: AppTextStyles.tabelHeader),
         ),
-      ),
-      child: const Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              "Transaction ID",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              "Client/Hotel",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "Amount",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "Status",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              "Payment",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            child: Text("Date", style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
+        Expanded(
+          flex: 2,
+          child: Text("Client/Hotel", style: AppTextStyles.tabelHeader),
+        ),
+        Expanded(child: Text("Plan", style: AppTextStyles.tabelHeader)),
+        Expanded(child: Text("Amount", style: AppTextStyles.tabelHeader)),
+        Expanded(child: Text("Status", style: AppTextStyles.tabelHeader)),
+        Expanded(child: Text("Payment", style: AppTextStyles.tabelHeader)),
+        Expanded(child: Text("Date", style: AppTextStyles.tabelHeader)),
+      ],
     );
   }
 
   Widget _buildTransactionRow(TransactionModel transaction) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
-      ),
+      padding: TableConfig.transactionRowPadding,
+      decoration: TableConfig.getRowBorder(),
       child: Row(
         children: [
           // Transaction ID
           Expanded(
             flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.transactionId,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
-                Text(
-                  transaction.planName,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                ),
-              ],
+            child: Text(
+              transaction.transactionId,
+              style: AppTextStyles.tableRowPrimary,
             ),
           ),
 
           // Client/Hotel
           Expanded(
             flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.clientName,
-                  style: const TextStyle(fontSize: 14),
-                ),
-                Text(
-                  transaction.hotelName,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                ),
-              ],
+            child: TableTwoLineContent(
+              primaryText: transaction.clientName,
+              secondaryText: transaction.hotelName,
+            ),
+          ),
+
+          // Plan
+          Expanded(
+            child: Text(
+              transaction.planName,
+              style: AppTextStyles.tableRowRegular,
             ),
           ),
 
@@ -432,18 +400,23 @@ class _TransactionsPageState extends State<TransactionsPage> {
           Expanded(
             child: Text(
               "\$${transaction.amount.toStringAsFixed(2)}",
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: AppTextStyles.tableRowPrimary,
             ),
           ),
 
           // Status
-          Expanded(child: _buildStatusBadge(transaction.status)),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [_buildStatusBadge(transaction.status)],
+            ),
+          ),
 
           // Payment Method
           Expanded(
             child: Text(
               transaction.paymentMethod.toUpperCase(),
-              style: const TextStyle(fontSize: 12),
+              style: AppTextStyles.tableRowRegular,
             ),
           ),
 
@@ -451,7 +424,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
           Expanded(
             child: Text(
               DateFormat('MMM dd, yyyy').format(transaction.createdAt),
-              style: const TextStyle(fontSize: 12),
+              style: AppTextStyles.tableRowDate,
             ),
           ),
         ],

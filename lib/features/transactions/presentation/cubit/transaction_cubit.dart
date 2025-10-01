@@ -159,6 +159,7 @@ class TransactionCubit extends Cubit<TransactionState> {
 
       // For page 1, use real-time listener
       if (page == 1) {
+        emit(state.copyWith(currentPage: 1, isLoading: false));
         _startRealtimeListener();
         return;
       }
@@ -166,25 +167,21 @@ class TransactionCubit extends Cubit<TransactionState> {
       // For other pages, cancel real-time and fetch manually
       _realtimeSubscription?.cancel();
 
-      // Navigate to the requested page
-      if (page > state.currentPage) {
-        // Going forward
-        if (state.lastDocument != null) {
-          query = query.startAfterDocument(state.lastDocument!);
-        }
-      } else if (page < state.currentPage) {
-        // Going backward
-        if (state.firstDocument != null) {
-          query = query
-              .endBeforeDocument(state.firstDocument!)
-              .limitToLast(state.pageSize);
-        }
-      }
+      // For pages other than 1, we need to fetch from the beginning
+      // and skip to the correct page
+      final skipCount = (page - 1) * state.pageSize;
 
-      query = query.limit(state.pageSize);
-      final snapshot = await query.get();
+      // Fetch documents up to the current page
+      query = query.limit(page * state.pageSize);
+      final allSnapshot = await query.get();
 
-      final transactions = snapshot.docs
+      // Get only the documents for the current page
+      final pageDocs = allSnapshot.docs
+          .skip(skipCount)
+          .take(state.pageSize)
+          .toList();
+
+      final transactions = pageDocs
           .map(
             (doc) => TransactionModel.fromDocSnap(
               doc as QueryDocumentSnapshot<Map<String, dynamic>>,
@@ -197,8 +194,8 @@ class TransactionCubit extends Cubit<TransactionState> {
           currentPageTransactions: transactions,
           currentPage: page,
           isLoading: false,
-          lastDocument: snapshot.docs.isNotEmpty ? snapshot.docs.last : null,
-          firstDocument: snapshot.docs.isNotEmpty ? snapshot.docs.first : null,
+          lastDocument: pageDocs.isNotEmpty ? pageDocs.last : null,
+          firstDocument: pageDocs.isNotEmpty ? pageDocs.first : null,
         ),
       );
     } catch (e) {

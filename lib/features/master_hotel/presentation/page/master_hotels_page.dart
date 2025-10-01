@@ -8,7 +8,9 @@ import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/helpers.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
+import 'package:taskoteladmin/core/widget/tabel_widgets.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
+import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-hotel/masterhotel_cubit.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-hotel/masterhotel_form_cubit.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/widgets/masterhotel_form.dart';
@@ -33,31 +35,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
       padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
       child: Column(
         children: [
-          PageHeader(
-            heading: "Hotel Masters",
-            subHeading: "Manage hotel franchises and their master tasks",
-            buttonText: "Add Hotel Master",
-            onButtonPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return Dialog(
-                    backgroundColor: Color(0xffFAFAFA),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-
-                    child: BlocProvider(
-                      create: (context) => MasterhotelFormCubit(
-                        masterHotelRepo: MasterHotelFirebaseRepo(),
-                      ),
-                      child: MasterHotelForm(),
-                    ),
-                  );
-                },
-              );
-            },
-          ),
+          _buildHeader(context),
           SizedBox(height: 20),
           CustomContainer(
             child: Column(
@@ -75,45 +53,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                 ),
                 SizedBox(height: 30),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(width: 15),
-                    Expanded(
-                      child: Text(
-                        "Franchise",
-                        style: AppTextStyles.tabelHeader,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        "Property Type",
-                        style: AppTextStyles.tabelHeader,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        "No. of Clients",
-                        style: AppTextStyles.tabelHeader,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        "Master Tasks",
-                        style: AppTextStyles.tabelHeader,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 100,
-                      child: Text("Status", style: AppTextStyles.tabelHeader),
-                    ),
-                    SizedBox(
-                      width: 100,
-                      child: Text("Actions", style: AppTextStyles.tabelHeader),
-                    ),
-                    SizedBox(width: 15),
-                  ],
-                ),
+                _buildTableHeader(),
                 SizedBox(height: 10),
                 Divider(color: AppColors.slateGray, thickness: 0.2),
 
@@ -126,238 +66,233 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                     }
                   },
                   builder: (context, state) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: List.generate(state.masterHotels.length, (
-                        index,
-                      ) {
+                    return ListView.separated(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: state.masterHotels.length,
+                      separatorBuilder: (context, index) =>
+                          Divider(color: AppColors.slateGray, thickness: 0.2),
+                      itemBuilder: (context, index) {
                         final masterHotel = state.masterHotels[index];
-                        return Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 15),
-                                // Franchise Name and Created Date
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        masterHotel.franchiseName,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                      Text(
-                                        "Created ${masterHotel.createdAt.goodDayDate()}",
-                                        style: TextStyle(
-                                          color: AppColors.slateGray,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                // Property Type
-                                Expanded(
-                                  child: Text(
-                                    masterHotel.propertyType,
-                                    style: AppTextStyles.tabelHeader.copyWith(
-                                      color: statusColor(
-                                        masterHotel.propertyType,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                // No. of Clients
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        CupertinoIcons.person_2,
-                                        size: 15,
-                                        color: AppColors.slateGray,
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text(
-                                        masterHotel.totalClients.toString(),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text("clients"),
-                                    ],
-                                  ),
-                                ),
-
-                                // Master Tasks
-                                Expanded(
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.checklist,
-                                        size: 15,
-                                        color: AppColors.slateGray,
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text(
-                                        masterHotel.totalMasterTasks.toString(),
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                      SizedBox(width: 5),
-                                      Text("tasks"),
-                                    ],
-                                  ),
-                                ),
-
-                                // Status
-                                SizedBox(
-                                  width: 100,
-                                  child: CupertinoSwitch(
-                                    activeTrackColor: AppColors.primary,
-                                    value: masterHotel.isActive,
-                                    onChanged: (value) {
-                                      context
-                                          .read<MasterHotelCubit>()
-                                          .updateStatusOfMasterHotel(
-                                            masterHotel.docId,
-                                            value,
-                                          );
-                                    },
-                                  ),
-                                ),
-
-                                // Actions
-                                SizedBox(
-                                  width: 100,
-                                  child: PopupMenuButton(
-                                    icon: Icon(Icons.more_horiz),
-                                    itemBuilder: (context) => [
-                                      PopupMenuItem(
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              CupertinoIcons.list_bullet,
-                                              size: 16,
-                                            ),
-                                            SizedBox(width: 8),
-                                            Text('View Tasks'),
-                                          ],
-                                        ),
-                                        onTap: () {
-                                          context.go(
-                                            '/master-hotels/${masterHotel.docId}/tasks?hotelName=${Uri.encodeComponent(masterHotel.franchiseName)}',
-                                          );
-                                        },
-                                      ),
-                                      PopupMenuItem(
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              CupertinoIcons.pencil,
-                                              size: 16,
-                                            ),
-                                            SizedBox(width: 8),
-                                            Text('Edit'),
-                                          ],
-                                        ),
-                                        onTap: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return Dialog(
-                                                backgroundColor: Color(
-                                                  0xffFAFAFA,
-                                                ),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
-                                                child: BlocProvider(
-                                                  create: (context) =>
-                                                      MasterhotelFormCubit(
-                                                        masterHotelRepo:
-                                                            MasterHotelFirebaseRepo(),
-                                                      ),
-                                                  child: MasterHotelForm(
-                                                    editMasterHotel:
-                                                        masterHotel,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        },
-                                      ),
-                                      PopupMenuItem(
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              CupertinoIcons.delete,
-                                              size: 16,
-                                              color: Colors.red,
-                                            ),
-                                            SizedBox(width: 8),
-                                            Text(
-                                              'Delete',
-                                              style: TextStyle(
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        onTap: () {
-                                          showConfirmDeletDialog(
-                                            context,
-                                            () {
-                                              context
-                                                  .read<MasterHotelCubit>()
-                                                  .deleteMasterHotel(
-                                                    masterHotel.docId,
-                                                  );
-                                            },
-                                            "Delete Hotel Master",
-                                            "Are you sure you want to delete this hotel master?",
-                                            "Delete",
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(width: 15),
-                              ],
-                            ),
-
-                            if (index != state.masterHotels.length - 1)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 10.0,
-                                ),
-                                child: Divider(
-                                  color: AppColors.slateGray,
-                                  thickness: 0.2,
-                                ),
-                              ),
-                          ],
+                        return _buildHotelMasterRow(
+                          masterHotel,
+                          context,
+                          index,
+                          state,
                         );
-                      }),
+                      },
                     );
                   },
                 ),
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  PageHeaderWithButton _buildHeader(BuildContext context) {
+    return PageHeaderWithButton(
+      heading: "Hotel Masters",
+      subHeading: "Manage hotel franchises and their master tasks",
+      buttonText: "Add Hotel Master",
+      onButtonPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              backgroundColor: Color(0xffFAFAFA),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: BlocProvider(
+                create: (context) => MasterhotelFormCubit(
+                  masterHotelRepo: MasterHotelFirebaseRepo(),
+                ),
+                child: MasterHotelForm(),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Table Header
+  Widget _buildTableHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        SizedBox(width: TableConfig.horizontalSpacing / 2), // 15px
+        Expanded(child: Text("Franchise", style: AppTextStyles.tabelHeader)),
+        Expanded(
+          child: Text("Property Type", style: AppTextStyles.tabelHeader),
+        ),
+        Expanded(
+          child: Text("No. of Clients", style: AppTextStyles.tabelHeader),
+        ),
+        Expanded(child: Text("Master Tasks", style: AppTextStyles.tabelHeader)),
+        SizedBox(
+          width: TableConfig.viewColumnWidth,
+          child: Text("Status", style: AppTextStyles.tabelHeader),
+        ),
+        SizedBox(
+          width: TableConfig.viewColumnWidth,
+          child: Text("Actions", style: AppTextStyles.tabelHeader),
+        ),
+        SizedBox(width: TableConfig.horizontalSpacing / 2), // 15px
+      ],
+    );
+  }
+
+  // Table Row
+  Widget _buildHotelMasterRow(
+    MasterHotelModel masterHotel,
+    BuildContext context,
+    int index,
+    MasterhotelState state,
+  ) {
+    return Padding(
+      padding: TableConfig.rowPadding,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(width: TableConfig.horizontalSpacing / 2), // 15px
+          // Franchise Name and Created Date
+          Expanded(
+            child: TableTwoLineContent(
+              primaryText: masterHotel.franchiseName,
+              secondaryText: "Created ${masterHotel.createdAt.goodDayDate()}",
+            ),
+          ),
+
+          // Property Type
+          Expanded(
+            child: Text(
+              masterHotel.propertyType,
+              style: AppTextStyles.tableRowBoldValue.copyWith(
+                color: statusColor(masterHotel.propertyType),
+              ),
+            ),
+          ),
+
+          // No. of Clients
+          Expanded(
+            child: TableIconCountLabel(
+              icon: CupertinoIcons.person_2,
+              count: masterHotel.totalClients,
+              label: "clients",
+            ),
+          ),
+
+          // Master Tasks
+          Expanded(
+            child: TableIconCountLabel(
+              icon: Icons.checklist,
+              count: masterHotel.totalMasterTasks,
+              label: "tasks",
+            ),
+          ),
+
+          // Status Toggle
+          SizedBox(
+            width: TableConfig.viewColumnWidth,
+            child: Transform.scale(
+              scale: 0.7,
+              child: CupertinoSwitch(
+                activeTrackColor: AppColors.primary,
+                value: masterHotel.isActive,
+                onChanged: (value) {
+                  context.read<MasterHotelCubit>().updateStatusOfMasterHotel(
+                    masterHotel.docId,
+                    value,
+                  );
+                },
+              ),
+            ),
+          ),
+
+          // Actions Menu
+          SizedBox(
+            width: TableConfig.viewColumnWidth,
+            child: PopupMenuButton(
+              icon: Icon(
+                Icons.more_horiz,
+                size: TableConfig.mediumIconSize,
+                color: AppColors.textBlackColor,
+              ),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  child: Row(
+                    children: [
+                      Icon(CupertinoIcons.list_bullet, size: 16),
+                      SizedBox(width: 8),
+                      Text('View Tasks'),
+                    ],
+                  ),
+                  onTap: () {
+                    context.go(
+                      '/master-hotels/${masterHotel.docId}/tasks?hotelName=${Uri.encodeComponent(masterHotel.franchiseName)}',
+                    );
+                  },
+                ),
+                PopupMenuItem(
+                  child: Row(
+                    children: [
+                      Icon(CupertinoIcons.pencil, size: 16),
+                      SizedBox(width: 8),
+                      Text('Edit'),
+                    ],
+                  ),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          backgroundColor: Color(0xffFAFAFA),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: BlocProvider(
+                            create: (context) => MasterhotelFormCubit(
+                              masterHotelRepo: MasterHotelFirebaseRepo(),
+                            ),
+                            child: MasterHotelForm(
+                              editMasterHotel: masterHotel,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+                PopupMenuItem(
+                  child: Row(
+                    children: [
+                      Icon(CupertinoIcons.delete, size: 16, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Delete', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                  onTap: () {
+                    showConfirmDeletDialog(
+                      context,
+                      () {
+                        context.read<MasterHotelCubit>().deleteMasterHotel(
+                          masterHotel.docId,
+                        );
+                      },
+                      "Delete Hotel Master",
+                      "Are you sure you want to delete this hotel master?",
+                      "Delete",
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: TableConfig.horizontalSpacing / 2), // 15px
         ],
       ),
     );

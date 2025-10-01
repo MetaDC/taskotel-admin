@@ -14,6 +14,7 @@ import 'package:taskoteladmin/features/clients/presentation/page/client_detail_p
 import 'package:taskoteladmin/features/master_hotel/presentation/page/master_hotel_task_page.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/page/master_hotels_page.dart';
 import 'package:taskoteladmin/features/report/presentation/pages/reports_page.dart';
+import 'package:taskoteladmin/features/report/presentation/cubit/report_cubit.dart';
 import 'package:taskoteladmin/features/subscription/presentation/pages/subscription_plans_page.dart';
 import 'package:taskoteladmin/features/transactions/presentation/pages/transactions_page.dart';
 import 'package:taskoteladmin/features/transactions/presentation/cubit/transaction_cubit.dart';
@@ -142,8 +143,12 @@ final GoRouter appRoute = GoRouter(
         ),
         GoRoute(
           path: Routes.reports,
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: ReportsPage()),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: BlocProvider(
+              create: (context) => ReportCubit(),
+              child: const ReportsPage(),
+            ),
+          ),
         ),
       ],
     ),
