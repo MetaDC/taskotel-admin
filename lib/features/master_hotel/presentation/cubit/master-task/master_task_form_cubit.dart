@@ -1,75 +1,282 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
-import 'package:taskoteladmin/core/services/image_picker.dart';
-import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:flutter/material.dart';
 import 'package:excel/excel.dart' as excel;
-import 'package:taskoteladmin/features/auth/presentation/cubit/auth_cubit.dart';
-
 import 'package:taskoteladmin/core/services/firebase.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
+
 part 'master_task_form_state.dart';
 
 class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
   final MasterHotelFirebaseRepo masterHotelRepo;
+
+  // Form key
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  // Controllers as cubit variables
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController descController = TextEditingController();
+  final TextEditingController durationController = TextEditingController();
+  final TextEditingController placeController = TextEditingController();
+  final TextEditingController dayOrDateController = TextEditingController();
+  final TextEditingController questionController = TextEditingController();
+
   MasterTaskFormCubit({required this.masterHotelRepo})
     : super(MasterTaskFormState.initial());
 
+  @override
+  Future<void> close() {
+    titleController.dispose();
+    descController.dispose();
+    durationController.dispose();
+    placeController.dispose();
+    dayOrDateController.dispose();
+    questionController.dispose();
+    return super.close();
+  }
+
+  // Initialize form for editing
+  void initializeForm(CommonTaskModel? taskToEdit) {
+    if (taskToEdit != null) {
+      titleController.text = taskToEdit.title;
+      descController.text = taskToEdit.desc;
+      durationController.text = taskToEdit.duration;
+      placeController.text = taskToEdit.place;
+      dayOrDateController.text = taskToEdit.dayOrDate;
+
+      emit(
+        state.copyWith(
+          selectedCategory: taskToEdit.assignedRole,
+          selectedFrequency: taskToEdit.frequency,
+          selectedDepartment: taskToEdit.assignedDepartmentId,
+          selectedServiceType: taskToEdit.serviceType,
+          questions: taskToEdit.questions,
+          isActive: taskToEdit.isActive,
+          isEditMode: true,
+        ),
+      );
+    } else {
+      clearForm();
+    }
+  }
+
+  // Clear form
+  void clearForm() {
+    titleController.clear();
+    descController.clear();
+    durationController.clear();
+    placeController.clear();
+    dayOrDateController.clear();
+    questionController.clear();
+
+    emit(MasterTaskFormState.initial());
+  }
+
+  // Select user category
   void selectUserCategory(String category) {
     emit(state.copyWith(selectedCategory: category));
   }
 
-  void selectFile(PlatformFile? file) {
-    // emit(state.copyWith(selectedFile: file));
-    print("File selected:${state.selectedFile?.name}");
+  // Select frequency
+  void selectFrequency(String frequency) {
+    emit(state.copyWith(selectedFrequency: frequency));
   }
 
-  void downloadTemplate() {
-    // Implement template download logic
+  // Select department
+  void selectDepartment(String? department) {
+    emit(state.copyWith(selectedDepartment: department));
+  }
+
+  // Select service type
+  void selectServiceType(String? serviceType) {
+    emit(state.copyWith(selectedServiceType: serviceType));
+  }
+
+  // Update active status
+  void updateActiveStatus(bool isActive) {
+    emit(state.copyWith(isActive: isActive));
+  }
+
+  // File operations
+  void selectFile(PlatformFile file) {
+    emit(state.copyWith(selectedFile: file));
+  }
+
+  void clearFile() {
+    emit(state.copyWith(selectedFile: null));
+  }
+
+  // Question operations
+  void addQuestion() {
+    final questionText = questionController.text.trim();
+    if (questionText.isEmpty) {
+      emit(state.copyWith(validationMessage: 'Please enter a question'));
+      return;
+    }
+
+    final question = {
+      'question': questionText,
+      'type': 'text', // or whatever type you need
+      'required': true,
+    };
+
+    final updatedQuestions = List<Map<String, dynamic>>.from(state.questions)
+      ..add(question);
+
+    questionController.clear();
+    emit(state.copyWith(questions: updatedQuestions, validationMessage: null));
+  }
+
+  void removeQuestion(int index) {
+    final updatedQuestions = List<Map<String, dynamic>>.from(state.questions)
+      ..removeAt(index);
+    emit(state.copyWith(questions: updatedQuestions));
+  }
+
+  // Download template
+  Future<void> downloadTemplate() async {
     emit(state.copyWith(isDownloadingTemplate: true));
-    // Simulate download
-    Future.delayed(Duration(seconds: 2), () {
-      emit(state.copyWith(isDownloadingTemplate: false));
-    });
+
+    try {
+      // Implement actual template download logic here
+      // For example, create Excel file and download
+      await Future.delayed(Duration(seconds: 1));
+
+      emit(state.copyWith(isDownloadingTemplate: false, errorMessage: null));
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isDownloadingTemplate: false,
+          errorMessage: 'Failed to download template: ${e.toString()}',
+        ),
+      );
+    }
   }
 
-  Future<void> createMasterTasks(
+  // Validate form
+  bool validateForm() {
+    if (!formKey.currentState!.validate()) {
+      emit(
+        state.copyWith(validationMessage: 'Please fill all required fields'),
+      );
+      return false;
+    }
+
+    if (state.selectedCategory == null) {
+      emit(state.copyWith(validationMessage: 'Please select a user category'));
+      return false;
+    }
+
+    if (state.selectedFrequency == null) {
+      emit(state.copyWith(validationMessage: 'Please select a frequency'));
+      return false;
+    }
+
+    emit(state.copyWith(validationMessage: null));
+    return true;
+  }
+
+  // Submit form (manual creation)
+  Future<void> submitForm(
+    BuildContext context,
+    String masterHotelId,
+    CommonTaskModel? taskToEdit,
+  ) async {
+    if (!validateForm()) return;
+
+    emit(state.copyWith(isCreating: true, errorMessage: null));
+
+    try {
+      final task = CommonTaskModel(
+        docId: taskToEdit?.docId ?? '',
+        title: titleController.text.trim(),
+        desc: descController.text.trim(),
+        createdAt: taskToEdit?.createdAt ?? DateTime.now(),
+        createdByDocId:
+            taskToEdit?.createdByDocId ?? FBAuth.auth.currentUser!.uid,
+        createdByName: taskToEdit?.createdByName ?? 'Super Admin',
+        updatedAt: DateTime.now(),
+        updatedBy: FBAuth.auth.currentUser!.uid,
+        updatedByName: 'Super Admin',
+        hotelId: masterHotelId,
+        assignedRole: state.selectedCategory!,
+        assignedDepartmentId: state.selectedDepartment,
+        serviceType: state.selectedServiceType,
+        frequency: state.selectedFrequency!,
+        dayOrDate: dayOrDateController.text.trim(),
+        duration: durationController.text.trim(),
+        place: placeController.text.trim(),
+        questions: state.questions,
+        fromMasterHotel: null,
+        isActive: state.isActive,
+      );
+
+      if (state.isEditMode && taskToEdit != null) {
+        await masterHotelRepo.updateTaskForHotel(task);
+      } else {
+        await masterHotelRepo.createTaskForHotel(task);
+      }
+
+      emit(state.copyWith(isCreating: false, isSuccess: true));
+
+      // Navigate back or show success message
+      if (context.mounted) {
+        Navigator.of(context).pop(true);
+      }
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isCreating: false,
+          errorMessage:
+              'Failed to ${state.isEditMode ? "update" : "create"} task: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  // Create master tasks from Excel
+  Future<void> createMasterTasksFromExcel(
     BuildContext context,
     String masterHotelId,
   ) async {
-    print("object ${state.selectedFile?.name}");
-    // final authCubit = context.read<AuthCubit>();
+    if (state.selectedCategory == null) {
+      emit(state.copyWith(errorMessage: 'Please select a user category first'));
+      return;
+    }
 
-    print(state.selectedCategory != null && state.selectedFile != null);
-    if (state.selectedCategory != null && state.selectedFile != null) {
-      emit(state.copyWith(isCreating: true));
-      // Simulate task creation
+    if (state.selectedFile == null) {
+      emit(state.copyWith(errorMessage: 'Please select an Excel file'));
+      return;
+    }
 
+    emit(state.copyWith(isCreating: true, errorMessage: null));
+
+    try {
       List<CommonTaskModel> importTaskList = [];
-
-      print("object=======1");
       final bytes = state.selectedFile!.bytes;
-      print("object=======2");
-      print(bytes != null);
-      final excelFile = excel.Excel.decodeBytes(bytes!);
-      print("object=======3");
-      // final excelFile = SpreadsheetDecoder.decodeBytes(bytes!, update: true);
+
+      if (bytes == null) {
+        throw Exception('Failed to read file bytes');
+      }
+
+      final excelFile = excel.Excel.decodeBytes(bytes);
+
       for (var sheet in excelFile.tables.keys) {
-        print("IN For Loop");
-        print("object=======4");
-
         final table = excelFile.tables[sheet]!;
-        print("object=======5");
 
-        for (var rowIndex = 1; rowIndex <= (table.maxRows - 1); rowIndex++) {
-          print("object=======6");
+        // Skip header row, start from row 1
+        for (var rowIndex = 1; rowIndex < table.maxRows; rowIndex++) {
+          final row = table.rows[rowIndex];
+
+          // Skip empty rows
+          if (row.isEmpty || row[0]?.value == null) continue;
 
           final toAddTask = CommonTaskModel(
             docId: '',
-            title: table.rows[rowIndex][0]!.value.toString(),
-            desc: table.rows[rowIndex][1]!.value.toString(),
+            title: row[0]!.value.toString(),
+            desc: row[1]!.value.toString(),
             createdAt: DateTime.now(),
             createdByDocId: FBAuth.auth.currentUser!.uid,
             createdByName: 'Super Admin',
@@ -78,29 +285,41 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
             updatedByName: 'Super Admin',
             hotelId: masterHotelId,
             assignedRole: state.selectedCategory!,
-            frequency: table.rows[rowIndex][5]!.value.toString(),
-            dayOrDate: table.rows[rowIndex][6]!.value.toString(),
-            duration: table.rows[rowIndex][2]!.value.toString(),
-            place: table.rows[rowIndex][3]!.value.toString(),
+            frequency: row[5]!.value.toString(),
+            dayOrDate: row[6]!.value.toString(),
+            duration: row[2]!.value.toString(),
+            place: row[3]!.value.toString(),
             questions: [],
             fromMasterHotel: null,
             isActive: true,
           );
-          print("object=======1");
 
           importTaskList.add(toAddTask);
-          print("object=======8");
-          print(importTaskList.length);
         }
       }
 
+      if (importTaskList.isEmpty) {
+        throw Exception('No valid tasks found in the Excel file');
+      }
+
+      // Create tasks in Firestore
       for (var task in importTaskList) {
         await masterHotelRepo.createTaskForHotel(task);
       }
 
-      await Future.delayed(Duration(seconds: 2), () {
-        emit(state.copyWith(isCreating: false, isSuccess: true));
-      });
+      emit(state.copyWith(isCreating: false, isSuccess: true));
+
+      // Navigate back or show success message
+      if (context.mounted) {
+        Navigator.of(context).pop(true);
+      }
+    } catch (e) {
+      emit(
+        state.copyWith(
+          isCreating: false,
+          errorMessage: 'Failed to import tasks: ${e.toString()}',
+        ),
+      );
     }
   }
 }

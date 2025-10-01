@@ -1,16 +1,10 @@
 import 'dart:async';
-
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
-import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
-import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
 import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
-import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-hotel/masterhotel_cubit.dart';
 
 part 'masterhotel_task_state.dart';
 
@@ -27,19 +21,29 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
     return super.close();
   }
 
-  void getHotelDetail(String hotelId, BuildContext context) async {
-    final masterHotelCubit = context.read<MasterHotelCubit>();
-    final hotelDetail = masterHotelCubit.state.masterHotels.firstWhere(
-      (hotel) => hotel.docId == hotelId,
-    );
-    emit(state.copyWith(hotelDetail: hotelDetail));
-  }
+  // void getHotelDetail(String hotelId, BuildContext context) async {
+  //   print("obj-----1");
+  //   final masterHotelCubit = context.read<MasterHotelCubit>();
+  //   print("obj-----2");
+  //   print(
+  //     "obj-----${hotelId} --- ${masterHotelCubit.state.masterHotels.length}",
+  //   );
 
-  void loadTasksForHotel(String hotelId, String roleId) async {
+  //   final hotelDetail = masterHotelCubit.state.masterHotels.firstWhere(
+  //     (hotel) => hotel.docId == hotelId,
+  //   );
+  //   emit(state.copyWith(hotelDetail: hotelDetail));
+
+  //   print("obj-----3");
+  //   print("obj-----4");
+  // }
+
+  void loadTasksForHotel(String hotelId, String role) async {
     emit(state.copyWith(isLoadingTasks: true));
     taskStream?.cancel();
+    print(taskStream);
     try {
-      taskStream = masterHotelRepo.getTaskOfHotel(hotelId, roleId).listen((
+      taskStream = masterHotelRepo.getTaskOfHotel(hotelId, role).listen((
         tasks,
       ) {
         emit(state.copyWith(allTasks: tasks, isLoadingTasks: false));
@@ -50,8 +54,9 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
     }
   }
 
-  void switchTab(RoleTab tab) {
+  void switchTab(String tab, String hotelId) async {
     if (state.selectedTab != tab) {
+      loadTasksForHotel(hotelId, tab);
       emit(state.copyWith(selectedTab: tab));
     }
   }
@@ -61,39 +66,16 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
   }
 
   void toggleTaskStatus(String taskId) {
-    final updatedTasks = state.allTasks.map((task) {
-      if (task.docId == taskId) {
-        // You'll need to implement copyWith in CommonTaskModel
-        // For now, create a new instance manually or use a different approach
-        // This is a placeholder - you'll need to implement this based on your model
-        return CommonTaskModel(
-          docId: task.docId,
-          title: task.title,
-          desc: task.desc,
-          frequency: task.frequency,
-          duration: task.duration,
-          assignedRole: task.assignedRole,
-          isActive: !task.isActive, // Toggle the status
-          createdAt: task.createdAt,
-          createdByDocId: task.createdByDocId,
-          createdByName: task.createdByName,
-          updatedAt: task.updatedAt,
-          updatedBy: task.updatedBy,
-          updatedByName: task.updatedByName,
-          hotelId: task.hotelId,
-          assignedDepartmentId: task.assignedDepartmentId,
-          serviceType: task.serviceType,
-          dayOrDate: task.dayOrDate,
-          questions: task.questions,
-          startDate: task.startDate,
-          endDate: task.endDate,
-          fromMasterHotel: task.fromMasterHotel,
-          place: task.place,
-        );
-      }
-      return task;
-    }).toList();
+    CommonTaskModel task = state.allTasks.firstWhere(
+      (task) => task.docId == taskId,
+    );
+    task = task.copyWith(isActive: !task.isActive);
+    masterHotelRepo.updateTaskForHotel(task);
+  }
 
-    emit(state.copyWith(allTasks: updatedTasks));
+  void deleteTask(String taskId) {
+    emit(state.copyWith(isLoading: true, message: null));
+    masterHotelRepo.deleteTask(taskId);
+    emit(state.copyWith(isLoading: false, message: "Task Deleted"));
   }
 }

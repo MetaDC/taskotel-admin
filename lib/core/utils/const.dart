@@ -61,6 +61,8 @@ final List<Map<String, String>> roles = [
   {'key': UserRoles.operators, 'name': 'Operators'},
 ];
 
+List<String> userRole =   roles.map((role) => role['key']!).toList();
+
 enum RoleTab { regionalManager, generalManager, departmentManager, operators }
 
 // Client Hotel Task Constants

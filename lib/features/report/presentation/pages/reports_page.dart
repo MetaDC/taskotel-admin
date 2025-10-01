@@ -19,7 +19,7 @@ class _ReportsPageState extends State<ReportsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<ReportCubit>().initialize();
+    // context.read<ReportCubit>().initialize();
   }
 
   @override

@@ -5,7 +5,7 @@ class MasterhotelTaskState extends Equatable {
   final bool isLoading;
   final bool isLoadingTasks;
   final String? message;
-  final RoleTab selectedTab;
+  final String selectedTab;
   final List<CommonTaskModel> allTasks; // Keep all tasks here
   final String searchQuery;
 
@@ -25,7 +25,7 @@ class MasterhotelTaskState extends Equatable {
       isLoading: false,
       isLoadingTasks: false,
       message: null,
-      selectedTab: RoleTab.regionalManager,
+      selectedTab: UserRoles.rm,
       allTasks: [],
       searchQuery: '',
     );
@@ -36,7 +36,7 @@ class MasterhotelTaskState extends Equatable {
     bool? isLoading,
     bool? isLoadingTasks,
     String? message,
-    RoleTab? selectedTab,
+    String? selectedTab,
     List<CommonTaskModel>? allTasks,
     String? searchQuery,
   }) {
@@ -53,24 +53,24 @@ class MasterhotelTaskState extends Equatable {
 
   // Get tasks for current role
   List<CommonTaskModel> get currentRoleTasks {
-    List<CommonTaskModel> roleTasks;
+    List<CommonTaskModel> roleTasks = [];
     switch (selectedTab) {
-      case RoleTab.regionalManager:
+      case UserRoles.rm:
         roleTasks = allTasks
             .where((task) => task.assignedRole == "rm")
             .toList();
         break;
-      case RoleTab.generalManager:
+      case UserRoles.gm:
         roleTasks = allTasks
             .where((task) => task.assignedRole == "gm")
             .toList();
         break;
-      case RoleTab.departmentManager:
+      case UserRoles.dm:
         roleTasks = allTasks
             .where((task) => task.assignedRole == "dm")
             .toList();
         break;
-      case RoleTab.operators:
+      case UserRoles.operators:
         roleTasks = allTasks
             .where((task) => task.assignedRole == "staff")
             .toList();
@@ -96,17 +96,18 @@ class MasterhotelTaskState extends Equatable {
   }
 
   // Get tab display name
-  String getTabDisplayName(RoleTab tab) {
+  String getTabDisplayName(String tab) {
     switch (tab) {
-      case RoleTab.regionalManager:
+      case UserRoles.rm:
         return "Regional Manager";
-      case RoleTab.generalManager:
+      case UserRoles.gm:
         return "General Manager";
-      case RoleTab.departmentManager:
+      case UserRoles.dm:
         return "Department Manager";
-      case RoleTab.operators:
+      case UserRoles.operators:
         return "Operators";
     }
+    return '';
   }
 
   @override

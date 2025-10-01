@@ -108,7 +108,11 @@ class ReportCubit extends Cubit<ReportState> {
 
       // Count active subscribers
       final activeSubscribers = clients
-          .where((c) => c.status == 'active' || c.status == 'trial')
+          .where(
+            (c) =>
+                c.status == ClientStatus.active ||
+                c.status == ClientStatus.trial,
+          )
           .length;
 
       final totalSubscribers = clients.length;
@@ -117,9 +121,9 @@ class ReportCubit extends Cubit<ReportState> {
       final churnedClients = clients
           .where(
             (c) =>
-                c.status == 'churned' ||
-                c.status == 'inactive' ||
-                c.status == 'suspended',
+                c.status == ClientStatus.churned ||
+                c.status == ClientStatus.inactive ||
+                c.status == ClientStatus.suspended,
           )
           .length;
 

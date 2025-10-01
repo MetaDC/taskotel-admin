@@ -6,7 +6,16 @@ import 'package:taskoteladmin/core/widget/custom_textfields.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-task/master_task_form_cubit.dart';
 
-class MasterTaskFormScreen extends StatelessWidget {
+class MasterTaskFormScreen extends StatefulWidget {
+  final String hotelId;
+
+  MasterTaskFormScreen({super.key, required this.hotelId});
+
+  @override
+  State<MasterTaskFormScreen> createState() => _MasterTaskFormScreenState();
+}
+
+class _MasterTaskFormScreenState extends State<MasterTaskFormScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -299,9 +308,9 @@ class MasterTaskFormScreen extends StatelessWidget {
                                           );
                                           await context
                                               .read<MasterTaskFormCubit>()
-                                              .createMasterTasks(
+                                              .createMasterTasksFromExcel(
                                                 context,
-                                                'random docId',
+                                                widget.hotelId,
                                               );
                                         }
                                         // if (result != null) {

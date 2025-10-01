@@ -114,4 +114,43 @@ class CommonTaskModel {
       "isActive": isActive,
     };
   }
+
+  CommonTaskModel copyWith({
+    String? title,
+    String? desc,
+    String? frequency,
+    String? dayOrDate,
+    String? duration,
+    String? place,
+    List<Map<String, dynamic>>? questions,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool? fromMasterHotel,
+    bool? isActive,
+  }) {
+    return CommonTaskModel(
+      docId: docId,
+      title: title ?? this.title,
+      desc: desc ?? this.desc,
+      frequency: frequency ?? this.frequency,
+      dayOrDate: dayOrDate ?? this.dayOrDate,
+      duration: duration ?? this.duration,
+      place: place ?? this.place,
+      questions: questions ?? this.questions,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      fromMasterHotel: fromMasterHotel ?? this.fromMasterHotel,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt,
+      createdByDocId: createdByDocId,
+      createdByName: createdByName,
+      updatedAt: updatedAt,
+      updatedBy: updatedBy,
+      updatedByName: updatedByName,
+      hotelId: hotelId,
+      assignedRole: assignedRole,
+      assignedDepartmentId: assignedDepartmentId,
+      serviceType: serviceType,
+    );
+  }
 }
