@@ -19,7 +19,12 @@ class _ReportsPageState extends State<ReportsPage> {
   @override
   void initState() {
     super.initState();
-    // context.read<ReportCubit>().initialize();
+    // Initialize after the first frame to avoid calling during build
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (mounted) {
+    //     context.read<ReportCubit>().initialize();
+    //   }
+    // });
   }
 
   @override

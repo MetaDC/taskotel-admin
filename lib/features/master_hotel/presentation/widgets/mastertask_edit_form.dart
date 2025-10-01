@@ -378,24 +378,30 @@ class TaskEditCreateForm extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: OutlinedButton(
-              onPressed: () {
-                if (Navigator.canPop(context)) {
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text("Cancel"),
+            child: SizedBox(
+              height: 40,
+              child: OutlinedButton(
+                onPressed: () {
+                  if (Navigator.canPop(context)) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: const Text("Cancel"),
+              ),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: ElevatedButton(
-              onPressed: state.isCreating
-                  ? null
-                  : () => cubit.submitForm(context, hotelId, taskToEdit),
-              child: state.isCreating
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : Text(state.isEditMode ? "Update Task" : "Create Task"),
+            child: SizedBox(
+              height: 40,
+              child: ElevatedButton(
+                onPressed: state.isCreating
+                    ? null
+                    : () => cubit.submitForm(context, hotelId, taskToEdit),
+                child: state.isCreating
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : Text(state.isEditMode ? "Update Task" : "Create Task"),
+              ),
             ),
           ),
         ],
