@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
@@ -15,14 +16,12 @@ class ClientCubit extends Cubit<ClientState> {
   static const int _pageSize = 10;
 
   ClientCubit({required this.clientRepo}) : super(ClientState.initial());
+  final searchController = TextEditingController();
 
   // Fetch active clients page
   Future<void> fetchActiveClientsPage() async {
-    print("Fetching active clients page");
     try {
-      print("Active current page: ${state.activeCurrentPage}");
       int pageZeroIndex = state.activeCurrentPage - 1;
-      print("Page zero index: $pageZeroIndex");
 
       // Check if we already have this page
       if (pageZeroIndex < state.activeClients.length &&
@@ -172,8 +171,6 @@ class ClientCubit extends Cubit<ClientState> {
       return;
     }
 
-    print("Initializing active clients pagination - fetching first page only");
-
     emit(
       state.copyWith(
         isLoading: true,
@@ -220,8 +217,6 @@ class ClientCubit extends Cubit<ClientState> {
       }
       return;
     }
-
-    print("Initializing lost clients pagination - fetching first page only");
 
     emit(
       state.copyWith(

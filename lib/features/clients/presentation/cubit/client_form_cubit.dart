@@ -66,7 +66,6 @@ class ClientFormCubit extends Cubit<ClientFormState> {
       );
 
       if (editClient != null) {
-        print("Updating client: ${client.name}--${state.isLoading}");
         await clientRepo.updateClient(client);
         emit(
           state.copyWith(
@@ -75,7 +74,6 @@ class ClientFormCubit extends Cubit<ClientFormState> {
           ),
         );
       } else {
-        print("Updating client: ${client.name}--${state.isLoading}");
         // Create new client
         await clientRepo.createAndRegisterClient(client, "1234567");
         emit(

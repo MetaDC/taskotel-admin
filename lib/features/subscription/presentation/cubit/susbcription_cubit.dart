@@ -39,6 +39,8 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
                   isLoading: false,
                 ),
               );
+              // Auto-calculate analytics whenever plans update
+              _calculateAnalytics();
             },
             onError: (error) {
               _emitWithMessage(
@@ -106,14 +108,69 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
     }
   }
 
-  // Load analytics
+  // Load analytics (now calls _calculateAnalytics)
   Future<void> loadAnalytics() async {
     try {
-      final analytics = await subscriptionRepo.getSubscriptionAnalytics();
-      emit(state.copyWith(analytics: analytics));
+      _calculateAnalytics();
     } catch (e) {
       _emitWithMessage(state, 'Failed to load analytics: $e');
     }
+  }
+
+  // Calculate analytics from subscription plans
+  void _calculateAnalytics() {
+    final plans = state.subscriptionPlans;
+
+    if (plans.isEmpty) {
+      emit(
+        state.copyWith(
+          analytics: {
+            'totalPlans': 0,
+            'totalSubscribers': 0,
+            'totalRevenue': 0.0,
+            'mostPopular': 'N/A',
+          },
+        ),
+      );
+      return;
+    }
+
+    // Total Plans
+    final totalPlans = plans.length;
+
+    // Total Active Subscribers (sum of all subscribers across all plans)
+    final totalSubscribers = plans.fold<int>(
+      0,
+      (sum, plan) => sum + plan.totalSubScribers,
+    );
+
+    // Total Monthly Revenue (sum of all revenue)
+    final totalRevenue = plans.fold<double>(
+      0.0,
+      (sum, plan) => sum + plan.totalRevenue,
+    );
+
+    // Most Popular Plan (plan with highest subscriber count)
+    String mostPopular = 'N/A';
+    if (plans.isNotEmpty) {
+      final popularPlan = plans.reduce(
+        (current, next) =>
+            next.totalSubScribers > current.totalSubScribers ? next : current,
+      );
+      mostPopular = popularPlan.title;
+    }
+
+    // Emit updated analytics
+    emit(
+      state.copyWith(
+        analytics: {
+          'totalPlans': totalPlans,
+          'totalSubscribers': totalSubscribers,
+          'totalRevenue': totalRevenue,
+          'mostPopular': mostPopular,
+        },
+      ),
+    );
   }
 
   // Search plans

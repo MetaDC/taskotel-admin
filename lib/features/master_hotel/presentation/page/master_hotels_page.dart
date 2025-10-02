@@ -5,14 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
+import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/core/utils/helpers.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
 import 'package:taskoteladmin/core/widget/tabel_widgets.dart';
-import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
 import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-hotel/masterhotel_cubit.dart';
-import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-hotel/masterhotel_form_cubit.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/widgets/masterhotel_form.dart';
 
 class MasterHotelsPage extends StatefulWidget {
@@ -34,65 +33,13 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
       child: Column(
-        children: [
-          _buildHeader(context),
-          SizedBox(height: 20),
-          CustomContainer(
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "Franchise Directory",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 30),
-
-                _buildTableHeader(),
-                SizedBox(height: 10),
-                Divider(color: AppColors.slateGray, thickness: 0.2),
-
-                BlocConsumer<MasterHotelCubit, MasterhotelState>(
-                  listener: (context, state) {
-                    if (state.message != null && state.message!.isNotEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(state.message ?? "")),
-                      );
-                    }
-                  },
-                  builder: (context, state) {
-                    return ListView.separated(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: state.masterHotels.length,
-                      separatorBuilder: (context, index) =>
-                          Divider(color: AppColors.slateGray, thickness: 0.2),
-                      itemBuilder: (context, index) {
-                        final masterHotel = state.masterHotels[index];
-                        return _buildHotelMasterRow(
-                          masterHotel,
-                          context,
-                          index,
-                          state,
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
+        children: [_buildHeader(context), SizedBox(height: 20), _buildTabel()],
       ),
     );
   }
 
-  PageHeaderWithButton _buildHeader(BuildContext context) {
+  // Header
+  Widget _buildHeader(BuildContext context) {
     return PageHeaderWithButton(
       heading: "Hotel Masters",
       subHeading: "Manage hotel franchises and their master tasks",
@@ -106,16 +53,65 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: BlocProvider(
-                create: (context) => MasterhotelFormCubit(
-                  masterHotelRepo: MasterHotelFirebaseRepo(),
-                ),
-                child: MasterHotelForm(),
-              ),
+              child: MasterHotelForm(),
             );
           },
         );
       },
+    );
+  }
+
+  // Table
+  Widget _buildTabel() {
+    return CustomContainer(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                "Franchise Directory",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+              ),
+            ],
+          ),
+          SizedBox(height: 30),
+
+          _buildTableHeader(),
+          SizedBox(height: 10),
+          Divider(color: AppColors.slateGray, thickness: 0.2),
+
+          BlocConsumer<MasterHotelCubit, MasterhotelState>(
+            listener: (context, state) {
+              if (state.message != null && state.message!.isNotEmpty) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message ?? "")));
+              }
+            },
+            builder: (context, state) {
+              if (state.isLoading) {
+                return Center(child: CircularProgressIndicator());
+              }
+              return ListView.separated(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: state.masterHotels.length,
+                separatorBuilder: (context, index) =>
+                    Divider(color: AppColors.slateGray, thickness: 0.2),
+                itemBuilder: (context, index) {
+                  final masterHotel = state.masterHotels[index];
+                  return _buildHotelMasterRow(
+                    masterHotel,
+                    context,
+                    index,
+                    state,
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -198,18 +194,22 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
           // Status Toggle
           SizedBox(
             width: TableConfig.viewColumnWidth,
-            child: Transform.scale(
-              scale: 0.7,
-              child: CupertinoSwitch(
-                activeTrackColor: AppColors.primary,
-                value: masterHotel.isActive,
-                onChanged: (value) {
-                  context.read<MasterHotelCubit>().updateStatusOfMasterHotel(
-                    masterHotel.docId,
-                    value,
-                  );
-                },
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Transform.scale(
+                  scale: 0.7,
+                  child: CupertinoSwitch(
+                    activeTrackColor: AppColors.primary,
+                    value: masterHotel.isActive,
+                    onChanged: (value) {
+                      context
+                          .read<MasterHotelCubit>()
+                          .updateStatusOfMasterHotel(masterHotel.docId, value);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -254,14 +254,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: BlocProvider(
-                            create: (context) => MasterhotelFormCubit(
-                              masterHotelRepo: MasterHotelFirebaseRepo(),
-                            ),
-                            child: MasterHotelForm(
-                              editMasterHotel: masterHotel,
-                            ),
-                          ),
+                          child: MasterHotelForm(editMasterHotel: masterHotel),
                         );
                       },
                     );

@@ -9,6 +9,7 @@ import 'package:taskoteladmin/features/subscription/data/subscription_firebasere
 import 'package:taskoteladmin/features/subscription/domain/model/subscription_model.dart';
 import 'package:taskoteladmin/features/subscription/presentation/cubit/subscription_form_cubit.dart';
 import 'package:taskoteladmin/features/subscription/presentation/cubit/susbcription_cubit.dart';
+import 'package:taskoteladmin/features/subscription/presentation/widgets/subscription_analytics.dart';
 import 'package:taskoteladmin/features/subscription/presentation/widgets/subscription_plan_card.dart';
 import 'package:taskoteladmin/features/subscription/presentation/widgets/create_plan_form.dart';
 
@@ -64,50 +65,16 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
             child: Column(
               children: [
                 // Page Header
-                PageHeaderWithButton(
-                  heading: "Subscription Plans",
-                  subHeading: "Manage subscription plans and pricing",
-                  buttonText: "Create Plan",
-                  onButtonPressed: () => _showCreatePlanModal(context),
-                ),
+                _buildPageHeader(context),
                 const SizedBox(height: 30),
 
                 // Analytics Cards
-                if (state.analytics != null) ...[
-                  StaggeredGrid.extent(
-                    maxCrossAxisExtent: 500,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    children: [
-                      StatCardIconLeft(
-                        icon: CupertinoIcons.doc_text,
-                        label: "Total Plans",
-                        value: "${state.analytics!['totalPlans'] ?? 0}",
-                        iconColor: Colors.blue,
-                      ),
-                      StatCardIconLeft(
-                        icon: CupertinoIcons.person_2,
-                        label: "Active Subscriptions",
-                        value: "${state.analytics!['totalSubscribers'] ?? 0}",
-                        iconColor: Colors.green,
-                      ),
-                      StatCardIconLeft(
-                        icon: CupertinoIcons.money_dollar,
-                        label: "Monthly Revenue",
-                        value:
-                            "\$${(state.analytics!['totalRevenue'] ?? 0.0).toStringAsFixed(0)}",
-                        iconColor: Colors.orange,
-                      ),
-                      StatCardIconLeft(
-                        icon: CupertinoIcons.star_fill,
-                        label: "Most Popular",
-                        value: "${state.analytics!['mostPopular'] ?? 'N/A'}",
-                        iconColor: Colors.purple,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                ],
+                _buildSubscriptionAnalytics(state),
+                const SizedBox(height: 30),
+
+                // Charts Section
+                _buildChartsSection(state),
+                const SizedBox(height: 30),
 
                 // Subscription Plans Grid
                 if (state.isLoading)
@@ -140,6 +107,108 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildPageHeader(BuildContext context) {
+    return PageHeaderWithButton(
+      heading: "Subscription Plans",
+      subHeading: "Manage subscription plans and pricing",
+      buttonText: "Create Plan",
+      onButtonPressed: () => _showCreatePlanModal(context),
+    );
+  }
+
+  Widget _buildSubscriptionAnalytics(SubscriptionState state) {
+    // Check if analytics is null
+    if (state.analytics == null) {
+      return const SizedBox.shrink();
+    }
+
+    return StaggeredGrid.extent(
+      maxCrossAxisExtent: 500,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      children: [
+        StatCardIconLeft(
+          icon: CupertinoIcons.doc_text,
+          label: "Total Plans",
+          value: "${state.analytics!['totalPlans'] ?? 0}",
+          iconColor: Colors.blue,
+        ),
+        StatCardIconLeft(
+          icon: CupertinoIcons.person_2,
+          label: "Active Subscriptions",
+          value: "${state.analytics!['totalSubscribers'] ?? 0}",
+          iconColor: Colors.green,
+        ),
+        StatCardIconLeft(
+          icon: CupertinoIcons.money_dollar,
+          label: "Monthly Revenue",
+          value:
+              "\$${(state.analytics!['totalRevenue'] ?? 0.0).toStringAsFixed(0)}",
+          iconColor: Colors.orange,
+        ),
+        StatCardIconLeft(
+          icon: CupertinoIcons.star_fill,
+          label: "Most Popular",
+          value: "${state.analytics!['mostPopular'] ?? 'N/A'}",
+          iconColor: Colors.purple,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChartsSection(SubscriptionState state) {
+    // Only show charts if we have subscription plans
+    if (state.subscriptionPlans.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Subscriber Distribution Chart
+        Expanded(
+          child: Container(
+            height: 400,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: SubscriberDistributionChart(plans: state.subscriptionPlans),
+          ),
+        ),
+        const SizedBox(width: 20),
+
+        // Revenue by Plan Chart
+        Expanded(
+          child: Container(
+            height: 400,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: RevenueByPlanChart(plans: state.subscriptionPlans),
+          ),
+        ),
+      ],
     );
   }
 

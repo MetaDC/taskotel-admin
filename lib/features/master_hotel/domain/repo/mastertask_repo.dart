@@ -14,7 +14,12 @@ abstract class MasterHotelTaskRepo {
 
   //Master Task Cubit Functions
   Stream<List<CommonTaskModel>> getTaskOfHotel(String hotelId, String role);
+
+  Future<List<CommonTaskModel>> getTaskForExcel(
+    String hotelId,
+    String taskId,
+  );
   Future<void> createTaskForHotel(CommonTaskModel task);
-  Future<void> updateTaskForHotel(CommonTaskModel task);
+  Future<void> updateTaskForHotel( String docId,CommonTaskModel task);
   Future<void> deleteTask(String taskId);
 }

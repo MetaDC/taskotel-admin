@@ -25,14 +25,9 @@ class HotelDetailPage extends StatefulWidget {
 }
 
 class _HotelDetailPageState extends State<HotelDetailPage> {
-  late TextEditingController _searchController;
-
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
-
-    // Load hotel details and initial tab data
 
     final cubit = context.read<ClientDetailCubit>();
     cubit.loadHotelDetails(widget.hotelId);
@@ -41,7 +36,6 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -335,7 +329,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
-              controller: _searchController,
+              controller: context.read<ClientDetailCubit>().serachController,
               decoration: const InputDecoration(
                 hintText: "Search tasks...",
                 border: InputBorder.none,
@@ -518,36 +512,6 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
           ),
         ],
       ),
-    );
-  }
-
-  void _showDeleteConfirmation(CommonTaskModel task) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete Task'),
-          content: Text(
-            'Are you sure you want to delete task "${task.title}"?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                context.read<ClientDetailCubit>().deleteTask(task.docId);
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Task ${task.title} deleted')),
-                );
-              },
-              child: const Text('Delete', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
     );
   }
 }

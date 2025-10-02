@@ -316,25 +316,31 @@ class CreatePlanForm extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: OutlinedButton(
-              onPressed: () {
-                // Safe navigation close
-                if (Navigator.canPop(context)) {
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text("Cancel"),
+            child: SizedBox(
+              height: 40,
+              child: OutlinedButton(
+                onPressed: () {
+                  // Safe navigation close
+                  if (Navigator.canPop(context)) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: const Text("Cancel"),
+              ),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: ElevatedButton(
-              onPressed: state.isSubmitting
-                  ? null
-                  : () => cubit.submitForm(planToEdit),
-              child: state.isSubmitting
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : Text(state.isEditMode ? "Update" : "Create"),
+            child: SizedBox(
+              height: 40,
+              child: ElevatedButton(
+                onPressed: state.isSubmitting
+                    ? null
+                    : () => cubit.submitForm(planToEdit),
+                child: state.isSubmitting
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : Text(state.isEditMode ? "Update" : "Create"),
+              ),
             ),
           ),
         ],

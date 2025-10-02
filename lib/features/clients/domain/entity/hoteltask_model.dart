@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CommonTaskModel {
   final String docId;
+  final String taskId;
   final String title;
   final String desc;
   final DateTime createdAt;
@@ -23,10 +24,12 @@ class CommonTaskModel {
   final DateTime? startDate; // null for master hotel
   final DateTime? endDate; // null if not to end this
   final bool? fromMasterHotel;
+
   final bool isActive;
 
   CommonTaskModel({
     required this.docId,
+    required this.taskId,
     required this.title,
     required this.desc,
     required this.createdAt,
@@ -60,6 +63,7 @@ class CommonTaskModel {
   factory CommonTaskModel.fromJson(Map<String, dynamic> json) {
     return CommonTaskModel(
       docId: json["docId"] ?? "",
+      taskId: json["taskId"] ?? "",
       title: json["title"] ?? "",
       desc: json["desc"] ?? "",
       createdAt: DateTime.fromMillisecondsSinceEpoch(json["createdAt"] ?? 0),
@@ -91,6 +95,7 @@ class CommonTaskModel {
   /// To Map / JSON for Firestore
   Map<String, dynamic> toMap() {
     return {
+      "taskId": taskId,
       "title": title,
       "desc": desc,
       "createdAt": createdAt.millisecondsSinceEpoch,
@@ -130,6 +135,7 @@ class CommonTaskModel {
   }) {
     return CommonTaskModel(
       docId: docId,
+      taskId: taskId,
       title: title ?? this.title,
       desc: desc ?? this.desc,
       frequency: frequency ?? this.frequency,

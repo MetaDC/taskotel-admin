@@ -46,10 +46,24 @@ class MasterHotelFirebaseRepo extends MasterHotelTaskRepo {
         .where('assignedRole', isEqualTo: role)
         .snapshots()
         .map((querySnapshot) {
+          print("query snapshot ${querySnapshot.docs.length}");
           return querySnapshot.docs
               .map((doc) => CommonTaskModel.fromSnap(doc))
               .toList();
         });
+  }
+
+  @override
+  Future<List<CommonTaskModel>> getTaskForExcel(
+    String hotelId,
+    String taskId,
+  ) async {
+    final snapshot = await FBFireStore.tasks
+        .where('hotelId', isEqualTo: hotelId)
+        .where('taskId', isEqualTo: taskId)
+        .get();
+
+    return snapshot.docs.map((doc) => CommonTaskModel.fromSnap(doc)).toList();
   }
 
   @override
@@ -58,8 +72,8 @@ class MasterHotelFirebaseRepo extends MasterHotelTaskRepo {
   }
 
   @override
-  Future<void> updateTaskForHotel(CommonTaskModel task) async {
-    await FBFireStore.tasks.doc(task.docId).update(task.toMap());
+  Future<void> updateTaskForHotel(String docId, CommonTaskModel task) async {
+    await FBFireStore.tasks.doc(docId).update(task.toMap());
   }
 
   @override

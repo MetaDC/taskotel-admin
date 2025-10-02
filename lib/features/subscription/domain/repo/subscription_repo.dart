@@ -10,7 +10,7 @@ abstract class SubscriptionRepo {
   Future<void> deleteSubscriptionPlan(String planId);
 
   // Analytics
-  Future<Map<String, dynamic>> getSubscriptionAnalytics();
+  // Future<Map<String, dynamic>> getSubscriptionAnalytics();
 
   // Search and filter
   Future<List<SubscriptionPlanModel>> searchPlans(String query);

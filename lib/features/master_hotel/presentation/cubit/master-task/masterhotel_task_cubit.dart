@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
@@ -14,6 +15,7 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
     : super(MasterhotelTaskState.initial());
 
   StreamSubscription<List<CommonTaskModel>>? taskStream;
+  final serachController = TextEditingController();
 
   @override
   Future<void> close() {
@@ -39,14 +41,15 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
   // }
 
   void loadTasksForHotel(String hotelId, String role) async {
-    emit(state.copyWith(isLoadingTasks: true));
+    emit(state.copyWith(isLoadingTasks: true, allTasks: []));
     taskStream?.cancel();
-    print(taskStream);
+
     try {
       taskStream = masterHotelRepo.getTaskOfHotel(hotelId, role).listen((
         tasks,
       ) {
         emit(state.copyWith(allTasks: tasks, isLoadingTasks: false));
+        searchTasks();
       });
     } catch (e) {
       print('Error fetching tasks for hotel: $e');
@@ -61,8 +64,13 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
     }
   }
 
-  void searchTasks(String query) {
-    emit(state.copyWith(searchQuery: query));
+  void searchTasks() {
+    final filteredTasks = state.allTasks.where((task) {
+      return task.title.toLowerCase().contains(
+        serachController.text.toLowerCase().trim().toLowerCase(),
+      );
+    }).toList();
+    emit(state.copyWith(filteredTasks: filteredTasks));
   }
 
   void toggleTaskStatus(String taskId) {
@@ -70,7 +78,7 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
       (task) => task.docId == taskId,
     );
     task = task.copyWith(isActive: !task.isActive);
-    masterHotelRepo.updateTaskForHotel(task);
+    masterHotelRepo.updateTaskForHotel(task.docId, task);
   }
 
   void deleteTask(String taskId) {

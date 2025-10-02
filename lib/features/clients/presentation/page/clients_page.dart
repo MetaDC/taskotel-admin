@@ -46,17 +46,8 @@ class _ClientsPageState extends State<ClientsPage> {
                 builder: (context) {
                   return Dialog(
                     backgroundColor: Color(0xffFAFAFA),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: BlocProvider(
-                      create: (context) =>
-                          ClientFormCubit(clientRepo: ClientFirebaseRepo()),
-                      child: Container(
-                        constraints: BoxConstraints(maxWidth: 600),
-                        child: ClientFormModal(),
-                      ),
-                    ),
+
+                    child: ClientFormModal(),
                   );
                 },
               );

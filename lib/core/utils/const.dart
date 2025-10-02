@@ -14,6 +14,14 @@ class ClientStatus {
   static const String churned = 'churned';
 }
 
+final clientStatus = [
+  ClientStatus.active,
+  ClientStatus.inactive,
+  ClientStatus.suspended,
+  ClientStatus.trial,
+  ClientStatus.churned,
+];
+
 final hotelTypes = ["Hotel", "Resort", "Motel", "Villa"];
 
 final List<String> departments = [
@@ -61,7 +69,7 @@ final List<Map<String, String>> roles = [
   {'key': UserRoles.operators, 'name': 'Operators'},
 ];
 
-List<String> userRole =   roles.map((role) => role['key']!).toList();
+List<String> userRole = roles.map((role) => role['key']!).toList();
 
 enum RoleTab { regionalManager, generalManager, departmentManager, operators }
 
@@ -327,7 +335,7 @@ final List<String> hotelIds = [
   "vEypYc3dGDBps8bzScmt",
 ];
 
-final List<String> roles1 = ["rm", "gm", "dm", "staff"];
+final List<String> roles1 = ["rm", "gm", "dm", "operators"];
 
 final List<String> serviceTypes = ["Cleaning", "Check-in", "Repair", "Cooking"];
 
@@ -364,6 +372,8 @@ List<CommonTaskModel> generateDummyTasks() {
 
     CommonTaskModel task = CommonTaskModel(
       docId: "", // Firestore will generate
+      taskId: "${role.toUpperCase()}${i + 1}",
+
       title: "Task ${i + 1} for Hotel $hotelId",
       desc: "Description for task ${i + 1}",
       createdAt: createdAt,
@@ -387,7 +397,7 @@ List<CommonTaskModel> generateDummyTasks() {
       ],
       startDate: null,
       endDate: null,
-      fromMasterHotel: true,
+      fromMasterHotel: false,
       isActive: true,
     );
 

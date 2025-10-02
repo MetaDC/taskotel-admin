@@ -76,7 +76,6 @@ class MasterhotelFormCubit extends Cubit<MasterhotelFormState> {
     } else {
       emit(state.copyWith(selectedFile: false));
     }
-    print("File deleted:${state.selectedFile}");
   }
 
   // Submit form

@@ -58,9 +58,9 @@ class TaskEditCreateForm extends StatelessWidget {
           final cubit = context.read<MasterTaskFormCubit>();
 
           return Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
               children: [

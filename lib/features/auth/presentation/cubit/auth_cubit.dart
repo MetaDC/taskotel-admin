@@ -26,7 +26,7 @@ class AuthCubit extends Cubit<AuthState> {
     if (loginFormKey.currentState?.validate() ?? false) {
       try {
         emit(state.copyWith(isLoading: true));
-        await authRepo.login(email, password);
+        await authRepo.login(email.trim().toLowerCase(), password);
         emit(
           state.copyWith(
             isAuthenticated: true,

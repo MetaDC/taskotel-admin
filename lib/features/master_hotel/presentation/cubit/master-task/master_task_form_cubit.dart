@@ -1,11 +1,15 @@
-import 'package:equatable/equatable.dart';
+import 'dart:io';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:excel/excel.dart' as excel;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
+import 'package:excel/excel.dart';
 
 part 'master_task_form_state.dart';
 
@@ -191,6 +195,7 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
     try {
       final task = CommonTaskModel(
         docId: taskToEdit?.docId ?? '',
+        taskId: taskToEdit?.taskId ?? '',
         title: titleController.text.trim(),
         desc: descController.text.trim(),
         createdAt: taskToEdit?.createdAt ?? DateTime.now(),
@@ -214,7 +219,7 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
       );
 
       if (state.isEditMode && taskToEdit != null) {
-        await masterHotelRepo.updateTaskForHotel(task);
+        await masterHotelRepo.updateTaskForHotel(taskToEdit.docId, task);
       } else {
         await masterHotelRepo.createTaskForHotel(task);
       }
@@ -275,8 +280,9 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
 
           final toAddTask = CommonTaskModel(
             docId: '',
-            title: row[0]!.value.toString(),
-            desc: row[1]!.value.toString(),
+            taskId: row[0]!.value.toString(),
+            title: row[1]!.value.toString(),
+            desc: row[2]!.value.toString(),
             createdAt: DateTime.now(),
             createdByDocId: FBAuth.auth.currentUser!.uid,
             createdByName: 'Super Admin',
@@ -285,10 +291,10 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
             updatedByName: 'Super Admin',
             hotelId: masterHotelId,
             assignedRole: state.selectedCategory!,
-            frequency: row[5]!.value.toString(),
-            dayOrDate: row[6]!.value.toString(),
-            duration: row[2]!.value.toString(),
-            place: row[3]!.value.toString(),
+            frequency: row[6]!.value.toString(),
+            dayOrDate: row[7]!.value.toString(),
+            duration: row[3]!.value.toString(),
+            place: row[4]!.value.toString(),
             questions: [],
             fromMasterHotel: null,
             isActive: true,
@@ -297,14 +303,24 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
           importTaskList.add(toAddTask);
         }
       }
-
       if (importTaskList.isEmpty) {
         throw Exception('No valid tasks found in the Excel file');
       }
 
       // Create tasks in Firestore
       for (var task in importTaskList) {
-        await masterHotelRepo.createTaskForHotel(task);
+        List<CommonTaskModel> res = await masterHotelRepo.getTaskForExcel(
+          masterHotelId,
+          task.taskId,
+        );
+        print(res);
+        if (res.isNotEmpty) {
+          await masterHotelRepo.updateTaskForHotel(res.first.docId, task);
+        } else {
+          await masterHotelRepo.createTaskForHotel(task);
+        }
+
+        // await masterHotelRepo.createTaskForHotel(task);
       }
 
       emit(state.copyWith(isCreating: false, isSuccess: true));
@@ -322,4 +338,61 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
       );
     }
   }
+
+  // Future<void> exportTasksToExcel(List<CommonTaskModel> tasks) async {
+  //   try {
+  //     // Request storage permission if needed
+  //     if (Platform.isAndroid) {
+  //       var status = await Permission.storage.request();
+  //       if (!status.isGranted) {
+  //         throw Exception("Storage permission not granted");
+  //       }
+  //     }
+
+  //     final excel = Excel.createExcel(); // Automatically creates a Sheet1
+  //     final Sheet sheet = excel['Tasks'];
+
+  //     // Write headers
+  //     sheet.appendRow([
+  //       'taskId',
+  //       'title',
+  //       'description',
+  //       'duration',
+  //       'place',
+  //       'departmentId',
+  //       'frequency',
+  //       'dayOrDate',
+  //     ]);
+
+  //     // Write task rows
+  //     for (var task in tasks) {
+  //       sheet.appendRow([
+  //         task.taskId,
+  //         task.title,
+  //         task.desc,
+  //         task.duration,
+  //         task.place,
+  //         task.assignedDepartmentId ?? '', // Handle null safely
+  //         task.frequency,
+  //         task.dayOrDate,
+  //       ]);
+  //     }
+
+  //     // Save to local file
+  //     final List<int>? fileBytes = excel.encode();
+  //     if (fileBytes == null) {
+  //       throw Exception("Failed to encode Excel file");
+  //     }
+
+  //     final directory = await getExternalStorageDirectory(); // Android-safe
+  //     final filePath = '${directory!.path}/exported_tasks.xlsx';
+  //     final file = File(filePath)
+  //       ..createSync(recursive: true)
+  //       ..writeAsBytesSync(fileBytes);
+
+  //     print("✅ Excel file saved: $filePath");
+  //   } catch (e) {
+  //     print("❌ Error exporting tasks: $e");
+  //   }
+  // }
 }

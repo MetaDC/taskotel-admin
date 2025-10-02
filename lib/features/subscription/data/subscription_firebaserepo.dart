@@ -31,50 +31,49 @@ class SubscriptionFirebaserepo extends SubscriptionRepo {
 
   @override
   Future<void> deleteSubscriptionPlan(String planId) async {
-    print("deleting plan:-${planId}");
     await subscriptionCollectionRef.doc(planId).delete();
   }
 
-  @override
-  Future<Map<String, dynamic>> getSubscriptionAnalytics() async {
-    try {
-      final querySnapshot = await subscriptionCollectionRef.get();
-      final plans = querySnapshot.docs
-          .map((doc) => SubscriptionPlanModel.fromDocSnap(doc))
-          .toList();
+  // @override
+  // Future<Map<String, dynamic>> getSubscriptionAnalytics() async {
+  //   try {
+  //     final querySnapshot = await subscriptionCollectionRef.get();
+  //     final plans = querySnapshot.docs
+  //         .map((doc) => SubscriptionPlanModel.fromDocSnap(doc))
+  //         .toList();
 
-      int totalPlans = plans.length;
-      int activePlans = plans.where((plan) => plan.isActive).length;
-      int totalSubscribers = plans.fold(
-        0,
-        (total, plan) => total + plan.totalSubScribers,
-      );
-      double totalRevenue = plans.fold(
-        0.0,
-        (total, plan) => total + plan.totalRevenue,
-      );
+  //     int totalPlans = plans.length;
+  //     int activePlans = plans.where((plan) => plan.isActive).length;
+  //     int totalSubscribers = plans.fold(
+  //       0,
+  //       (total, plan) => total + plan.totalSubScribers,
+  //     );
+  //     double totalRevenue = plans.fold(
+  //       0.0,
+  //       (total, plan) => total + plan.totalRevenue,
+  //     );
 
-      // Find most popular plan
-      String mostPopular = 'N/A';
-      if (plans.isNotEmpty) {
-        final popularPlan = plans.reduce(
-          (a, b) => a.totalSubScribers > b.totalSubScribers ? a : b,
-        );
-        mostPopular = popularPlan.title;
-      }
+  //     // Find most popular plan
+  //     String mostPopular = 'N/A';
+  //     if (plans.isNotEmpty) {
+  //       final popularPlan = plans.reduce(
+  //         (a, b) => a.totalSubScribers > b.totalSubScribers ? a : b,
+  //       );
+  //       mostPopular = popularPlan.title;
+  //     }
 
-      return {
-        'totalPlans': totalPlans,
-        'activePlans': activePlans,
-        'totalSubscribers': totalSubscribers,
-        'totalRevenue': totalRevenue,
-        'mostPopular': mostPopular,
-        'plans': plans,
-      };
-    } catch (e) {
-      throw Exception('Failed to get analytics: $e');
-    }
-  }
+  //     return {
+  //       'totalPlans': totalPlans,
+  //       'activePlans': activePlans,
+  //       'totalSubscribers': totalSubscribers,
+  //       'totalRevenue': totalRevenue,
+  //       'mostPopular': mostPopular,
+  //       'plans': plans,
+  //     };
+  //   } catch (e) {
+  //     throw Exception('Failed to get analytics: $e');
+  //   }
+  // }
 
   @override
   Future<List<SubscriptionPlanModel>> searchPlans(String query) async {

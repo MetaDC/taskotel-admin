@@ -1,308 +1,273 @@
+// ============================================
+// File 1: subscriber_distribution_chart.dart
+// ============================================
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:taskoteladmin/core/theme/app_colors.dart';
-import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/features/subscription/domain/model/subscription_model.dart';
 
-// ============================================
-// SUBSCRIBER DISTRIBUTION CHART
-// ============================================
 class SubscriberDistributionChart extends StatelessWidget {
   final List<SubscriptionPlanModel> plans;
 
-  const SubscriberDistributionChart({Key? key, required this.plans})
-    : super(key: key);
+  const SubscriberDistributionChart({super.key, required this.plans});
 
   @override
   Widget build(BuildContext context) {
-    return CustomContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Subscriber Distribution",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: 40),
-          Center(
-            child: SizedBox(
-              height: 250,
-              child: PieChart(
-                PieChartData(
-                  sections: _buildPieChartSections(),
-                  sectionsSpace: 2,
-                  centerSpaceRadius: 80,
-                  borderData: FlBorderData(show: false),
+    final sections = _generatePieChartSections();
+
+    if (sections.isEmpty) {
+      return const Center(
+        child: Text(
+          'No subscriber data available',
+          style: TextStyle(color: Colors.grey),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        const Text(
+          'Subscriber Distribution',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 20),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: PieChart(
+                  PieChartData(
+                    sections: sections,
+                    centerSpaceRadius: 80,
+                    sectionsSpace: 2,
+                    borderData: FlBorderData(show: false),
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(width: 20),
+              Expanded(child: _buildLegend()),
+            ],
           ),
-          SizedBox(height: 30),
-          _buildLegend(),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  List<PieChartSectionData> _buildPieChartSections() {
+  List<PieChartSectionData> _generatePieChartSections() {
     final colors = [
-      Color(0xFF5B7C99), // Slate blue
-      Color(0xFFFFA726), // Orange
-      Color(0xFF42A5F5), // Blue
-      Color(0xFFAB47BC), // Purple
+      const Color(0xFF5B7C99), // Basic - Gray-blue
+      const Color(0xFFF5A623), // Standard - Orange
+      const Color(0xFF4A90E2), // Premium - Blue
+      const Color(0xFF9B59B6), // Enterprise - Purple
     ];
 
-    return plans.asMap().entries.map((entry) {
-      final index = entry.key;
-      final plan = entry.value;
-      final color = colors[index % colors.length];
+    final activePlans = plans.where((p) => p.isActive).toList();
+    final totalSubscribers = activePlans.fold<int>(
+      0,
+      (sum, plan) => sum + plan.totalSubScribers,
+    );
+
+    if (totalSubscribers == 0) return [];
+
+    return List.generate(activePlans.length, (index) {
+      final plan = activePlans[index];
+      final percentage = (plan.totalSubScribers / totalSubscribers) * 100;
 
       return PieChartSectionData(
-        color: color,
         value: plan.totalSubScribers.toDouble(),
-        title: '',
+        title: '${percentage.toStringAsFixed(0)}%',
+        color: colors[index % colors.length],
         radius: 60,
+        titleStyle: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
       );
-    }).toList();
+    });
   }
 
   Widget _buildLegend() {
     final colors = [
-      Color(0xFF5B7C99),
-      Color(0xFFFFA726),
-      Color(0xFF42A5F5),
-      Color(0xFFAB47BC),
+      const Color(0xFF5B7C99),
+      const Color(0xFFF5A623),
+      const Color(0xFF4A90E2),
+      const Color(0xFF9B59B6),
     ];
 
-    return Wrap(
-      spacing: 20,
-      runSpacing: 12,
-      alignment: WrapAlignment.center,
-      children: plans.asMap().entries.map((entry) {
-        final index = entry.key;
-        final plan = entry.value;
-        final color = colors[index % colors.length];
+    final activePlans = plans.where((p) => p.isActive).toList();
 
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 12,
-              height: 12,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-            ),
-            SizedBox(width: 6),
-            Text(
-              "${plan.title} (${plan.totalSubScribers})",
-              style: TextStyle(fontSize: 14),
-            ),
-          ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: List.generate(activePlans.length, (index) {
+        final plan = activePlans[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              Container(
+                width: 16,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: colors[index % colors.length],
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${plan.title} (${plan.totalSubScribers})',
+                  style: const TextStyle(fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         );
-      }).toList(),
+      }),
     );
   }
 }
 
 // ============================================
-// REVENUE BY PLAN CHART
+// File 2: revenue_by_plan_chart.dart
 // ============================================
+
 class RevenueByPlanChart extends StatelessWidget {
   final List<SubscriptionPlanModel> plans;
 
-  const RevenueByPlanChart({Key? key, required this.plans}) : super(key: key);
+  const RevenueByPlanChart({super.key, required this.plans});
 
   @override
   Widget build(BuildContext context) {
-    return CustomContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Revenue by Plan",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: 40),
-          SizedBox(
-            height: 300,
-            child: BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
-                maxY: _getMaxRevenue() * 1.2,
-                barTouchData: BarTouchData(
-                  touchTooltipData: BarTouchTooltipData(
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      return BarTooltipItem(
-                        '\$${rod.toY.toStringAsFixed(0)}',
-                        TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+    final activePlans = plans.where((p) => p.isActive).toList();
+
+    if (activePlans.isEmpty) {
+      return const Center(
+        child: Text(
+          'No revenue data available',
+          style: TextStyle(color: Colors.grey),
+        ),
+      );
+    }
+
+    final maxRevenue = activePlans.fold<double>(
+      0,
+      (max, plan) => plan.totalRevenue > max ? plan.totalRevenue : max,
+    );
+
+    // If all revenues are 0, show a message
+    if (maxRevenue == 0) {
+      return const Center(
+        child: Text(
+          'No revenue data available',
+          style: TextStyle(color: Colors.grey),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        const Text(
+          'Revenue by Plan',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 20),
+        Expanded(
+          child: BarChart(
+            BarChartData(
+              maxY: maxRevenue * 1.2,
+              barGroups: _generateBarGroups(activePlans),
+              titlesData: FlTitlesData(
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 50,
+                    getTitlesWidget: (value, meta) {
+                      return Text(
+                        '\$${(value / 1000).toStringAsFixed(0)}k',
+                        style: const TextStyle(fontSize: 10),
                       );
                     },
                   ),
                 ),
-                titlesData: FlTitlesData(
-                  show: true,
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        if (value.toInt() >= 0 &&
-                            value.toInt() < plans.length) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              plans[value.toInt()].title,
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          );
-                        }
-                        return Text('');
-                      },
-                    ),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 50,
-                      getTitlesWidget: (value, meta) {
-                        return Text(
-                          '\$${(value / 1000).toStringAsFixed(0)}k',
-                          style: TextStyle(fontSize: 11),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      final index = value.toInt();
+                      if (index >= 0 && index < activePlans.length) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            activePlans[index].title,
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         );
-                      },
-                    ),
-                  ),
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
+                      }
+                      return const SizedBox();
+                    },
                   ),
                 ),
-                borderData: FlBorderData(show: false),
-                gridData: FlGridData(
-                  show: true,
-                  drawVerticalLine: false,
-                  horizontalInterval: 7000,
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
                 ),
-                barGroups: _buildBarGroups(),
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+              ),
+              borderData: FlBorderData(show: false),
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: false,
+                horizontalInterval: maxRevenue > 0 ? maxRevenue / 4 : 1,
+              ),
+              barTouchData: BarTouchData(
+                enabled: true,
+                touchTooltipData: BarTouchTooltipData(
+                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                    return BarTooltipItem(
+                      '\$${rod.toY.toStringAsFixed(0)}',
+                      const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  List<BarChartGroupData> _buildBarGroups() {
-    return plans.asMap().entries.map((entry) {
-      final index = entry.key;
-      final plan = entry.value;
+  List<BarChartGroupData> _generateBarGroups(
+    List<SubscriptionPlanModel> activePlans,
+  ) {
+    final colors = [
+      const Color(0xFF5B7C99),
+      const Color(0xFFF5A623),
+      const Color(0xFF4A90E2),
+      const Color(0xFF9B59B6),
+    ];
 
+    return List.generate(activePlans.length, (index) {
+      final plan = activePlans[index];
       return BarChartGroupData(
         x: index,
         barRods: [
           BarChartRodData(
             toY: plan.totalRevenue,
-            color: Color(0xFF42A5F5),
+            color: colors[index % colors.length],
             width: 40,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
           ),
         ],
       );
-    }).toList();
-  }
-
-  double _getMaxRevenue() {
-    if (plans.isEmpty) return 30000;
-    return plans.map((p) => p.totalRevenue).reduce((a, b) => a > b ? a : b);
-  }
-}
-
-// ============================================
-// PLAN DETAILS CARDS (Below Charts)
-// ============================================
-class PlanDetailsCard extends StatelessWidget {
-  final SubscriptionPlanModel plan;
-
-  const PlanDetailsCard({Key? key, required this.plan}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomContainer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                plan.title,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-              ),
-              Icon(Icons.more_horiz, size: 20),
-            ],
-          ),
-          SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                "\${(plan.price['monthly'] ?? 0).toStringAsFixed(0)}",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                " /month",
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-              ),
-            ],
-          ),
-          SizedBox(height: 4),
-          Text(
-            "\${(plan.price['yearly'] ?? 0).toStringAsFixed(0)} /year",
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-          ),
-          SizedBox(height: 8),
-          Text(
-            plan.desc,
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-          ),
-          SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    plan.totalSubScribers.toString(),
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "Subscribers",
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "\$${plan.totalRevenue.toStringAsFixed(0)}",
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "Revenue",
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+    });
   }
 }

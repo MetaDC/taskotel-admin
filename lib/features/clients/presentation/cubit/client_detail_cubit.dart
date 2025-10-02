@@ -1,6 +1,7 @@
 // ClientDetailCubit
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/%20analytics_models.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
@@ -13,6 +14,8 @@ part 'client_detail_state.dart';
 class ClientDetailCubit extends Cubit<ClientDetailState> {
   final ClientRepo clientRepo;
 
+  final TextEditingController serachController = TextEditingController();
+
   ClientDetailCubit({required this.clientRepo})
     : super(ClientDetailState.initial());
 
@@ -22,10 +25,8 @@ class ClientDetailCubit extends Cubit<ClientDetailState> {
       final client = await clientRepo.getClientDetials(clientId);
       final hotels = await clientRepo.getClientHotels(clientId);
 
-      print("Client loaded: ${client.name}");
       emit(state.copyWith(client: client, hotels: hotels, isLoading: false));
       loadClientAnalytics();
-      print("Client loaded: ${state.client?.docId}--${hotels.length}");
     } catch (e) {
       emit(state.copyWith(isLoading: false, message: e.toString()));
     }
@@ -57,7 +58,6 @@ class ClientDetailCubit extends Cubit<ClientDetailState> {
           ),
         );
       } else {
-        print("Hotel not found in loaded hotels list");
         emit(state.copyWith(message: "Hotel not found", isLoadingTasks: false));
       }
     } catch (e) {
@@ -74,18 +74,17 @@ class ClientDetailCubit extends Cubit<ClientDetailState> {
   }
 
   void searchTasks(String query) {
-    print("Searching tasks with query: '$query'");
     emit(state.copyWith(searchQuery: query));
   }
 
   void toggleTaskStatus(String taskId) {
-    print("Toggling task status for: $taskId");
     final updatedTasks = state.allTasks.map((task) {
       if (task.docId == taskId) {
         // You'll need to implement copyWith in CommonTaskModel
         // For now, create a new instance manually or use a different approach
         // This is a placeholder - you'll need to implement this based on your model
         return CommonTaskModel(
+          taskId: task.taskId,
           docId: task.docId,
           title: task.title,
           desc: task.desc,
@@ -117,7 +116,6 @@ class ClientDetailCubit extends Cubit<ClientDetailState> {
   }
 
   void deleteTask(String taskId) {
-    print("Deleting task: $taskId");
     final updatedTasks = state.allTasks
         .where((task) => task.docId != taskId)
         .toList();
@@ -129,11 +127,7 @@ class ClientDetailCubit extends Cubit<ClientDetailState> {
       emit(state.copyWith(message: "Please navigate from client page"));
       return;
     }
-    for (var hotel in state.hotels) {
-      print(
-        "Hotel: ${hotel.name}---${hotel.totaltask}---${hotel.totalRevenue}",
-      );
-    }
+
     try {
       final clientAnalytics = ClientDetailAnalytics(
         totalHotels: state.client?.totalHotels ?? 0,
@@ -158,33 +152,4 @@ class ClientDetailCubit extends Cubit<ClientDetailState> {
       print("Error loading client analytics: ${e.toString()}");
     }
   }
-
-  // void loadHotelAnalytics() {
-  //   if (state.hotelDetail == null) {
-  //     emit(state.copyWith(message: "Please navigate from client page"));
-  //     return;
-  //   }
-  //   try {
-  //     final hotelAnalytics = HotelDetailAnalytics(
-  //       totalTasks: state.hotelDetail?.totaltask ?? 0,
-  //       activeTasks: state.allTasks.where((task) => task.isActive).length,
-  //       completedTasks: state.allTasks.where((task) => !task.isActive).length,
-  //       taskCompletionRate:
-  //           (state.allTasks.where((task) => !task.isActive).length /
-  //               state.allTasks.length) *
-  //           100,
-  //       totalRooms:
-  //           state.hotelDetail?.floors.values.fold<int>(
-  //             0,
-  //             (sum, rooms) => sum + rooms,
-  //           ) ??
-  //           0,
-  //       monthlyRevenue: state.hotelDetail?.totalRevenue ?? 0.0,
-  //     );
-
-  //     emit(state.copyWith(hotelAnalytics: hotelAnalytics));
-  //   } catch (e) {
-  //     print("Error loading hotel analytics: ${e.toString()}");
-  //   }
-  // }
 }

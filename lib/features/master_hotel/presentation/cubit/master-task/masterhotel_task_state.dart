@@ -1,12 +1,13 @@
 part of 'masterhotel_task_cubit.dart';
 
-class MasterhotelTaskState extends Equatable {
+class MasterhotelTaskState {
   final MasterHotelModel? hotelDetail;
   final bool isLoading;
   final bool isLoadingTasks;
   final String? message;
   final String selectedTab;
-  final List<CommonTaskModel> allTasks; // Keep all tasks here
+  final List<CommonTaskModel> allTasks;
+  final List<CommonTaskModel> filteredTasks; // Keep all tasks here
   final String searchQuery;
 
   const MasterhotelTaskState({
@@ -17,6 +18,7 @@ class MasterhotelTaskState extends Equatable {
     required this.selectedTab,
     required this.allTasks,
     required this.searchQuery,
+    required this.filteredTasks,
   });
 
   factory MasterhotelTaskState.initial() {
@@ -28,6 +30,7 @@ class MasterhotelTaskState extends Equatable {
       selectedTab: UserRoles.rm,
       allTasks: [],
       searchQuery: '',
+      filteredTasks: [],
     );
   }
 
@@ -39,6 +42,7 @@ class MasterhotelTaskState extends Equatable {
     String? selectedTab,
     List<CommonTaskModel>? allTasks,
     String? searchQuery,
+    List<CommonTaskModel>? filteredTasks,
   }) {
     return MasterhotelTaskState(
       hotelDetail: hotelDetail ?? this.hotelDetail,
@@ -48,51 +52,8 @@ class MasterhotelTaskState extends Equatable {
       selectedTab: selectedTab ?? this.selectedTab,
       allTasks: allTasks ?? this.allTasks,
       searchQuery: searchQuery ?? this.searchQuery,
+      filteredTasks: filteredTasks ?? this.filteredTasks,
     );
-  }
-
-  // Get tasks for current role
-  List<CommonTaskModel> get currentRoleTasks {
-    List<CommonTaskModel> roleTasks = [];
-    switch (selectedTab) {
-      case UserRoles.rm:
-        roleTasks = allTasks
-            .where((task) => task.assignedRole == "rm")
-            .toList();
-        break;
-      case UserRoles.gm:
-        roleTasks = allTasks
-            .where((task) => task.assignedRole == "gm")
-            .toList();
-        break;
-      case UserRoles.dm:
-        roleTasks = allTasks
-            .where((task) => task.assignedRole == "dm")
-            .toList();
-        break;
-      case UserRoles.operators:
-        roleTasks = allTasks
-            .where((task) => task.assignedRole == "staff")
-            .toList();
-        break;
-    }
-
-    return roleTasks;
-  }
-
-  // Filtered tasks based on current role and search query
-  List<CommonTaskModel> get filteredTasks {
-    final roleTasks = currentRoleTasks;
-
-    if (searchQuery.isEmpty) return roleTasks;
-
-    final filtered = roleTasks.where((task) {
-      return task.title.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          task.desc.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          task.docId.toLowerCase().contains(searchQuery.toLowerCase());
-    }).toList();
-
-    return filtered;
   }
 
   // Get tab display name
@@ -109,15 +70,4 @@ class MasterhotelTaskState extends Equatable {
     }
     return '';
   }
-
-  @override
-  List<Object?> get props => [
-    hotelDetail,
-    isLoading,
-    isLoadingTasks,
-    message,
-    selectedTab,
-    allTasks,
-    searchQuery,
-  ];
 }

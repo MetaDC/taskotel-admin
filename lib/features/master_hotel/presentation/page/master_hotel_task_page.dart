@@ -7,14 +7,13 @@ import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/core/utils/helpers.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
-import 'package:taskoteladmin/core/widget/custom_textfields.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
 import 'package:taskoteladmin/core/widget/tabel_widgets.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
-import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
+import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-task/master_task_form_cubit.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-task/masterhotel_task_cubit.dart';
 import 'package:taskoteladmin/features/master_hotel/presentation/widgets/mastertask_edit_form.dart';
-import 'package:taskoteladmin/features/master_hotel/presentation/widgets/mastertask_form.dart';
+import 'package:taskoteladmin/features/master_hotel/presentation/widgets/mastertask_excel_form.dart';
 
 class MasterHotelTaskPage extends StatefulWidget {
   final String hotelId;
@@ -30,12 +29,9 @@ class MasterHotelTaskPage extends StatefulWidget {
 }
 
 class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
-  late TextEditingController _searchController;
-
   @override
   void initState() {
     super.initState();
-    _searchController = TextEditingController();
     final cubit = context.read<MasterhotelTaskCubit>();
     cubit.loadTasksForHotel(widget.hotelId, UserRoles.rm);
   }
@@ -49,18 +45,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PageHeaderWithButton(
-                heading: widget.HotelName,
-                subHeading: "Manage master tasks and franchise details",
-                buttonText: "Create Task",
-                onButtonPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) =>
-                        MasterTaskFormScreen(hotelId: widget.hotelId),
-                  );
-                },
-              ),
+              _buildHeader(context),
 
               const SizedBox(height: 30),
               Expanded(
@@ -95,6 +80,23 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
     );
   }
 
+  // Header
+  Widget _buildHeader(BuildContext context) {
+    return PageHeaderWithButton(
+      heading: widget.HotelName,
+      subHeading: "Manage master tasks and franchise details",
+      buttonText: "Create Task",
+      onButtonPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) =>
+              Dialog(child: MasterTaskExcelFormScreen(hotelId: widget.hotelId)),
+        );
+      },
+    );
+  }
+
+  // Role Tabs
   Widget _buildRoleTabs(MasterhotelTaskState state) {
     // Create a map for the segmented control
     Map<String, Widget> segmentedControlTabs = {};
@@ -129,35 +131,46 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
     );
   }
 
+  // Search Bar
   Widget _buildSearchBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          const Icon(CupertinoIcons.search, size: 16, color: Colors.grey),
-          const SizedBox(width: 8),
-          Expanded(
+    return Row(
+      children: [
+        const Icon(CupertinoIcons.search, size: 16, color: Colors.grey),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: TextField(
-              controller: TextEditingController(),
+              controller: context.read<MasterhotelTaskCubit>().serachController,
               decoration: const InputDecoration(
                 hintText: "Search tasks...",
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(vertical: 12),
               ),
               onChanged: (value) {
-                context.read<ClientDetailCubit>().searchTasks(value);
+                context.read<MasterhotelTaskCubit>().searchTasks();
               },
             ),
           ),
-        ],
-      ),
+        ),
+        IconButton(
+          onPressed: () {
+            // context.read<MasterTaskFormCubit>().exportTasksToExcel(
+            //   context,
+            //   context.read<MasterhotelTaskCubit>().state.filteredTasks,
+            // );
+          },
+          icon: const Icon(Icons.download, color: Colors.grey),
+        ),
+      ],
     );
   }
 
+  // Task Table
   Widget _buildTaskTable(MasterhotelTaskState state) {
     return Expanded(
       child: Column(
@@ -165,6 +178,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
           // Table Header
           Row(
             children: [
+              SizedBox(width: TableConfig.horizontalSpacing),
               _buildTableHeader("Task ID", flex: 1),
               _buildTableHeader("Task Title", flex: 2),
               _buildTableHeader("Description", flex: 2),
@@ -200,6 +214,15 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
     );
   }
 
+  // Table Header
+  Widget _buildTableHeader(String title, {int flex = 1}) {
+    return Expanded(
+      flex: flex,
+      child: Text(title, style: AppTextStyles.tabelHeader),
+    );
+  }
+
+  // Task Row
   Widget _buildTaskRow(CommonTaskModel task, int index) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -210,10 +233,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
               SizedBox(width: TableConfig.horizontalSpacing),
               Expanded(
                 flex: 1,
-                child: Text(
-                  "${task.assignedRole.toUpperCase()} ${index + 1}",
-                  style: AppTextStyles.tableRowPrimary,
-                ),
+                child: Text(task.taskId, style: AppTextStyles.tableRowPrimary),
               ),
               Expanded(
                 flex: 2,
@@ -244,229 +264,101 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
                   style: AppTextStyles.tableRowRegular,
                 ),
               ),
-              // Expanded(
-              //   flex: 1,
-              //   child: Container(
-              //     padding: const EdgeInsets.symmetric(
-              //       horizontal: 8,
-              //       vertical: 4,
-              //     ),
-              //     decoration: BoxDecoration(
-              //       // color: statusColor.withOpacity(0.1),
-              //       borderRadius: BorderRadius.circular(12),
-              //     ),
-              //     child: Text(
-              //       task.fromMasterHotel ?? false ? "Imported" : "Created",
-              //       style: TextStyle(
-              //         // color: statusColor,
-              //         fontWeight: FontWeight.w600,
-              //         fontSize: 12,
-              //       ),
-              //     ),
-              //   ),
-              // ),
               Expanded(
                 flex: 1,
-                child: Transform.scale(
-                  scale: 0.7,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Transform.scale(
+                      scale: 0.7,
 
-                  child: CupertinoSwitch(
-                    activeTrackColor: AppColors.primary,
-                    value: task.isActive,
-                    onChanged: (value) {
-                      context.read<MasterhotelTaskCubit>().toggleTaskStatus(
-                        task.docId,
-                      );
-                    },
-                  ),
+                      child: CupertinoSwitch(
+                        activeTrackColor: AppColors.primary,
+                        value: task.isActive,
+                        onChanged: (value) {
+                          context.read<MasterhotelTaskCubit>().toggleTaskStatus(
+                            task.docId,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
                 flex: 1,
-                child: true
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          PopupMenuButton(
-                            icon: Icon(
-                              Icons.more_horiz,
-                              size: TableConfig.mediumIconSize,
-                              color: AppColors.textBlackColor,
-                            ),
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                child: Row(
-                                  children: [
-                                    Icon(CupertinoIcons.pencil, size: 16),
-                                    SizedBox(width: 8),
-                                    Text('Edit'),
-                                  ],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    PopupMenuButton(
+                      icon: Icon(
+                        Icons.more_horiz,
+                        size: TableConfig.mediumIconSize,
+                        color: AppColors.textBlackColor,
+                      ),
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          child: Row(
+                            children: [
+                              Icon(CupertinoIcons.pencil, size: 16),
+                              SizedBox(width: 8),
+                              Text('Edit'),
+                            ],
+                          ),
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                child: Container(
+                                  constraints: BoxConstraints(maxWidth: 600),
+                                  child: TaskEditCreateForm(
+                                    hotelId: widget.hotelId,
+                                    taskToEdit: task,
+                                  ),
                                 ),
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => Dialog(
-                                      child: Container(
-                                        constraints: BoxConstraints(
-                                          maxWidth: 600,
-                                        ),
-                                        child: TaskEditCreateForm(
-                                          hotelId: widget.hotelId,
-                                          taskToEdit: task,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
                               ),
-                              PopupMenuItem(
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      CupertinoIcons.delete,
-                                      size: 16,
-                                      color: Colors.red,
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Delete',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                  ],
-                                ),
-                                onTap: () {
-                                  showConfirmDeletDialog(
-                                    context,
-                                    () {
-                                      context
-                                          .read<MasterhotelTaskCubit>()
-                                          .deleteTask(task.docId);
-                                    },
-                                    "Delete Task",
-                                    "Are you sure you want to delete this task ?",
-                                    "Delete",
-                                  );
-                                },
+                            );
+                          },
+                        ),
+                        PopupMenuItem(
+                          child: Row(
+                            children: [
+                              Icon(
+                                CupertinoIcons.delete,
+                                size: 16,
+                                color: Colors.red,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.red),
                               ),
                             ],
                           ),
-                        ],
-                      )
-                    : Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(CupertinoIcons.pencil, size: 16),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => Dialog(
-                                  child: Container(
-                                    constraints: BoxConstraints(maxWidth: 600),
-                                    child: TaskEditCreateForm(
-                                      hotelId: widget.hotelId,
-                                      taskToEdit: task,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
+                          onTap: () {
+                            showConfirmDeletDialog(
+                              context,
+                              () {
+                                context.read<MasterhotelTaskCubit>().deleteTask(
+                                  task.docId,
+                                );
+                              },
+                              "Delete Task",
+                              "Are you sure you want to delete this task ?",
+                              "Delete",
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              // Expanded(
-              //   flex: 1,
-              //   child: Row(
-              //     children: [
-              //       IconButton(
-              //         icon: const Icon(CupertinoIcons.pencil, size: 16),
-              //         onPressed: () {
-              //           // Edit task functionality
-              //           ScaffoldMessenger.of(context).showSnackBar(
-              //             SnackBar(content: Text('Edit task: ${task.docId}')),
-              //           );
-              //         },
-              //       ),
-              //       IconButton(
-              //         icon: const Icon(CupertinoIcons.delete, size: 16),
-              //         onPressed: () {
-              //           // Delete task with confirmation
-              //           _showDeleteConfirmation(task);
-              //         },
-              //       ),
-              //     ],
-              //   ),
-              // ),
             ],
           ),
           const SizedBox(height: 8),
           const Divider(thickness: 0.1),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTableHeader(String title, {int flex = 1}) {
-    return Expanded(
-      flex: flex,
-      child: Text(title, style: AppTextStyles.tabelHeader),
-    );
-  }
-}
-
-class EditTaskForm extends StatelessWidget {
-  const EditTaskForm({super.key, required this.task});
-  final CommonTaskModel task;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: BoxConstraints(maxWidth: 600),
-
-      child: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("Edit Task", style: AppTextStyles.dialogHeading),
-            SizedBox(height: 20),
-            StaggeredGrid.extent(
-              maxCrossAxisExtent: 400,
-              mainAxisSpacing: 15,
-              crossAxisSpacing: 15,
-              children: [
-                CustomTextField(
-                  controller: TextEditingController(),
-                  hintText: 'Task Title',
-                  title: 'Title',
-                ),
-                CustomTextField(
-                  controller: TextEditingController(),
-                  hintText: 'Task Description',
-                  title: 'Description',
-                ),
-                CustomDropDownField(
-                  title: "Frequency",
-                  hintText: "Select Frequency",
-                  initialValue: task.frequency,
-                  validatorText: "Please select a frequency",
-                  items: frequencies.map((item) {
-                    return DropdownMenuItem(value: item, child: Text(item));
-                  }).toList(),
-                  onChanged: (value) {
-                    print("value: $value");
-                  },
-                ),
-
-                CustomTextField(
-                  controller: TextEditingController(),
-                  hintText: 'Duration',
-                  title: 'Duration',
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }

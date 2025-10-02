@@ -10,12 +10,12 @@ import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
 class ClientFirebaseRepo extends ClientRepo {
   final clientsCollectionRef = FBFireStore.clients;
 
+  // CRUD
   @override
   Future<void> createAndRegisterClient(
     ClientModel client,
     String password,
   ) async {
-    print("Creating user: ${client.name}");
     try {
       final res = await FBFunctions.ff.httpsCallable('createUser').call({
         "name": client.name,
@@ -30,7 +30,7 @@ class ClientFirebaseRepo extends ClientRepo {
         "createdAt": client.createdAt.millisecondsSinceEpoch,
         "updatedAt": client.updatedAt.millisecondsSinceEpoch,
       });
-      print(res.data);
+
       if (res.data?['success'] == false) {
         throw Exception(res.data?['msg']);
       }
@@ -57,37 +57,6 @@ class ClientFirebaseRepo extends ClientRepo {
     }
   }
 
-  // @override
-  // Stream<List<ClientModel>> getActiveClientsStream() {
-  //   return clientsCollectionRef
-  //       .where('status', isEqualTo: ClientStatus.active)
-  //       .orderBy('createdAt', descending: true)
-  //       .snapshots()
-  //       .map(
-  //         (snapshot) =>
-  //             snapshot.docs.map((doc) => ClientModel.fromDocSnap(doc)).toList(),
-  //       );
-  // }
-
-  // @override
-  // Stream<List<ClientModel>> getLostClientsStream() {
-  //   return clientsCollectionRef
-  //       .where(
-  //         'status',
-  //         whereIn: [
-  //           ClientStatus.inactive,
-  //           ClientStatus.suspended,
-  //           ClientStatus.churned,
-  //         ],
-  //       )
-  //       .orderBy('createdAt', descending: true)
-  //       .snapshots()
-  //       .map(
-  //         (snapshot) =>
-  //             snapshot.docs.map((doc) => ClientModel.fromDocSnap(doc)).toList(),
-  //       );
-  // }
-
   @override
   Future<List<ClientModel>> searchClients(String query) async {
     try {
@@ -99,36 +68,6 @@ class ClientFirebaseRepo extends ClientRepo {
       return snapshot.docs.map((doc) => ClientModel.fromDocSnap(doc)).toList();
     } catch (e) {
       throw Exception("Failed to search clients: $e");
-    }
-  }
-
-  @override
-  Future<Map<String, dynamic>> getClientAnalytics() async {
-    try {
-      final activeClients = await clientsCollectionRef
-          .where('status', isEqualTo: ClientStatus.active)
-          .get();
-
-      final totalClients = await clientsCollectionRef.get();
-
-      final totalRevenue = totalClients.docs.fold<double>(
-        0.0,
-        (total, doc) => total + (doc.data()['totalRevenue'] ?? 0.0),
-      );
-
-      final totalHotels = totalClients.docs.fold<int>(
-        0,
-        (total, doc) => total + ((doc.data()['totalHotels'] ?? 0) as int),
-      );
-
-      return {
-        'totalClients': totalClients.docs.length,
-        'activeClients': activeClients.docs.length,
-        'totalRevenue': totalRevenue,
-        'totalHotels': totalHotels,
-      };
-    } catch (e) {
-      throw Exception("Failed to get analytics: $e");
     }
   }
 
@@ -165,13 +104,10 @@ class ClientFirebaseRepo extends ClientRepo {
       final snapshot = await FBFireStore.tasks
           .where('hotelId', isEqualTo: hotelId)
           .get();
-      print("snapshot.docs.length: ${snapshot.docs.length}");
+
       return snapshot.docs.map((doc) => CommonTaskModel.fromSnap(doc)).toList();
     } catch (e) {
       throw Exception("Failed to get hotel tasks: $e");
     }
   }
-
-  // analytics
-
 }

@@ -17,6 +17,8 @@ class MasterTaskFormState {
   final bool isActive;
   final bool isEditMode;
 
+  final bool isCreateNewTasks;
+
   MasterTaskFormState({
     this.selectedCategory,
     this.selectedFile,
@@ -31,6 +33,7 @@ class MasterTaskFormState {
     this.questions = const [],
     this.isActive = true,
     this.isEditMode = false,
+    this.isCreateNewTasks = false,
   });
 
   factory MasterTaskFormState.initial() {
@@ -51,6 +54,7 @@ class MasterTaskFormState {
     List<Map<String, dynamic>>? questions,
     bool? isActive,
     bool? isEditMode,
+    bool? isCreateNewTasks,
   }) {
     return MasterTaskFormState(
       selectedCategory: selectedCategory ?? this.selectedCategory,
@@ -67,6 +71,7 @@ class MasterTaskFormState {
       questions: questions ?? this.questions,
       isActive: isActive ?? this.isActive,
       isEditMode: isEditMode ?? this.isEditMode,
+      isCreateNewTasks: isCreateNewTasks ?? this.isCreateNewTasks,
     );
   }
 }
