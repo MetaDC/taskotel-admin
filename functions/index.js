@@ -70,8 +70,8 @@ exports.createUser = onCall(async (request) => {
 exports.deleteUser = onCall(async (request) => {
   try {
     // await auth.deleteUser(request.data.userId);
-    await db.collection("users").doc(request.data.userId).update({
-      deleted: true,
+    await db.collection("clients").doc(request.data.userId).update({
+      isDeleted: true,
     });
     return { success: true, msg: "User deleted successfully" };
   } catch (error) {

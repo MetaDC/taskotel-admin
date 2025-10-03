@@ -6,6 +6,7 @@ import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 
 import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
+import 'package:taskoteladmin/features/subscription/domain/model/subscription_model.dart';
 
 class ClientFirebaseRepo extends ClientRepo {
   final clientsCollectionRef = FBFireStore.clients;
@@ -110,4 +111,24 @@ class ClientFirebaseRepo extends ClientRepo {
       throw Exception("Failed to get hotel tasks: $e");
     }
   }
+
+  //Client Analytics
+  // @override
+  // Future<ClientListAnalytics> getClientsAnalytics() async {
+  //   final activeClients = FBFireStore.clients
+  //       .where('status', whereIn: ['active', 'trial'])
+  //       .count();
+
+  //   final lostClients = FBFireStore.clients
+  //       .where('status', whereIn: ['churned', 'inactive', 'suspended'])
+  //       .count();
+
+  //   final totalHotels = FBFireStore.hotels.count();
+
+  //   final snapshot = await Future.wait([
+  //     activeClients.get(),
+  //     lostClients.get(),
+  //     totalHotels.get(),
+  //   ]);
+  // }
 }

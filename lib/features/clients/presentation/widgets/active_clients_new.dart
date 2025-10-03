@@ -61,25 +61,25 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
         StatCardIconLeft(
           icon: CupertinoIcons.person_2,
           label: "Total Clients",
-          value: "${state.stats?['totalClients'] ?? 0}",
+          value: "${state.stats?.totalClients.toString() ?? 0}",
           iconColor: Colors.blue,
         ),
         StatCardIconLeft(
           icon: CupertinoIcons.circle_fill,
           label: "Active Clients",
-          value: "${state.stats?['activeClients'] ?? 0}",
+          value: "${state.stats?.activeClients ?? 0}",
           iconColor: Colors.green,
         ),
         StatCardIconLeft(
           icon: CupertinoIcons.building_2_fill,
           label: "Total Hotels",
-          value: "${state.stats?['totalHotels'] ?? 0}",
+          value: "${state.stats?.totalHotels ?? 0}",
           iconColor: Colors.teal,
         ),
         StatCardIconLeft(
           icon: CupertinoIcons.money_dollar,
           label: "Total Revenue",
-          value: "\$${state.stats?['totalActiveRevenue'] ?? 0}",
+          value: "\$${state.stats?.totalRevenue ?? 0}",
           iconColor: Colors.orange,
         ),
       ],
@@ -172,7 +172,8 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                 const SizedBox(height: 20),
 
                 // Pagination
-                if (state.activeTotalPages > 1)
+                if (state.activeTotalPages > 1 &&
+                    context.read<ClientCubit>().searchController.text.isEmpty)
                   DynamicPagination(
                     currentPage: state.activeCurrentPage,
                     totalPages: state.activeTotalPages,
@@ -260,6 +261,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
         ),
         Expanded(child: Text("Hotels", style: AppTextStyles.tabelHeader)),
         Expanded(child: Text("Revenue", style: AppTextStyles.tabelHeader)),
+        Expanded(child: Text("Expiry", style: AppTextStyles.tabelHeader)),
         Expanded(child: Text("Status", style: AppTextStyles.tabelHeader)),
         SizedBox(
           width: 100,
@@ -319,6 +321,14 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
           Expanded(
             child: Text(
               "\$${client.totalRevenue.toStringAsFixed(0)}",
+              style: AppTextStyles.tableRowBoldValue,
+            ),
+          ),
+
+          // Expiry Date
+          Expanded(
+            child: Text(
+              client.lastPaymentExpiry?.convertToDDMMYY() ?? 'N/A',
               style: AppTextStyles.tableRowBoldValue,
             ),
           ),

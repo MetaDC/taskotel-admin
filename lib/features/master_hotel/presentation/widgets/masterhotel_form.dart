@@ -164,7 +164,12 @@ class _MasterHotelFormState extends State<MasterHotelForm> {
                                     onDeleteImageTap: () {
                                       masterHotelFormCubit.deletPickFile(false);
                                     },
-                                    uploadImg: state.selectedFile != null
+                                    uploadImg: state.dbFile != null
+                                        ? Image.network(
+                                            state.dbFile!,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : state.selectedFile != null
                                         ? Image.memory(
                                             state.selectedFile!.uInt8List,
                                             fit: BoxFit.cover,
@@ -218,7 +223,11 @@ class _MasterHotelFormState extends State<MasterHotelForm> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Text("Create Hotel Master"),
+                                : Text(
+                                    widget.editMasterHotel != null
+                                        ? "Update Hotel Master"
+                                        : "Create Hotel Master",
+                                  ),
                           ),
                         ],
                       ),

@@ -396,7 +396,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
               Expanded(
                 flex: 1,
                 child: Text(
-                  "${task.assignedRole.toUpperCase()} ${index + 1}",
+                  task.taskId,
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
               ),

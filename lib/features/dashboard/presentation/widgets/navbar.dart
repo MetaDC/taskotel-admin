@@ -54,7 +54,7 @@ class Navbar extends StatelessWidget {
           // loop through navItems
           ...navItems.map((item) => buildNavItem(context, item)).toList(),
           const Spacer(),
-          _iconWithBadge(Icons.notifications, 3),
+          _iconWithBadge(Icons.notifications, 0),
           const SizedBox(width: 20),
           userDropdown(context: context),
         ],
@@ -109,7 +109,7 @@ class Navbar extends StatelessWidget {
       actions: [
         mobileDropDown(isMobile: true, context: context),
         const SizedBox(width: 10),
-        _iconWithBadge(Icons.notifications, 3),
+        _iconWithBadge(Icons.notifications, 0),
         const SizedBox(width: 10),
         userDropdown(isMobile: true, context: context),
       ],
@@ -148,27 +148,34 @@ class Navbar extends StatelessWidget {
   }
 
   Widget _iconWithBadge(IconData icon, int count) {
-    return Stack(
-      alignment: Alignment.topRight,
-      children: [
-        Icon(icon, color: Colors.white),
-        if (count > 0)
-          Positioned(
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(3),
-              decoration: const BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-                "$count",
-                style: const TextStyle(color: Colors.white, fontSize: 10),
-              ),
-            ),
-          ),
-      ],
-    );
+    return true
+        ? count > 0
+              ? Badge(
+                  label: Text("$count"),
+                  child: Icon(icon, color: Colors.white),
+                )
+              : Icon(icon, color: Colors.white)
+        : Stack(
+            alignment: Alignment.topRight,
+            children: [
+              Icon(icon, color: Colors.white),
+              if (count > 0)
+                Positioned(
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: const BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      "$count",
+                      style: const TextStyle(color: Colors.white, fontSize: 10),
+                    ),
+                  ),
+                ),
+            ],
+          );
   }
 
   Widget mobileDropDown({
@@ -222,9 +229,9 @@ class Navbar extends StatelessWidget {
       onSelected: (value) {
         if (value == "Settings") {
           // 👉 Navigate to settings page
-          context.go("/settings");
+          // context.go("/settings");
         } else if (value == "Logout") {
-          context.read<AuthCubit>().logout();
+          context.read<AuthCubit>().logout(context);
         }
       },
       itemBuilder: (context) {

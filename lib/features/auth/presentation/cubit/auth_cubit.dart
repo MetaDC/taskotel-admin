@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
+import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/features/auth/domain/repo/auth_repo.dart';
 
 part 'auth_state.dart';
@@ -47,7 +49,7 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  void logout() async {
+  void logout(BuildContext context) async {
     try {
       emit(state.copyWith(isLoading: true));
       await authRepo.logout();
@@ -57,7 +59,8 @@ class AuthCubit extends Cubit<AuthState> {
       emit(
         state.copyWith(isAuthenticated: false, isLoading: false, message: null),
       );
-      // Router will automatically redirect due to the redirect logic
+
+      context.go(Routes.login);
     } catch (e) {
       emit(state.copyWith(isLoading: false, message: e.toString()));
     }

@@ -19,7 +19,8 @@ class ClientModel {
   final DateTime updatedAt;
   final DateTime? lastLogin; // ✅ Nullable
   final int totalHotels; // current hotel count
-  final double totalRevenue; // generated revenue
+  final double totalRevenue;
+  final bool? isDeleted; // generated revenue
 
   ClientModel({
     required this.docId,
@@ -33,6 +34,7 @@ class ClientModel {
     this.lastLogin,
     required this.totalHotels,
     required this.totalRevenue,
+    this.isDeleted,
   });
 
   /// 🔹 Convert to JSON for Firestore
@@ -49,6 +51,7 @@ class ClientModel {
       "lastLogin": lastLogin?.millisecondsSinceEpoch,
       "totalHotels": totalHotels,
       "totalRevenue": totalRevenue,
+      "isDeleted": isDeleted ?? false,
     };
   }
 
@@ -70,6 +73,7 @@ class ClientModel {
           : null,
       totalHotels: json["totalHotels"] ?? 0,
       totalRevenue: (json["totalRevenue"] ?? 0).toDouble(),
+      isDeleted: json["isDeleted"] ?? false,
     );
   }
 
@@ -92,6 +96,7 @@ class ClientModel {
           : null,
       totalHotels: data['totalHotels'] ?? 0,
       totalRevenue: (data['totalRevenue'] ?? 0).toDouble(),
+      isDeleted: data['isDeleted'] ?? false,
     );
   }
 
@@ -116,6 +121,7 @@ class ClientModel {
           : null,
       totalHotels: data['totalHotels'] ?? 0,
       totalRevenue: (data['totalRevenue'] ?? 0).toDouble(),
+      isDeleted: data['isDeleted'] ?? false,
     );
   }
 
@@ -131,6 +137,7 @@ class ClientModel {
     DateTime? lastLogin,
     int? totalHotels,
     double? totalRevenue,
+    bool? isDeleted,
   }) {
     return ClientModel(
       docId: docId, // docId never changes
@@ -144,6 +151,7 @@ class ClientModel {
       lastLogin: lastLogin ?? this.lastLogin,
       totalHotels: totalHotels ?? this.totalHotels,
       totalRevenue: totalRevenue ?? this.totalRevenue,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 }

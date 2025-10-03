@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/%20analytics_models.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,6 +18,7 @@ class ClientCubit extends Cubit<ClientState> {
 
   ClientCubit({required this.clientRepo}) : super(ClientState.initial());
   final searchController = TextEditingController();
+  Timer? debounce;
 
   // Fetch active clients page
   Future<void> fetchActiveClientsPage() async {
@@ -31,6 +33,7 @@ class ClientCubit extends Cubit<ClientState> {
 
       Query query = FBFireStore.clients
           .where('status', whereIn: ['active', 'trial'])
+          .orderBy('lastPaymentExpiry', descending: true)
           .limit(_pageSize);
 
       if (state.activeLastFetchedDoc != null) {
@@ -100,6 +103,7 @@ class ClientCubit extends Cubit<ClientState> {
 
       Query query = FBFireStore.clients
           .where('status', whereIn: ['churned', 'inactive', 'suspended'])
+          .orderBy('lastPaymentExpiry', descending: true)
           .limit(_pageSize);
 
       if (state.lostLastFetchedDoc != null) {
@@ -288,30 +292,33 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Search functionality
   void searchClients(String query) {
+    if (debounce?.isActive ?? false) debounce?.cancel();
     emit(state.copyWith(searchQuery: query));
-
     // Filter active clients
-    if (state.activeClients.isNotEmpty) {
-      final currentActiveClients =
-          state.activeClients[state.activeCurrentPage - 1];
-      final filteredActive = currentActiveClients.where((client) {
-        return client.name.toLowerCase().contains(query.toLowerCase()) ||
-            client.email.toLowerCase().contains(query.toLowerCase());
-      }).toList();
 
-      emit(state.copyWith(filteredActiveClients: filteredActive));
-    }
+    debounce = Timer(const Duration(milliseconds: 500), () {
+      if (state.activeClients.isNotEmpty) {
+        final currentActiveClients =
+            state.activeClients[state.activeCurrentPage - 1];
+        final filteredActive = currentActiveClients.where((client) {
+          return client.name.toLowerCase().contains(query.toLowerCase()) ||
+              client.email.toLowerCase().contains(query.toLowerCase());
+        }).toList();
 
-    // Filter lost clients
-    if (state.lostClients.isNotEmpty) {
-      final currentLostClients = state.lostClients[state.lostCurrentPage - 1];
-      final filteredLost = currentLostClients.where((client) {
-        return client.name.toLowerCase().contains(query.toLowerCase()) ||
-            client.email.toLowerCase().contains(query.toLowerCase());
-      }).toList();
+        emit(state.copyWith(filteredActiveClients: filteredActive));
+      }
 
-      emit(state.copyWith(filteredLostClients: filteredLost));
-    }
+      // Filter lost clients
+      if (state.lostClients.isNotEmpty) {
+        final currentLostClients = state.lostClients[state.lostCurrentPage - 1];
+        final filteredLost = currentLostClients.where((client) {
+          return client.name.toLowerCase().contains(query.toLowerCase()) ||
+              client.email.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+
+        emit(state.copyWith(filteredLostClients: filteredLost));
+      }
+    });
   }
 
   // Update single client in the list (for optimized updates)
@@ -339,6 +346,8 @@ class ClientCubit extends Cubit<ClientState> {
           currentPageIndex < updatedActiveClients.length
           ? updatedActiveClients[currentPageIndex]
           : state.filteredActiveClients;
+
+      //remove
 
       emit(
         state.copyWith(
@@ -434,6 +443,7 @@ class ClientCubit extends Cubit<ClientState> {
     if (state.selectedTab != tab) {
       // Only update the selected tab and clear error messages
       // Don't clear the cached data or reset pagination
+      searchController.clear();
       emit(
         state.copyWith(
           selectedTab: tab,

@@ -149,6 +149,9 @@ class CustomNumTextField extends StatelessWidget {
             if (double.tryParse(value) == null) {
               return 'Enter a valid number';
             }
+            if (double.parse(value) <= 0) {
+              return 'Enter a number greater than 0';
+            }
             return null;
           },
           keyboardType: TextInputType.number,

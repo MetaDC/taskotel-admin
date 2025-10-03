@@ -33,6 +33,7 @@ class MasterhotelFormCubit extends Cubit<MasterhotelFormState> {
           dbFile: editMasterHotel.logoUrl,
           isLoading: false,
           selectedFile: null,
+          
         ),
       );
     } else {

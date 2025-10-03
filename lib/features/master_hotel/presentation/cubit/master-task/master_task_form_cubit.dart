@@ -182,6 +182,11 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
     return true;
   }
 
+  //createNewTasks
+  void createNewTasks(bool value) {
+    emit(state.copyWith(isCreateNewTasks: value));
+  }
+
   // Submit form (manual creation)
   Future<void> submitForm(
     BuildContext context,
@@ -307,20 +312,51 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
         throw Exception('No valid tasks found in the Excel file');
       }
 
-      // Create tasks in Firestore
-      for (var task in importTaskList) {
-        List<CommonTaskModel> res = await masterHotelRepo.getTaskForExcel(
-          masterHotelId,
-          task.taskId,
-        );
-        print(res);
-        if (res.isNotEmpty) {
-          await masterHotelRepo.updateTaskForHotel(res.first.docId, task);
-        } else {
-          await masterHotelRepo.createTaskForHotel(task);
+      // Step 1: Pre-check for duplicates if isCreateNewTasks is true
+      if (state.isCreateNewTasks) {
+        for (var task in importTaskList) {
+          // Check for existing task with same taskId AND assignedRole
+          List<CommonTaskModel> existingTasks = await masterHotelRepo
+              .getTaskForExcel(masterHotelId, task.taskId);
+
+          // Filter by assignedRole to check if this specific role already has this task
+          List<CommonTaskModel> roleSpecificTasks = existingTasks
+              .where((t) => t.assignedRole == task.assignedRole)
+              .toList();
+
+          if (roleSpecificTasks.isNotEmpty) {
+            throw Exception(
+              'Task ID ${task.taskId} already exists for role ${task.assignedRole}. Import aborted.',
+            );
+          }
         }
 
-        // await masterHotelRepo.createTaskForHotel(task);
+        // All task IDs are unique for the selected role — safe to create
+        for (var task in importTaskList) {
+          await masterHotelRepo.createTaskForHotel(task);
+        }
+      } else {
+        // isCreateNewTasks == false — create or update for specific role
+        for (var task in importTaskList) {
+          List<CommonTaskModel> existingTasks = await masterHotelRepo
+              .getTaskForExcel(masterHotelId, task.taskId);
+
+          // Filter to find task for the specific role
+          List<CommonTaskModel> roleSpecificTasks = existingTasks
+              .where((t) => t.assignedRole == task.assignedRole)
+              .toList();
+
+          if (roleSpecificTasks.isNotEmpty) {
+            // Update only the task for this specific role
+            await masterHotelRepo.updateTaskForHotel(
+              roleSpecificTasks.first.docId,
+              task,
+            );
+          } else {
+            // Create new task for this role (even if taskId exists for other roles)
+            await masterHotelRepo.createTaskForHotel(task);
+          }
+        }
       }
 
       emit(state.copyWith(isCreating: false, isSuccess: true));

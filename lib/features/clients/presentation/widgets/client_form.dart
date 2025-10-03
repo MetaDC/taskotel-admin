@@ -140,12 +140,15 @@ class _ClientFormModalState extends State<ClientFormModal> {
         ),
         const SizedBox(height: 16),
 
-        CustomTextField(
-          title: "Email",
-          hintText: "Enter email",
-          prefixIcon: CupertinoIcons.mail,
-          controller: cubit.emailController,
-          validator: true,
+        IgnorePointer(
+          ignoring: true,
+          child: CustomTextField(
+            title: "Email",
+            hintText: "Enter email",
+            prefixIcon: CupertinoIcons.mail,
+            controller: cubit.emailController,
+            validator: true,
+          ),
         ),
         const SizedBox(height: 16),
 

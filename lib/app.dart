@@ -7,6 +7,13 @@ import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:taskoteladmin/features/auth/data/auth_firebaserepo.dart';
 import 'package:taskoteladmin/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
+import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.dart';
+import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
+import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-hotel/masterhotel_cubit.dart';
+import 'package:taskoteladmin/features/master_hotel/presentation/cubit/master-task/masterhotel_task_cubit.dart';
+import 'package:taskoteladmin/features/subscription/data/subscription_firebaserepo.dart';
+import 'package:taskoteladmin/features/subscription/presentation/cubit/susbcription_cubit.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -16,26 +23,55 @@ class MyApp extends StatelessWidget {
     return BlocProvider(
       create: (context) => AuthCubit(authRepo: AuthFirebaseRepo())..checkAuth(),
       child: BlocBuilder<AuthCubit, AuthState>(
-        // Only rebuild when authentication status changes
         buildWhen: (previous, current) =>
             previous.isAuthenticated != current.isAuthenticated,
         builder: (context, state) {
-          return ResponsiveWid(
-            mobile: ScreenUtilInit(
-              designSize: const Size(430, 932),
-              minTextAdapt: true,
-              builder: (_, __) => MaterialApp.router(
+          return MultiBlocProvider(
+            providers: [
+              // Add your cubits here
+              //client cubit
+              // Add your cubits here
+              //client cubit
+              BlocProvider(
+                create: (context) =>
+                    ClientCubit(clientRepo: ClientFirebaseRepo()),
+              ),
+              //master hotel cubit
+              BlocProvider(
+                create: (context) => MasterHotelCubit(
+                  masterHotelRepo: MasterHotelFirebaseRepo(),
+                ),
+              ),
+              //master task cubit
+              BlocProvider(
+                create: (context) => MasterhotelTaskCubit(
+                  masterHotelRepo: MasterHotelFirebaseRepo(),
+                ),
+              ),
+              //subscription cubit
+              BlocProvider(
+                create: (context) => SubscriptionCubit(
+                  subscriptionRepo: SubscriptionFirebaserepo(),
+                ),
+              ),
+            ],
+            child: ResponsiveWid(
+              mobile: ScreenUtilInit(
+                designSize: const Size(430, 932),
+                minTextAdapt: true,
+                builder: (_, __) => MaterialApp.router(
+                  title: 'Taskotel Admin',
+                  debugShowCheckedModeBanner: false,
+                  theme: AppTheme.lightTheme,
+                  routerConfig: appRoute,
+                ),
+              ),
+              desktop: MaterialApp.router(
                 title: 'Taskotel Admin',
                 debugShowCheckedModeBanner: false,
                 theme: AppTheme.lightTheme,
                 routerConfig: appRoute,
               ),
-            ),
-            desktop: MaterialApp.router(
-              title: 'Taskotel Admin',
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.lightTheme,
-              routerConfig: appRoute,
             ),
           );
         },

@@ -1,6 +1,6 @@
 part of 'client_cubit.dart';
 
-class ClientState extends Equatable {
+class ClientState {
   // Active clients pagination
   final List<List<ClientModel>> activeClients;
   final List<ClientModel> filteredActiveClients;
@@ -18,7 +18,7 @@ class ClientState extends Equatable {
   // Common state
   final bool isLoading;
   final String? message;
-  final Map<String, int>? stats;
+  final ClientListAnalytics? stats;
   final String searchQuery;
   final ClientTab selectedTab;
 
@@ -74,7 +74,7 @@ class ClientState extends Equatable {
     DocumentSnapshot? lostLastFetchedDoc,
     bool? isLoading,
     String? message,
-    Map<String, int>? stats,
+    ClientListAnalytics? stats,
     String? searchQuery,
     ClientTab? selectedTab,
   }) {
@@ -97,21 +97,4 @@ class ClientState extends Equatable {
       selectedTab: selectedTab ?? this.selectedTab,
     );
   }
-
-  @override
-  List<Object?> get props => [
-    activeClients,
-    filteredActiveClients,
-    activeCurrentPage,
-    activeTotalPages,
-    lostClients,
-    filteredLostClients,
-    lostCurrentPage,
-    lostTotalPages,
-    isLoading,
-    message,
-    stats,
-    searchQuery,
-    selectedTab,
-  ];
 }

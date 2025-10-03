@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:go_router/go_router.dart';
+import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/helpers.dart';
@@ -54,21 +56,21 @@ class _LostClientsNewState extends State<LostClientsNew> {
         StatCardIconLeft(
           icon: CupertinoIcons.person_badge_minus,
           label: "Lost Clients",
-          value: "${state.stats?['lostClients'] ?? 0}",
+          value: "${state.stats?.lostClients ?? 0}",
           iconColor: Colors.red,
         ),
         StatCardIconLeft(
           icon: CupertinoIcons.building_2_fill,
           label: "Lost Hotels",
-          value: "${state.stats?['lostHotels'] ?? 0}",
+          value: "${state.stats?.lostHotels ?? 0}",
           iconColor: Colors.orange,
         ),
-        StatCardIconLeft(
-          icon: CupertinoIcons.money_dollar,
-          label: "Lost Revenue",
-          value: "\$${state.stats?['lostRevenue'] ?? 0}",
-          iconColor: Colors.grey,
-        ),
+        // StatCardIconLeft(
+        //   icon: CupertinoIcons.money_dollar,
+        //   label: "Lost Revenue",
+        //   value: "\$${state.stats?.lostRevenue ?? 0}",
+        //   iconColor: Colors.grey,
+        // ),
       ],
     );
   }
@@ -380,7 +382,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
                     color: AppColors.textBlackColor,
                   ),
                   onPressed: () {
-                    // Handle view client
+                    context.go(Routes.clientDetail(client.docId));
                   },
                 ),
               ],

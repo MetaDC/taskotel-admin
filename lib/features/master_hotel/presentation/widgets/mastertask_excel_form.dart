@@ -378,17 +378,30 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
         ),
         const SizedBox(height: 24),
 
-        Row(
-          children: [
-            Text(
-              "Import New Tasks from Excel:",
-              style: AppTextStyles.textFieldTitle.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Checkbox(value: false, onChanged: (value) {}),
-          ],
+        // Row(
+        //   children: [
+        //     Text(
+        //       "Import New Tasks from Excel:",
+        //       style: AppTextStyles.textFieldTitle.copyWith(
+        //         fontSize: 16,
+        //         fontWeight: FontWeight.w600,
+        //       ),
+        //     ),
+        //     Checkbox(
+        //       value: state.isCreateNewTasks,
+        //       onChanged: (value) {
+        //         context.read<MasterTaskFormCubit>().createNewTasks(value!);
+        //       },
+        //     ),
+        //   ],
+        // ),
+        
+        SwitchListTile(
+          title: const Text("New Tasks"),
+          subtitle: const Text("Import new tasks from Excel"),
+          value: state.isCreateNewTasks,
+          onChanged: (value) =>
+              context.read<MasterTaskFormCubit>().createNewTasks(value),
         ),
       ],
     );

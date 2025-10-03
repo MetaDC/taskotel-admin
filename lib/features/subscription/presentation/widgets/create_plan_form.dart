@@ -154,20 +154,18 @@ class CreatePlanForm extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: CustomTextField(
+              child: CustomNumTextField(
                 controller: cubit.minRoomsController,
                 title: "Min Rooms",
                 hintText: "1",
-                validator: true,
               ),
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: CustomTextField(
+              child: CustomNumTextField(
                 controller: cubit.maxRoomsController,
                 title: "Max Rooms",
                 hintText: "100",
-                validator: true,
               ),
             ),
           ],

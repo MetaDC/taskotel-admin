@@ -1,8 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taskoteladmin/core/services/firebase.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
+import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.dart';
 
 part 'client_form_state.dart';
 
@@ -67,6 +70,15 @@ class ClientFormCubit extends Cubit<ClientFormState> {
 
       if (editClient != null) {
         await clientRepo.updateClient(client);
+
+        final updatedClient = await FBFireStore.clients
+            .doc(editClient.docId)
+            .get();
+
+        context.read<ClientCubit>().updateClientInList(
+          ClientModel.fromSnap(updatedClient),
+        );
+
         emit(
           state.copyWith(
             isLoading: false,

@@ -1,15 +1,19 @@
 // 1. Analytics Models
 class ClientListAnalytics {
   final int totalClients;
-  final double totalRevenue;
+  final int activeClients;
   final int totalHotels;
-  final int activeSubscriptions;
+  final double totalRevenue;
+  final int? lostHotels;
+  final int? lostClients;
 
   const ClientListAnalytics({
     required this.totalClients,
-    required this.totalRevenue,
+    required this.activeClients,
     required this.totalHotels,
-    required this.activeSubscriptions,
+    required this.totalRevenue,
+    this.lostHotels,
+    this.lostClients,
   });
 }
 
