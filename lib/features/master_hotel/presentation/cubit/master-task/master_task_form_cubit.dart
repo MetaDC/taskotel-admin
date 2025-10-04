@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,8 @@ import 'package:taskoteladmin/core/services/firebase.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
 import 'package:excel/excel.dart';
-
+import 'package:web/web.dart' as web;
+import 'dart:js_interop';
 part 'master_task_form_state.dart';
 
 class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
@@ -144,8 +146,7 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
     emit(state.copyWith(isDownloadingTemplate: true));
 
     try {
-      // Implement actual template download logic here
-      // For example, create Excel file and download
+      exportEmptyTemplateToExcel();
       await Future.delayed(Duration(seconds: 1));
 
       emit(state.copyWith(isDownloadingTemplate: false, errorMessage: null));
@@ -375,60 +376,181 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
     }
   }
 
-  // Future<void> exportTasksToExcel(List<CommonTaskModel> tasks) async {
-  //   try {
-  //     // Request storage permission if needed
-  //     if (Platform.isAndroid) {
-  //       var status = await Permission.storage.request();
-  //       if (!status.isGranted) {
-  //         throw Exception("Storage permission not granted");
-  //       }
-  //     }
+  // Helper method for web download using package:web
+  // Helper method for web download using package:web
+  void _downloadFileWeb(List<int> bytes, String fileName) {
+    if (kIsWeb) {
+      // Convert List<int> to Uint8List first
+      final uint8List = bytes is Uint8List ? bytes : Uint8List.fromList(bytes);
 
-  //     final excel = Excel.createExcel(); // Automatically creates a Sheet1
-  //     final Sheet sheet = excel['Tasks'];
+      final blob = web.Blob(
+        [uint8List.toJS].toJS,
+        web.BlobPropertyBag(
+          type:
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ),
+      );
 
-  //     // Write headers
-  //     sheet.appendRow([
-  //       'taskId',
-  //       'title',
-  //       'description',
-  //       'duration',
-  //       'place',
-  //       'departmentId',
-  //       'frequency',
-  //       'dayOrDate',
-  //     ]);
+      final url = web.URL.createObjectURL(blob);
+      final anchor = web.document.createElement('a') as web.HTMLAnchorElement;
+      anchor.href = url;
+      anchor.download = fileName;
+      anchor.click();
 
-  //     // Write task rows
-  //     for (var task in tasks) {
-  //       sheet.appendRow([
-  //         task.taskId,
-  //         task.title,
-  //         task.desc,
-  //         task.duration,
-  //         task.place,
-  //         task.assignedDepartmentId ?? '', // Handle null safely
-  //         task.frequency,
-  //         task.dayOrDate,
-  //       ]);
-  //     }
+      web.URL.revokeObjectURL(url);
+    }
+  }
 
-  //     // Save to local file
-  //     final List<int>? fileBytes = excel.encode();
-  //     if (fileBytes == null) {
-  //       throw Exception("Failed to encode Excel file");
-  //     }
+  // Template with examples
+  Future<void> exportTemplateToExcel() async {
+    try {
+      final excel = Excel.createExcel();
+      Sheet sheet = excel['Sheet1'];
 
-  //     final directory = await getExternalStorageDirectory(); // Android-safe
-  //     final filePath = '${directory!.path}/exported_tasks.xlsx';
-  //     final file = File(filePath)
-  //       ..createSync(recursive: true)
-  //       ..writeAsBytesSync(fileBytes);
+      final headers = [
+        'Task ID',
+        'Title',
+        'Description',
+        'Duration',
+        'Place',
+        'Department ID',
+        'Frequency',
+        'Day or Date',
+      ];
+      sheet.appendRow(headers.map((e) => TextCellValue(e)).toList());
 
-  //     print("✅ Excel file saved: $filePath");
-  //   } catch (e) {
-  //     print("❌ Error exporting tasks: $e");
-  //   }
-  // }
+      final exampleRows = [
+        [
+          'TASK001',
+          'Clean Reception Area',
+          'Sweep and mop the reception floor, dust furniture',
+          '30',
+          'Reception',
+          'DEPT001',
+          'Daily',
+          'Monday',
+        ],
+        [
+          'TASK002',
+          'Check Fire Extinguishers',
+          'Inspect all fire extinguishers for expiry and damage',
+          '45',
+          'All Floors',
+          'DEPT002',
+          'Weekly',
+          '2024-01-15',
+        ],
+        [
+          'TASK003',
+          'Inventory Check',
+          'Count and record all cleaning supplies',
+          '60',
+          'Storage Room',
+          'DEPT001',
+          'Monthly',
+          '1st of Month',
+        ],
+      ];
+
+      for (var row in exampleRows) {
+        sheet.appendRow(row.map((e) => TextCellValue(e)).toList());
+      }
+
+      // Style headers
+      for (var i = 0; i < headers.length; i++) {
+        var cell = sheet.cell(
+          CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0),
+        );
+        cell.cellStyle = CellStyle(bold: true, fontSize: 12);
+      }
+
+      print("📊 Template created with ${sheet.maxRows} rows");
+
+      final List<int>? fileBytes = excel.encode();
+      if (fileBytes == null) {
+        throw Exception("Failed to encode Excel file");
+      }
+
+      if (kIsWeb) {
+        _downloadFileWeb(fileBytes, 'tasks_template.xlsx');
+        print("✅ Template downloaded");
+      } else {
+        if (Platform.isAndroid) {
+          var status = await Permission.storage.request();
+          if (!status.isGranted) {
+            throw Exception("Storage permission not granted");
+          }
+        }
+
+        final directory = await getExternalStorageDirectory();
+        final filePath = '${directory!.path}/tasks_template.xlsx';
+        final file = File(filePath)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(fileBytes);
+
+        print("✅ Template saved: $filePath");
+      }
+    } catch (e) {
+      print("❌ Error exporting template: $e");
+      rethrow;
+    }
+  }
+
+  // Empty template (headers only)
+  Future<void> exportEmptyTemplateToExcel() async {
+    try {
+      final excel = Excel.createExcel();
+      Sheet sheet = excel['Sheet1'];
+
+      final headers = [
+        'Task ID',
+        'Title',
+        'Description',
+        'Duration',
+        'Place',
+        'Department ID',
+        'Frequency',
+        'Day or Date',
+      ];
+      sheet.appendRow(headers.map((e) => TextCellValue(e)).toList());
+
+      // Style headers
+      for (var i = 0; i < headers.length; i++) {
+        var cell = sheet.cell(
+          CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0),
+        );
+        cell.cellStyle = CellStyle(bold: true, fontSize: 12);
+      }
+
+      print("📊 Empty template created");
+
+      final List<int>? fileBytes = excel.encode();
+      if (fileBytes == null) {
+        throw Exception("Failed to encode Excel file");
+      }
+
+      if (kIsWeb) {
+        _downloadFileWeb(fileBytes, 'tasks_template_empty.xlsx');
+        print("✅ Empty template downloaded");
+      } else {
+        if (Platform.isAndroid) {
+          var status = await Permission.storage.request();
+          if (!status.isGranted) {
+            throw Exception("Storage permission not granted");
+          }
+        }
+
+        final directory = await getExternalStorageDirectory();
+        final filePath = '${directory!.path}/tasks_template_empty.xlsx';
+        final file = File(filePath)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(fileBytes);
+
+        print("✅ Empty template saved: $filePath");
+      }
+    } catch (e) {
+      print("❌ Error exporting empty template: $e");
+      rethrow;
+    }
+  }
 }

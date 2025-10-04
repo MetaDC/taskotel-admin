@@ -20,7 +20,7 @@ class ClientModel {
   final DateTime? lastLogin; // ✅ Nullable
   final int totalHotels; // current hotel count
   final double totalRevenue;
-  final bool? isDeleted; // generated revenue
+  final bool? isDeleted;
 
   ClientModel({
     required this.docId,

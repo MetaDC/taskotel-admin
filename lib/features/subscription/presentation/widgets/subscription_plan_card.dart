@@ -35,7 +35,11 @@ class SubscriptionPlanCard extends StatelessWidget {
                 ),
               ),
               PopupMenuButton<String>(
-                icon: const Icon(Icons.more_horiz, color: AppColors.slateGray),
+                icon: Icon(
+                  CupertinoIcons.ellipsis,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
                 onSelected: (value) {
                   if (value == 'edit') {
                     onEdit();
@@ -72,37 +76,50 @@ class SubscriptionPlanCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          // const SizedBox(height: 5),
 
           // Price
-          RichText(
-            text: TextSpan(
+          Text.rich(
+            TextSpan(
               children: [
                 TextSpan(
-                  text: "\$${plan.price['monthly']?.toStringAsFixed(0) ?? '0'}",
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const TextSpan(
-                  text: " /month",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.slateGray,
-                    fontWeight: FontWeight.w400,
-                  ),
+                  children: [
+                    const TextSpan(
+                      text: "\$",
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+
+                    TextSpan(
+                      text: plan.price['monthly']?.toStringAsFixed(0) ?? '0',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const TextSpan(
+                      text: " /month",
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: AppColors.slateGray,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          // const SizedBox(height: 8),
 
           // Description
           Text(
             plan.desc,
-            style: const TextStyle(fontSize: 14, color: AppColors.slateGray),
+            style: const TextStyle(fontSize: 13, color: AppColors.slateGray),
           ),
           const SizedBox(height: 24),
 
@@ -120,11 +137,11 @@ class SubscriptionPlanCard extends StatelessWidget {
                         color: AppColors.primary,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    // const SizedBox(height: 4),
                     const Text(
                       "Subscribers",
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 13,
                         color: AppColors.slateGray,
                       ),
                     ),
@@ -142,11 +159,11 @@ class SubscriptionPlanCard extends StatelessWidget {
                         color: AppColors.primary,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    // const SizedBox(height: 4),
                     const Text(
                       "Revenue",
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 13,
                         color: AppColors.slateGray,
                       ),
                     ),
@@ -161,43 +178,43 @@ class SubscriptionPlanCard extends StatelessWidget {
           Row(
             children: [
               Icon(
-                CupertinoIcons.arrow_right,
-                size: 16,
-                color: AppColors.primary,
+                CupertinoIcons.checkmark_alt,
+                size: 17,
+                color: Color(0xff35c662),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   "Up to ${plan.maxRooms} rooms per hotels",
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 13.8,
                     color: AppColors.primary,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 7),
           ...plan.features.map(
             (feature) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 7),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(
-                    CupertinoIcons.arrow_right,
-                    size: 16,
-                    color: AppColors.primary,
+                    CupertinoIcons.checkmark_alt,
+                    size: 17,
+                    color: Color(0xff35c662),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       feature,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13.8,
                         color: AppColors.primary,
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -209,17 +226,21 @@ class SubscriptionPlanCard extends StatelessWidget {
 
           // Status Badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
               color: plan.isActive
-                  ? Colors.green.withOpacity(0.1)
+                  ? Color(0xff35c662).withOpacity(0.1)
                   : Colors.red.withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: plan.isActive ? Color(0xff35c662) : Colors.red,
+                width: .7,
+              ),
             ),
             child: Text(
               plan.isActive ? "Active" : "Inactive",
               style: TextStyle(
-                color: plan.isActive ? Colors.green : Colors.red,
+                color: plan.isActive ? Color(0xff35c662) : Colors.red,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),

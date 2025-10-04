@@ -119,24 +119,35 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
           const SizedBox(height: 10),
           const Divider(color: AppColors.slateGray, thickness: 0.1),
 
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: state.hotels.length,
-            separatorBuilder: (_, __) => const Divider(
-              color: AppColors.slateGray,
-              thickness: 0.07,
-              height: 0,
+          if (state.hotels.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: const Text(
+                  "No Hotels Found",
+                  style: TextStyle(fontSize: 16, color: AppColors.slateGray),
+                ),
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: state.hotels.length,
+              separatorBuilder: (_, __) => const Divider(
+                color: AppColors.slateGray,
+                thickness: 0.07,
+                height: 0,
+              ),
+              itemBuilder: (context, index) {
+                final hotel = state.hotels[index];
+                final totalRooms = hotel.floors.values.fold<int>(
+                  0,
+                  (sum, rooms) => sum + rooms,
+                );
+                return _buildHotelRow(context, hotel, totalRooms);
+              },
             ),
-            itemBuilder: (context, index) {
-              final hotel = state.hotels[index];
-              final totalRooms = hotel.floors.values.fold<int>(
-                0,
-                (sum, rooms) => sum + rooms,
-              );
-              return _buildHotelRow(context, hotel, totalRooms);
-            },
-          ),
         ],
       ),
     );

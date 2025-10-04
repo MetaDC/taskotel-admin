@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   static const Color primary = Color(0xFF17191d);
@@ -7,7 +6,7 @@ class AppColors {
   static const Color borderGrey = Color(0xFFFebeef1);
   static const Color backgroundColor = Color(0xFFfafafa);
   static const Color slateGray = Color(0xFFF64748b);
-  static const Color slateLightGray = Color(0xFFFF0F1F3);
+  static const Color slateLightGray = Color(0xFFf1f5f9);
   static const Color containerGreyColor = Color(0xFFFBFBFB);
 
   // btn Colors

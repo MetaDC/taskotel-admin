@@ -250,7 +250,8 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
   Row _buildTabelHeader() {
     return Row(
       children: [
-        SizedBox(width: 30),
+        SizedBox(width: TableConfig.horizontalSpacing),
+
         Expanded(
           flex: 2,
           child: Text("Client", style: AppTextStyles.tabelHeader),
@@ -386,7 +387,15 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                     title: Text('Delete', style: TextStyle(color: Colors.red)),
                   ),
                   onTap: () {
-                    // Handle delete client
+                    showConfirmDeletDialog(
+                      context,
+                      () {
+                        context.read<ClientCubit>().deleteClient(client.docId);
+                      },
+                      "Delete Client",
+                      "Are you sure you want to delete this client?",
+                      "Delete",
+                    );
                   },
                 ),
               ],

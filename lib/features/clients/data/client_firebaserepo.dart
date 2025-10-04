@@ -52,7 +52,13 @@ class ClientFirebaseRepo extends ClientRepo {
   @override
   Future<void> deleteClient(String clientId) async {
     try {
-      await clientsCollectionRef.doc(clientId).delete();
+      final res = await FBFunctions.ff.httpsCallable('deleteUser').call({
+        "userId": clientId,
+      });
+
+      if (res.data?['success'] == false) {
+        throw Exception(res.data?['msg']);
+      }
     } catch (e) {
       throw Exception("Failed to delete client: $e");
     }

@@ -1,12 +1,22 @@
 import 'dart:async';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
 import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:excel/excel.dart' as excel;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:excel/excel.dart';
+import 'dart:io' show File, Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:js_interop';
 
+import 'package:web/web.dart' as web;
 part 'masterhotel_task_state.dart';
 
 class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
@@ -85,5 +95,104 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
     emit(state.copyWith(isLoading: true, message: null));
     masterHotelRepo.deleteTask(taskId);
     emit(state.copyWith(isLoading: false, message: "Task Deleted"));
+  }
+
+  Future<void> exportTasksToExcel(List<CommonTaskModel> filteredTasks) async {
+    try {
+      final excel = Excel.createExcel();
+
+      // Remove the default sheet and create our own
+      excel.delete('Sheet1');
+      excel.copy('Sheet1', 'Tasks'); // Or just rename
+
+      // OR better: just use the default sheet
+      Sheet sheet = excel['Sheet1']; // Use default sheet instead
+
+      // Headers
+      final headers = [
+        'Task ID',
+        'Title',
+        'Description',
+        'Duration',
+        'Place',
+        'Department ID',
+        'Frequency',
+        'Day or Date',
+      ];
+      sheet.appendRow(headers.map((e) => TextCellValue(e)).toList());
+
+      // Write task data
+      for (var task in filteredTasks) {
+        sheet.appendRow([
+          TextCellValue(task.taskId ?? ''),
+          TextCellValue(task.title ?? ''),
+          TextCellValue(task.desc ?? ''),
+          TextCellValue(task.duration?.toString() ?? ''),
+          TextCellValue(task.place ?? ''),
+          TextCellValue(task.assignedDepartmentId ?? ''),
+          TextCellValue(task.frequency ?? ''),
+          TextCellValue(task.dayOrDate ?? ''),
+        ]);
+      }
+
+      // Debug: Check if tasks were added
+      print("📊 Total tasks to export: ${filteredTasks.length}");
+      print("📊 Sheet rows: ${sheet.maxRows}");
+      print("📊 Available sheets: ${excel.tables.keys.toList()}");
+
+      final List<int>? fileBytes = excel.encode();
+      if (fileBytes == null) {
+        throw Exception("Failed to encode Excel file");
+      }
+
+      print("📊 File size: ${fileBytes.length} bytes");
+
+      if (kIsWeb) {
+        _downloadFileWeb(fileBytes, 'exported_tasks.xlsx');
+        print("✅ Excel file downloaded for web");
+      } else {
+        if (Platform.isAndroid) {
+          var status = await Permission.storage.request();
+          if (!status.isGranted) {
+            throw Exception("Storage permission not granted");
+          }
+        }
+
+        final directory = await getExternalStorageDirectory();
+        final filePath = '${directory!.path}/exported_tasks.xlsx';
+        final file = File(filePath)
+          ..createSync(recursive: true)
+          ..writeAsBytesSync(fileBytes);
+
+        print("✅ Excel file saved: $filePath");
+      }
+    } catch (e) {
+      print("❌ Error exporting tasks: $e");
+      rethrow;
+    }
+  }
+
+  // Helper method for web download using package:web
+  void _downloadFileWeb(List<int> bytes, String fileName) {
+    if (kIsWeb) {
+      // Convert List<int> to Uint8List first
+      final uint8List = bytes is Uint8List ? bytes : Uint8List.fromList(bytes);
+
+      final blob = web.Blob(
+        [uint8List.toJS].toJS,
+        web.BlobPropertyBag(
+          type:
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ),
+      );
+
+      final url = web.URL.createObjectURL(blob);
+      final anchor = web.document.createElement('a') as web.HTMLAnchorElement;
+      anchor.href = url;
+      anchor.download = fileName;
+      anchor.click();
+
+      web.URL.revokeObjectURL(url);
+    }
   }
 }

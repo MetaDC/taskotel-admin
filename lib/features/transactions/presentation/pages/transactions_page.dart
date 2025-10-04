@@ -66,6 +66,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                       const SizedBox(height: 20),
 
                       _buildTransactionsList(state),
+                      const SizedBox(height: 20),
+
                       if (!state.isSearching && state.searchQuery.isEmpty)
                         _buildPagination(state),
                     ],
@@ -239,14 +241,14 @@ class _TransactionsPageState extends State<TransactionsPage> {
             },
           ),
         ),
-        const SizedBox(width: 16),
-        // Search Within Filter Switch
-        Switch(
-          value: state.searchWithinFilter,
-          onChanged: (value) {
-            context.read<TransactionCubit>().toggleSearchWithinFilter(value);
-          },
-        ),
+        // const SizedBox(width: 16),
+        // // Search Within Filter Switch
+        // Switch(
+        //   value: state.searchWithinFilter,
+        //   onChanged: (value) {
+        //     context.read<TransactionCubit>().toggleSearchWithinFilter(value);
+        //   },
+        // ),
       ],
     );
   }
@@ -323,6 +325,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
     return Column(
       children: [
+        const SizedBox(height: 20),
+
         // Table Header
         _buildTableHeader(),
         const SizedBox(height: 13),
@@ -347,6 +351,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
   Widget _buildTableHeader() {
     return Row(
       children: [
+        SizedBox(width: TableConfig.horizontalSpacing / 2),
+
         Expanded(
           flex: 2,
           child: Text("Transaction ID", style: AppTextStyles.tabelHeader),
@@ -360,22 +366,24 @@ class _TransactionsPageState extends State<TransactionsPage> {
         Expanded(child: Text("Status", style: AppTextStyles.tabelHeader)),
         Expanded(child: Text("Payment", style: AppTextStyles.tabelHeader)),
         Expanded(child: Text("Date", style: AppTextStyles.tabelHeader)),
+        SizedBox(width: TableConfig.horizontalSpacing / 2),
       ],
     );
   }
 
   Widget _buildTransactionRow(TransactionModel transaction) {
-    return Container(
-      padding: TableConfig.transactionRowPadding,
-      decoration: TableConfig.getRowBorder(),
+    return Padding(
+      padding: TableConfig.rowPadding,
       child: Row(
         children: [
+          SizedBox(width: TableConfig.horizontalSpacing / 2),
+
           // Transaction ID
           Expanded(
             flex: 2,
             child: Text(
               transaction.transactionId,
-              style: AppTextStyles.tableRowPrimary,
+              style: AppTextStyles.tableRowPrimary.copyWith(fontSize: 13.5),
             ),
           ),
 
@@ -390,9 +398,26 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
           // Plan
           Expanded(
-            child: Text(
-              transaction.planName,
-              style: AppTextStyles.tableRowRegular,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Color(0xff3e85f6).withOpacity(0.1),
+                    border: Border.all(color: Color(0xff3e85f6), width: .7),
+                  ),
+                  child: Text(
+                    transaction.planName,
+                    style: TextStyle(
+                      color: Color(0xff3e85f6),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -427,6 +452,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
               style: AppTextStyles.tableRowDate,
             ),
           ),
+          SizedBox(width: TableConfig.horizontalSpacing / 2),
         ],
       ),
     );

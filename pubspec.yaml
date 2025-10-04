@@ -76,6 +76,7 @@ dependencies:
   spreadsheet_decoder: ^2.3.0
   path_provider: ^2.1.1
   permission_handler: ^11.0.1
+  web: ^1.0.0
 
 dev_dependencies:
   flutter_test:

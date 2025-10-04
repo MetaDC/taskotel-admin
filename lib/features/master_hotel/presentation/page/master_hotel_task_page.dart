@@ -102,11 +102,18 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
     Map<String, Widget> segmentedControlTabs = {};
 
     for (String tab in roles.map((role) => role['key']!).toList()) {
+      final isSelected = state.selectedTab == tab;
+
       segmentedControlTabs[tab] = Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Text(
           state.getTabDisplayName(tab),
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: isSelected ? Color(0xff040917) : AppColors.slateGray,
+          ),
         ),
       );
     }
@@ -116,6 +123,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
       child: CupertinoSlidingSegmentedControl<String>(
         children: segmentedControlTabs,
         groupValue: state.selectedTab,
+
         onValueChanged: (String? value) {
           if (value != null) {
             context.read<MasterhotelTaskCubit>().switchTab(
@@ -135,36 +143,58 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
   Widget _buildSearchBar() {
     return Row(
       children: [
-        const Icon(CupertinoIcons.search, size: 16, color: Colors.grey),
-        const SizedBox(width: 8),
         Expanded(
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: TextField(
+            height: 45,
+            child: TextFormField(
               controller: context.read<MasterhotelTaskCubit>().serachController,
-              decoration: const InputDecoration(
-                hintText: "Search tasks...",
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(vertical: 12),
-              ),
               onChanged: (value) {
                 context.read<MasterhotelTaskCubit>().searchTasks();
               },
+              cursorHeight: 18,
+              decoration: InputDecoration(
+                hintText: " Search tasks...",
+                prefixIcon: Icon(
+                  CupertinoIcons.search,
+                  color: AppColors.slateGray,
+                  size: 18,
+                ),
+                // hint: Center(child: Text("Search tasks...")),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: AppColors.slateLightGray,
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: AppColors.slateLightGray,
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: AppColors.slateLightGray,
+                    width: 1.5,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+
+              // contentPadding: EdgeInsets.symmetric(vertical: 12),
             ),
           ),
         ),
+        SizedBox(width: 12),
         IconButton(
           onPressed: () {
-            // context.read<MasterTaskFormCubit>().exportTasksToExcel(
-            //   context,
-            //   context.read<MasterhotelTaskCubit>().state.filteredTasks,
-            // );
+            context.read<MasterhotelTaskCubit>().exportTasksToExcel(
+              context.read<MasterhotelTaskCubit>().state.filteredTasks,
+            );
           },
-          icon: const Icon(Icons.download, color: Colors.grey),
+          icon: Icon(CupertinoIcons.cloud_download, color: Colors.grey),
         ),
       ],
     );
@@ -191,8 +221,9 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
               // _buildTableHeader("Actions", flex: 1),
             ],
           ),
-          const Divider(thickness: 0.5),
-
+          // const Divider(thickness: 0.5),
+          const SizedBox(height: 13),
+          const Divider(color: AppColors.slateGray, thickness: 0.07, height: 0),
           // Task Rows
           if (state.isLoadingTasks)
             const Expanded(child: Center(child: CircularProgressIndicator()))
@@ -200,7 +231,13 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
             const Expanded(child: Center(child: Text("No tasks found")))
           else
             Expanded(
-              child: ListView.builder(
+              child: ListView.separated(
+                shrinkWrap: true,
+                separatorBuilder: (context, index) => Divider(
+                  color: AppColors.slateGray,
+                  thickness: 0.07,
+                  height: 0,
+                ),
                 itemCount: state.filteredTasks.length,
                 itemBuilder: (context, index) {
                   final task = state.filteredTasks[index];
@@ -356,8 +393,8 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          const Divider(thickness: 0.1),
+          // const SizedBox(height: 8),
+          // const Divider(thickness: 0.1),
         ],
       ),
     );

@@ -163,7 +163,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      border: Border(top: BorderSide(color: Colors.grey[200]!)),
+                      // border: Border(top: BorderSide(color: Colors.grey[200]!)),
                     ),
                     child: DynamicPagination(
                       currentPage: state.lostCurrentPage,

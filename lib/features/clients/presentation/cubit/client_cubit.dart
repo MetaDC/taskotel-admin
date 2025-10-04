@@ -389,6 +389,34 @@ class ClientCubit extends Cubit<ClientState> {
     }
   }
 
+  //update clinet list on delete
+  void removeClientFromList(String clientId) {
+    // Remove from active clients if it belongs there
+    final updatedActiveClients = List<List<ClientModel>>.from(
+      state.activeClients,
+    );
+    for (int i = 0; i < updatedActiveClients.length; i++) {
+      final pageClients = List<ClientModel>.from(updatedActiveClients[i]);
+      pageClients.removeWhere((c) => c.docId == clientId);
+      updatedActiveClients[i] = pageClients;
+    }
+
+    // Remove from lost clients if it belongs there
+    final updatedLostClients = List<List<ClientModel>>.from(state.lostClients);
+    for (int i = 0; i < updatedLostClients.length; i++) {
+      final pageClients = List<ClientModel>.from(updatedLostClients[i]);
+      pageClients.removeWhere((c) => c.docId == clientId);
+      updatedLostClients[i] = pageClients;
+    }
+
+    emit(
+      state.copyWith(
+        activeClients: updatedActiveClients,
+        lostClients: updatedLostClients,
+      ),
+    );
+  }
+
   // Add new client to the list (for optimized creation)
   void addClientToList(ClientModel newClient) {
     if (newClient.status == 'active' || newClient.status == 'trial') {
@@ -533,5 +561,40 @@ class ClientCubit extends Cubit<ClientState> {
       print('Error getting total lost clients count: $e');
       return 0;
     }
+  }
+
+  Future<int> getTotalHotelsCount() async {
+    try {
+      final hotelCountSnap = await FBFireStore.hotels.count().get();
+      return hotelCountSnap.count ?? 0;
+    } catch (e) {
+      print('Error getting total hotels count: $e');
+      return 0;
+    }
+  }
+
+  //delete client
+  void deleteClient(String clientId) async {
+    emit(state.copyWith(isLoading: true, message: null));
+    await clientRepo.deleteClient(clientId);
+    removeClientFromList(clientId);
+    emit(state.copyWith(isLoading: false, message: "Client Deleted"));
+  }
+
+  void getClientsAnalytics() async {
+    final activeClients = await getTotalActiveClientsCount();
+    final lostClients = await getTotalLostClientsCount();
+    final totalHotels = await getTotalHotelsCount();
+    // final totalRevenue = await getTotalRevenue();
+
+    final analytics = ClientListAnalytics(
+      totalClients: activeClients + lostClients,
+      activeClients: activeClients,
+      totalHotels: totalHotels,
+      totalRevenue: 0.0,
+      lostClients: lostClients,
+    );
+
+    emit(state.copyWith(stats: analytics));
   }
 }
