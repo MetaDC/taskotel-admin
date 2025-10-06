@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/%20analytics_models.dart';
@@ -33,6 +31,7 @@ class ClientCubit extends Cubit<ClientState> {
 
       Query query = FBFireStore.clients
           .where('status', whereIn: ['active', 'trial'])
+          .where("isDeleted", isEqualTo: false)
           .orderBy('lastPaymentExpiry', descending: true)
           .limit(_pageSize);
 
@@ -103,6 +102,7 @@ class ClientCubit extends Cubit<ClientState> {
 
       Query query = FBFireStore.clients
           .where('status', whereIn: ['churned', 'inactive', 'suspended'])
+          .where("isDeleted", isEqualTo: false)
           .orderBy('lastPaymentExpiry', descending: true)
           .limit(_pageSize);
 
@@ -389,34 +389,6 @@ class ClientCubit extends Cubit<ClientState> {
     }
   }
 
-  //update clinet list on delete
-  void removeClientFromList(String clientId) {
-    // Remove from active clients if it belongs there
-    final updatedActiveClients = List<List<ClientModel>>.from(
-      state.activeClients,
-    );
-    for (int i = 0; i < updatedActiveClients.length; i++) {
-      final pageClients = List<ClientModel>.from(updatedActiveClients[i]);
-      pageClients.removeWhere((c) => c.docId == clientId);
-      updatedActiveClients[i] = pageClients;
-    }
-
-    // Remove from lost clients if it belongs there
-    final updatedLostClients = List<List<ClientModel>>.from(state.lostClients);
-    for (int i = 0; i < updatedLostClients.length; i++) {
-      final pageClients = List<ClientModel>.from(updatedLostClients[i]);
-      pageClients.removeWhere((c) => c.docId == clientId);
-      updatedLostClients[i] = pageClients;
-    }
-
-    emit(
-      state.copyWith(
-        activeClients: updatedActiveClients,
-        lostClients: updatedLostClients,
-      ),
-    );
-  }
-
   // Add new client to the list (for optimized creation)
   void addClientToList(ClientModel newClient) {
     if (newClient.status == 'active' || newClient.status == 'trial') {
@@ -466,17 +438,53 @@ class ClientCubit extends Cubit<ClientState> {
     }
   }
 
+  //remove client from list
+  void removeClientFromList(String clientId) {
+    // Remove from active clients if it belongs there
+    final updatedActiveClients = List<List<ClientModel>>.from(
+      state.activeClients,
+    );
+
+    for (int i = 0; i < updatedActiveClients.length; i++) {
+      final pageClients = List<ClientModel>.from(updatedActiveClients[i]);
+      pageClients.removeWhere((c) => c.docId == clientId);
+      updatedActiveClients[i] = pageClients;
+    }
+
+    // Remove from lost clients if it belongs there
+    final updatedLostClients = List<List<ClientModel>>.from(state.lostClients);
+    for (int i = 0; i < updatedLostClients.length; i++) {
+      final pageClients = List<ClientModel>.from(updatedLostClients[i]);
+      pageClients.removeWhere((c) => c.docId == clientId);
+      updatedLostClients[i] = pageClients;
+    }
+
+    emit(
+      state.copyWith(
+        filteredActiveClients: state.filteredActiveClients
+            .where((c) => c.docId != clientId)
+            .toList(),
+        filteredLostClients: state.filteredLostClients
+            .where((c) => c.docId != clientId)
+            .toList(),
+        activeClients: updatedActiveClients,
+        lostClients: updatedLostClients,
+      ),
+    );
+  }
+
   // Tab management methods - FIXED VERSION
+  // Tab management methods - FIXED to clear delete message on tab switch
   void switchTab(ClientTab tab) {
     if (state.selectedTab != tab) {
-      // Only update the selected tab and clear error messages
-      // Don't clear the cached data or reset pagination
       searchController.clear();
+
+      // Clear the delete message when switching tabs
       emit(
         state.copyWith(
           selectedTab: tab,
-          message: null, // Clear any error messages
-          searchQuery: '', // Clear search when switching tabs
+          message: "", // This will clear the "Client Deleted" message
+          searchQuery: '',
         ),
       );
 
@@ -540,6 +548,7 @@ class ClientCubit extends Cubit<ClientState> {
     try {
       final userCountSnap = await FBFireStore.clients
           .where('status', whereIn: ['active', 'trial'])
+          .where("isDeleted", isEqualTo: false)
           .count()
           .get();
       return userCountSnap.count ?? 0;
@@ -554,6 +563,7 @@ class ClientCubit extends Cubit<ClientState> {
     try {
       final userCountSnap = await FBFireStore.clients
           .where('status', whereIn: ['churned', 'inactive', 'suspended'])
+          .where("isDeleted", isEqualTo: false)
           .count()
           .get();
       return userCountSnap.count ?? 0;
@@ -578,6 +588,7 @@ class ClientCubit extends Cubit<ClientState> {
     emit(state.copyWith(isLoading: true, message: null));
     await clientRepo.deleteClient(clientId);
     removeClientFromList(clientId);
+
     emit(state.copyWith(isLoading: false, message: "Client Deleted"));
   }
 

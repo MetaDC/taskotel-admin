@@ -4,6 +4,7 @@
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/features/subscription/domain/model/subscription_model.dart';
 
 class SubscriberDistributionChart extends StatelessWidget {
@@ -16,19 +17,19 @@ class SubscriberDistributionChart extends StatelessWidget {
     final sections = _generatePieChartSections();
 
     if (sections.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'No subscriber data available',
-          style: TextStyle(color: Colors.grey),
+          style: GoogleFonts.inter(color: Colors.grey),
         ),
       );
     }
 
     return Column(
       children: [
-        const Text(
+        Text(
           'Subscriber Distribution',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 20),
         Expanded(
@@ -79,7 +80,7 @@ class SubscriberDistributionChart extends StatelessWidget {
         title: '${percentage.toStringAsFixed(0)}%',
         color: colors[index % colors.length],
         radius: 60,
-        titleStyle: const TextStyle(
+        titleStyle: GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.bold,
           color: Colors.white,
@@ -119,7 +120,7 @@ class SubscriberDistributionChart extends StatelessWidget {
               Expanded(
                 child: Text(
                   '${plan.title} (${plan.totalSubScribers})',
-                  style: const TextStyle(fontSize: 12),
+                  style: GoogleFonts.inter(fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -145,10 +146,10 @@ class RevenueByPlanChart extends StatelessWidget {
     final activePlans = plans.where((p) => p.isActive).toList();
 
     if (activePlans.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'No revenue data available',
-          style: TextStyle(color: Colors.grey),
+          style: GoogleFonts.inter(color: Colors.grey),
         ),
       );
     }
@@ -160,19 +161,19 @@ class RevenueByPlanChart extends StatelessWidget {
 
     // If all revenues are 0, show a message
     if (maxRevenue == 0) {
-      return const Center(
+      return Center(
         child: Text(
           'No revenue data available',
-          style: TextStyle(color: Colors.grey),
+          style: GoogleFonts.inter(color: Colors.grey),
         ),
       );
     }
 
     return Column(
       children: [
-        const Text(
+        Text(
           'Revenue by Plan',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 20),
         Expanded(
@@ -188,7 +189,7 @@ class RevenueByPlanChart extends StatelessWidget {
                     getTitlesWidget: (value, meta) {
                       return Text(
                         '\$${(value / 1000).toStringAsFixed(0)}k',
-                        style: const TextStyle(fontSize: 10),
+                        style: GoogleFonts.inter(fontSize: 10),
                       );
                     },
                   ),
@@ -203,7 +204,7 @@ class RevenueByPlanChart extends StatelessWidget {
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
                             activePlans[index].title,
-                            style: const TextStyle(fontSize: 12),
+                            style: GoogleFonts.inter(fontSize: 12),
                           ),
                         );
                       }
@@ -230,7 +231,7 @@ class RevenueByPlanChart extends StatelessWidget {
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     return BarTooltipItem(
                       '\$${rod.toY.toStringAsFixed(0)}',
-                      const TextStyle(
+                      GoogleFonts.inter(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),

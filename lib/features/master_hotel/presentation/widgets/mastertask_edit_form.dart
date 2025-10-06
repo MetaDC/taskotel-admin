@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
@@ -313,7 +314,7 @@ class TaskEditCreateForm extends StatelessWidget {
                         ),
                         child: Text(
                           'Q${index + 1}',
-                          style: TextStyle(
+                          style: GoogleFonts.inter(
                             color: Colors.blue.shade700,
                             fontWeight: FontWeight.w600,
                             fontSize: 12,
@@ -324,7 +325,7 @@ class TaskEditCreateForm extends StatelessWidget {
                       Expanded(
                         child: Text(
                           question['question'] ?? '',
-                          style: const TextStyle(fontSize: 14),
+                          style:  GoogleFonts.inter(fontSize: 14),
                         ),
                       ),
                       IconButton(

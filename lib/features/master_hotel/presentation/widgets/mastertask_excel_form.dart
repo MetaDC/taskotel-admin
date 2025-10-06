@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
@@ -134,7 +135,7 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           "Choose the user category for all tasks in the Excel file",
-          style: TextStyle(color: Colors.grey[600], fontSize: 14),
+          style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 14),
         ),
         const SizedBox(height: 16),
         CustomDropDownField(
@@ -164,7 +165,40 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Step 2: Import Tasks from Excel",
+          "Step 2: Import Option",
+          style: AppTextStyles.textFieldTitle.copyWith(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.grey.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+          ),
+          child: SwitchListTile(
+            title: Text(
+              "New Tasks (Create new tasks)",
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            subtitle: const Text(
+              "Note:- If you want to update existing tasks, please uncheck this option.",
+              style: TextStyle(color: Colors.red),
+            ),
+            value: state.isCreateNewTasks,
+            onChanged: (value) =>
+                context.read<MasterTaskFormCubit>().createNewTasks(value),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text(
+          "Step 3: Import Tasks from Excel",
           style: AppTextStyles.textFieldTitle.copyWith(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -199,9 +233,9 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "Download Excel Template",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -209,7 +243,10 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       "Get the template, fill in your tasks, and upload it below",
-                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                      style: GoogleFonts.inter(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
                     ),
                   ],
                 ),
@@ -258,9 +295,12 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 "Upload Excel File",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -315,7 +355,7 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
                               state.selectedFile != null
                                   ? state.selectedFile!.name
                                   : "Click to select Excel file",
-                              style: TextStyle(
+                              style: GoogleFonts.inter(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 color: state.selectedFile != null
@@ -330,7 +370,7 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
                               state.selectedFile != null
                                   ? "File selected successfully"
                                   : "Supported formats: .xlsx, .xls",
-                              style: TextStyle(
+                              style: GoogleFonts.inter(
                                 fontSize: 14,
                                 color: Colors.grey[600],
                               ),
@@ -365,7 +405,7 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         "Please select a user category first",
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           color: Colors.orange[700],
                           fontSize: 14,
                         ),
@@ -395,14 +435,6 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
         //     ),
         //   ],
         // ),
-        
-        SwitchListTile(
-          title: const Text("New Tasks"),
-          subtitle: const Text("Import new tasks from Excel"),
-          value: state.isCreateNewTasks,
-          onChanged: (value) =>
-              context.read<MasterTaskFormCubit>().createNewTasks(value),
-        ),
       ],
     );
   }

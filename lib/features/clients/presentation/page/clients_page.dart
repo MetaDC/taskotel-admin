@@ -87,6 +87,7 @@ class _ClientsPageState extends State<ClientsPage> {
                         ),
                         SizedBox(width: 15),
                         Text("Lost Clients"),
+                        
                       ],
                     ),
                   ),

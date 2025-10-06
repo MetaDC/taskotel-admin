@@ -3,7 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
+import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
 import 'package:taskoteladmin/features/report/presentation/cubit/report_cubit.dart';
@@ -99,29 +101,29 @@ class _ReportsPageState extends State<ReportsPage> {
 
   Widget _buildHeader(ReportState state) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Expanded(
-          child: PageHeaderWithButton(
-            heading: "Reports & Analytics",
-            subHeading: "Comprehensive business performance metrics",
-            buttonText: "Export Report",
-            onButtonPressed: () {
-              // TODO: Implement export functionality
-            },
-          ),
+        // Left heading
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Reports & Analytics", style: AppTextStyles.headerHeading),
+            Text(
+              "Comprehensive business performance metrics",
+              style: AppTextStyles.headerSubheading,
+            ),
+          ],
         ),
-        const SizedBox(width: 20),
-        // Year selector
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey[300]!),
-          ),
+        const Spacer(),
+
+        // YEAR SELECTOR
+        _buildStyledContainer(
           child: DropdownButton<int>(
             value: state.selectedYear,
             underline: const SizedBox(),
+            isDense: true,
+            isExpanded: false,
+            icon: const Icon(Icons.keyboard_arrow_down),
             items: List.generate(5, (index) {
               final year = DateTime.now().year - index;
               return DropdownMenuItem(
@@ -136,18 +138,16 @@ class _ReportsPageState extends State<ReportsPage> {
             },
           ),
         ),
+
         const SizedBox(width: 12),
-        // Time filter
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey[300]!),
-          ),
+
+        // TIME FILTER
+        _buildStyledContainer(
           child: DropdownButton<ReportTimeFilter>(
             value: state.timeFilter,
             underline: const SizedBox(),
+            isDense: true,
+            icon: const Icon(Icons.keyboard_arrow_down),
             items: const [
               DropdownMenuItem(
                 value: ReportTimeFilter.yearly,
@@ -163,6 +163,30 @@ class _ReportsPageState extends State<ReportsPage> {
                 context.read<ReportCubit>().changeTimeFilter(filter);
               }
             },
+          ),
+        ),
+
+        const SizedBox(width: 12),
+
+        // EXPORT BUTTON (styled to match dropdowns)
+        _buildStyledContainer(
+          isButton: true,
+          child: InkWell(
+            onTap: () {
+              // Handle export
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Row(
+              children: const [
+                Icon(
+                  CupertinoIcons.cloud_download,
+                  size: 16,
+                  color: Colors.white,
+                ),
+                SizedBox(width: 8),
+                Text("Export Report", style: TextStyle(color: Colors.white)),
+              ],
+            ),
           ),
         ),
       ],
@@ -223,9 +247,12 @@ class _ReportsPageState extends State<ReportsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 "Revenue Trend",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               IconButton(
                 icon: const Icon(CupertinoIcons.arrow_down_doc),
@@ -249,7 +276,7 @@ class _ReportsPageState extends State<ReportsPage> {
                             getTitlesWidget: (value, meta) {
                               return Text(
                                 '\$${(value / 1000).toStringAsFixed(0)}k',
-                                style: const TextStyle(fontSize: 10),
+                                style: GoogleFonts.inter(fontSize: 10),
                               );
                             },
                           ),
@@ -262,7 +289,7 @@ class _ReportsPageState extends State<ReportsPage> {
                                   value.toInt() < state.revenueByMonth.length) {
                                 return Text(
                                   state.revenueByMonth[value.toInt()]['month'],
-                                  style: const TextStyle(fontSize: 10),
+                                  style: GoogleFonts.inter(fontSize: 10),
                                 );
                               }
                               return const Text('');
@@ -324,9 +351,9 @@ class _ReportsPageState extends State<ReportsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Plan Distribution",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -369,7 +396,9 @@ class _ReportsPageState extends State<ReportsPage> {
                                       Expanded(
                                         child: Text(
                                           '${entry.key} (${entry.value})',
-                                          style: const TextStyle(fontSize: 12),
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12,
+                                          ),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
@@ -405,9 +434,9 @@ class _ReportsPageState extends State<ReportsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "New Client Acquisition",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -425,7 +454,7 @@ class _ReportsPageState extends State<ReportsPage> {
                             getTitlesWidget: (value, meta) {
                               return Text(
                                 value.toInt().toString(),
-                                style: const TextStyle(fontSize: 10),
+                                style: GoogleFonts.inter(fontSize: 10),
                               );
                             },
                           ),
@@ -440,7 +469,7 @@ class _ReportsPageState extends State<ReportsPage> {
                                 return Text(
                                   state.clientAcquisitionByMonth[value
                                       .toInt()]['month'],
-                                  style: const TextStyle(fontSize: 10),
+                                  style: GoogleFonts.inter(fontSize: 10),
                                 );
                               }
                               return const Text('');
@@ -500,9 +529,9 @@ class _ReportsPageState extends State<ReportsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Churn vs Retention",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -520,7 +549,7 @@ class _ReportsPageState extends State<ReportsPage> {
                             getTitlesWidget: (value, meta) {
                               return Text(
                                 value.toInt().toString(),
-                                style: const TextStyle(fontSize: 10),
+                                style: GoogleFonts.inter(fontSize: 10),
                               );
                             },
                           ),
@@ -535,7 +564,7 @@ class _ReportsPageState extends State<ReportsPage> {
                                 return Text(
                                   state.churnVsRetention[value
                                       .toInt()]['month'],
-                                  style: const TextStyle(fontSize: 10),
+                                  style: GoogleFonts.inter(fontSize: 10),
                                 );
                               }
                               return const Text('');
@@ -597,7 +626,7 @@ class _ReportsPageState extends State<ReportsPage> {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 8),
-        Text(label, style: const TextStyle(fontSize: 12)),
+        Text(label, style: GoogleFonts.inter(fontSize: 12)),
       ],
     );
   }
@@ -626,7 +655,7 @@ class _ReportsPageState extends State<ReportsPage> {
         value: planEntry.value.toDouble(),
         title: '$percentage%',
         radius: 80,
-        titleStyle: const TextStyle(
+        titleStyle: GoogleFonts.inter(
           fontSize: 14,
           fontWeight: FontWeight.bold,
           color: Colors.white,
@@ -643,5 +672,19 @@ class _ReportsPageState extends State<ReportsPage> {
       'Enterprise': Colors.purple,
     };
     return colors[planName] ?? Colors.grey;
+  }
+
+  Widget _buildStyledContainer({required Widget child, bool isButton = false}) {
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isButton ? Colors.black : Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      alignment: Alignment.center,
+      child: child,
+    );
   }
 }

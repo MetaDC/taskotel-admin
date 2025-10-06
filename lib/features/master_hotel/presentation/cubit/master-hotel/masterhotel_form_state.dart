@@ -1,11 +1,13 @@
 part of 'masterhotel_form_cubit.dart';
 
-class MasterhotelFormState extends Equatable {
+class MasterhotelFormState {
   final bool isLoading;
   final String? message;
   final String? selectedPropertyType;
   final SelectedImage? selectedFile;
   final String? dbFile;
+  final String? dbFileExt;
+  final String? dbFileName;
 
   const MasterhotelFormState({
     required this.isLoading,
@@ -13,6 +15,8 @@ class MasterhotelFormState extends Equatable {
     this.selectedPropertyType,
     this.dbFile,
     this.selectedFile,
+    this.dbFileExt,
+    this.dbFileName,
   });
 
   // Initial state
@@ -23,6 +27,8 @@ class MasterhotelFormState extends Equatable {
       selectedPropertyType: null,
       selectedFile: null,
       dbFile: null,
+      dbFileExt: null,
+      dbFileName: '',
     );
   }
 
@@ -33,6 +39,8 @@ class MasterhotelFormState extends Equatable {
     String? selectedPropertyType,
     dynamic selectedFile,
     dynamic dbFile,
+    String? dbFileExt,
+    String? dbFileName,
   }) {
     return MasterhotelFormState(
       isLoading: isLoading ?? this.isLoading,
@@ -42,15 +50,8 @@ class MasterhotelFormState extends Equatable {
       selectedFile: selectedFile is bool
           ? null
           : (selectedFile ?? this.selectedFile),
+      dbFileExt: dbFileExt ?? this.dbFileExt,
+      dbFileName: dbFileName ?? this.dbFileName,
     );
   }
-
-  @override
-  List<Object?> get props => [
-    isLoading,
-    message,
-    selectedPropertyType,
-    selectedFile, // Add selectedFile to props
-    dbFile, // Add dbFile to props
-  ];
 }

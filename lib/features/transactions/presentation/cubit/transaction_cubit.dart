@@ -9,6 +9,7 @@ part 'transaction_state.dart';
 
 class TransactionCubit extends Cubit<TransactionState> {
   StreamSubscription? _realtimeSubscription;
+  Timer? debounce;
 
   TransactionCubit() : super(TransactionState.initial());
 
@@ -255,63 +256,68 @@ class TransactionCubit extends Cubit<TransactionState> {
       state.copyWith(searchQuery: query, isSearching: true, errorMessage: null),
     );
 
-    if (query.isEmpty) {
-      emit(state.copyWith(searchResults: [], isSearching: false));
-      // Resume real-time updates for page 1
-      if (state.currentPage == 1) {
-        _startRealtimeListener();
+    if (debounce?.isActive ?? false) debounce?.cancel();
+    debounce = Timer(const Duration(milliseconds: 500), () async {
+      if (query.isEmpty) {
+        emit(state.copyWith(searchResults: [], isSearching: false));
+        // Resume real-time updates for page 1
+        if (state.currentPage == 1) {
+          _startRealtimeListener();
+        }
+        return;
       }
-      return;
-    }
 
-    try {
-      // Cancel real-time updates during search
-      _realtimeSubscription?.cancel();
+      try {
+        // Cancel real-time updates during search
+        _realtimeSubscription?.cancel();
 
-      Query searchQuery;
+        Query searchQuery;
 
-      if (state.searchWithinFilter) {
-        // Search within current filter
-        searchQuery = _buildBaseQuery();
-      } else {
-        // Search all transactions
-        searchQuery = FBFireStore.transactions.orderBy(
-          'createdAt',
-          descending: true,
+        if (state.searchWithinFilter) {
+          // Search within current filter
+          searchQuery = _buildBaseQuery();
+        } else {
+          // Search all transactions
+          searchQuery = FBFireStore.transactions.orderBy(
+            'createdAt',
+            descending: true,
+          );
+        }
+
+        // Fetch all matching documents (Firestore doesn't support text search natively)
+        // In production, consider using Algolia or ElasticSearch for better search
+        final snapshot = await searchQuery.limit(100).get();
+
+        final allTransactions = snapshot.docs
+            .map(
+              (doc) => TransactionModel.fromDocSnap(
+                doc as QueryDocumentSnapshot<Map<String, dynamic>>,
+              ),
+            )
+            .toList();
+
+        // Filter locally by search query
+        final searchLower = query.toLowerCase();
+        final results = allTransactions.where((transaction) {
+          return transaction.transactionId.toLowerCase().contains(
+                searchLower,
+              ) ||
+              transaction.clientName.toLowerCase().contains(searchLower) ||
+              transaction.hotelName.toLowerCase().contains(searchLower) ||
+              transaction.email.toLowerCase().contains(searchLower) ||
+              transaction.amount.toString().contains(searchLower);
+        }).toList();
+
+        emit(state.copyWith(searchResults: results, isSearching: false));
+      } catch (e) {
+        emit(
+          state.copyWith(
+            isSearching: false,
+            errorMessage: 'Search failed: ${e.toString()}',
+          ),
         );
       }
-
-      // Fetch all matching documents (Firestore doesn't support text search natively)
-      // In production, consider using Algolia or ElasticSearch for better search
-      final snapshot = await searchQuery.limit(100).get();
-
-      final allTransactions = snapshot.docs
-          .map(
-            (doc) => TransactionModel.fromDocSnap(
-              doc as QueryDocumentSnapshot<Map<String, dynamic>>,
-            ),
-          )
-          .toList();
-
-      // Filter locally by search query
-      final searchLower = query.toLowerCase();
-      final results = allTransactions.where((transaction) {
-        return transaction.transactionId.toLowerCase().contains(searchLower) ||
-            transaction.clientName.toLowerCase().contains(searchLower) ||
-            transaction.hotelName.toLowerCase().contains(searchLower) ||
-            transaction.email.toLowerCase().contains(searchLower) ||
-            transaction.amount.toString().contains(searchLower);
-      }).toList();
-
-      emit(state.copyWith(searchResults: results, isSearching: false));
-    } catch (e) {
-      emit(
-        state.copyWith(
-          isSearching: false,
-          errorMessage: 'Search failed: ${e.toString()}',
-        ),
-      );
-    }
+    });
   }
 
   // Fetch analytics

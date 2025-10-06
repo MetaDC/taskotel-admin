@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/custom_textfields.dart';
@@ -55,9 +54,9 @@ class _MasterHotelFormState extends State<MasterHotelForm> {
                             color: Colors.blue,
                           ),
                           const SizedBox(width: 10),
-                          const Text(
+                          Text(
                             "Create Hotel Master",
-                            style: TextStyle(
+                            style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
@@ -76,9 +75,9 @@ class _MasterHotelFormState extends State<MasterHotelForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               "Basic Information",
-                              style: TextStyle(
+                              style: GoogleFonts.inter(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
@@ -140,9 +139,11 @@ class _MasterHotelFormState extends State<MasterHotelForm> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               "Brand Assets",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 15),
                             const SizedBox(height: 15),
@@ -155,7 +156,9 @@ class _MasterHotelFormState extends State<MasterHotelForm> {
                                   child: CustomFileUploadField(
                                     title: "Logo",
                                     hintText: state.selectedFile != null
-                                        ? "File Selected ${state.selectedFile!.name}"
+                                        ? "File Selected:-${state.selectedFile!.name}"
+                                        : state.dbFile != null
+                                        ? "File Selected:-${state.dbFileName}"
                                         : "Upload logo or paste URL",
                                     prefixIcon: Icon(Icons.upload_file),
                                     onTap: () {
@@ -164,14 +167,14 @@ class _MasterHotelFormState extends State<MasterHotelForm> {
                                     onDeleteImageTap: () {
                                       masterHotelFormCubit.deletPickFile(false);
                                     },
-                                    uploadImg: state.dbFile != null
-                                        ? Image.network(
-                                            state.dbFile!,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : state.selectedFile != null
+                                    uploadImg: state.selectedFile != null
                                         ? Image.memory(
                                             state.selectedFile!.uInt8List,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : state.dbFile != null
+                                        ? Image.network(
+                                            state.dbFile!,
                                             fit: BoxFit.cover,
                                           )
                                         : null,

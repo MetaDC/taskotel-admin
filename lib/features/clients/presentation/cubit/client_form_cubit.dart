@@ -87,7 +87,9 @@ class ClientFormCubit extends Cubit<ClientFormState> {
         );
       } else {
         // Create new client
-        await clientRepo.createAndRegisterClient(client, "1234567");
+        final res = await clientRepo.createAndRegisterClient(client, "1234567");
+        client.docId = res;
+        context.read<ClientCubit>().addClientToList(client);
         emit(
           state.copyWith(
             isLoading: false,

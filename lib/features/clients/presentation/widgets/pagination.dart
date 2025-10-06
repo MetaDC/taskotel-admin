@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DynamicPagination extends StatelessWidget {
   const DynamicPagination({
@@ -96,7 +97,7 @@ class DynamicPagination extends StatelessWidget {
         ),
         child: Text(
           '$page',
-          style: TextStyle(
+          style: GoogleFonts.inter(
             fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
             fontSize: 14,
             color: enabled ? const Color(0xff3E3E3E) : const Color(0xffCBCBCB),
@@ -129,7 +130,7 @@ class DynamicPagination extends StatelessWidget {
       ),
       label: Text(
         label,
-        style: TextStyle(
+        style: GoogleFonts.inter(
           fontWeight: enabled ? FontWeight.bold : FontWeight.w500,
           fontSize: 13,
           letterSpacing: .8,
@@ -248,7 +249,7 @@ class DynamicPagination extends StatelessWidget {
         ),
         child: Text(
           '$page',
-          style: TextStyle(
+          style: GoogleFonts.inter(
               fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
               fontSize: 14,
               color: enabled ? Color(0xff3E3E3E) : Color(0xffCBCBCB)),
@@ -279,7 +280,7 @@ class DynamicPagination extends StatelessWidget {
       ),
       label: Text(
         label,
-        style: TextStyle(
+        style: GoogleFonts.inter(
             fontWeight: enabled ? FontWeight.bold : FontWeight.w500,
             fontSize: 13,
             letterSpacing: .8),

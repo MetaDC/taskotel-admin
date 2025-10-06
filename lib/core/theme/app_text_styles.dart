@@ -4,51 +4,51 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  static final headerHeading = TextStyle(
+  static final headerHeading = GoogleFonts.inter(
     fontSize: 28,
-    fontWeight: FontWeight.w900,
+    fontWeight: FontWeight.w800,
     color: Colors.black,
   );
-  static final headerSubheading = TextStyle(
+  static final headerSubheading = GoogleFonts.inter(
     fontSize: 15,
     fontWeight: FontWeight.w500,
     color: AppColors.slateGray,
   );
-  static final tabelHeader = TextStyle(
+  static final tabelHeader = GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w600,
     color: AppColors.slateGray,
   );
-  static final dialogHeading = TextStyle(
+  static final dialogHeading = GoogleFonts.inter(
     fontSize: 18,
     fontWeight: FontWeight.w700,
     color: AppColors.primary,
   );
-  static final textFieldTitle = TextStyle(
+  static final textFieldTitle = GoogleFonts.inter(
     fontWeight: FontWeight.bold,
     fontSize: 14,
     color: AppColors.primary,
   );
 
   // Navigation
-  static final navBarItems = TextStyle(
+  static final navBarItems = GoogleFonts.inter(
     fontSize: 34,
     fontWeight: FontWeight.w700,
     color: AppColors.primary,
   );
 
   //stat cards styles
-  static final statCardLabel = GoogleFonts.albertSans(
+  static final statCardLabel = GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w500,
     color: AppColors.slateGray,
   );
-  static final statCardValue = GoogleFonts.albertSans(
-    fontSize: 28,
-    fontWeight: FontWeight.bold,
+  static final statCardValue = GoogleFonts.inter(
+    fontSize: 24,
+    fontWeight: FontWeight.w700,
     color: AppColors.primary,
   );
-  static final hintText = GoogleFonts.albertSans(
+  static final hintText = GoogleFonts.inter(
     fontSize: 16,
     color: AppColors.slateGray,
     fontWeight: FontWeight.w400,
@@ -57,40 +57,40 @@ class AppTextStyles {
   // ============ TABLE STYLES ============
 
   // Table Row Primary Text (Bold text like names, IDs)
-  static final tableRowPrimary = TextStyle(
+  static final tableRowPrimary = GoogleFonts.inter(
     fontWeight: FontWeight.bold,
     fontSize: 15,
     color: AppColors.textBlackColor,
   );
 
   // Table Row Secondary Text (Smaller, gray text)
-  static final tableRowSecondary = TextStyle(
+  static final tableRowSecondary = GoogleFonts.inter(
     fontSize: 13.5,
     color: AppColors.slateGray,
   );
 
   // Table Row Normal Text (Regular data)
-  static final tableRowNormal = TextStyle(
+  static final tableRowNormal = GoogleFonts.inter(
     fontSize: 14,
     color: AppColors.textBlackColor,
     fontWeight: FontWeight.w500,
   );
 
   // Table Row Bold Numbers/Values
-  static final tableRowBoldValue = TextStyle(
+  static final tableRowBoldValue = GoogleFonts.inter(
     fontWeight: FontWeight.w600,
     fontSize: 15,
     color: AppColors.textBlackColor,
   );
 
   // Table Row Regular Text
-  static final tableRowRegular = TextStyle(
+  static final tableRowRegular = GoogleFonts.inter(
     fontSize: 14,
     color: AppColors.textBlackColor,
   );
 
   // Table Row Date Text
-  static final tableRowDate = TextStyle(
+  static final tableRowDate = GoogleFonts.inter(
     fontSize: 15,
     color: AppColors.textBlackColor,
   );

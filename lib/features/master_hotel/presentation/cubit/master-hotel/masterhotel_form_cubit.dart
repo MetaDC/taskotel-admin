@@ -31,9 +31,10 @@ class MasterhotelFormCubit extends Cubit<MasterhotelFormState> {
       emit(
         state.copyWith(
           dbFile: editMasterHotel.logoUrl,
+          dbFileExt: editMasterHotel.logoExtension,
+          dbFileName: editMasterHotel.logoName ?? '',
           isLoading: false,
           selectedFile: null,
-          
         ),
       );
     } else {
@@ -108,7 +109,7 @@ class MasterhotelFormCubit extends Cubit<MasterhotelFormState> {
           websiteUrl: websiteUrlController.text.trim(),
           createdAt: editMasterHotel == null ? DateTime.now() : DateTime.now(),
           updatedAt: DateTime.now(),
-          isActive: true,
+          isActive: editMasterHotel == null ? true : editMasterHotel.isActive,
           totalClients: 0,
           totalMasterTasks: 0,
         );

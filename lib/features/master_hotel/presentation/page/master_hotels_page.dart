@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
@@ -70,7 +71,10 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
             children: [
               Text(
                 "Franchise Directory",
-                style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900),
+                style: GoogleFonts.inter(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -98,7 +102,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                   child: Center(
                     child: Text(
                       "No Hotels Found",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 16,
                         color: AppColors.slateGray,
                       ),
@@ -292,20 +296,28 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                             color: Colors.red,
                           ),
                           SizedBox(width: 8),
-                          Text('Delete', style: TextStyle(color: Colors.red)),
+                          Text(
+                            'Delete',
+                            style: GoogleFonts.inter(color: Colors.red),
+                          ),
                         ],
                       ),
                       onTap: () {
-                        showConfirmDeletDialog(
-                          context,
-                          () {
+                        showConfirmDeletDialog<
+                          MasterHotelCubit,
+                          MasterhotelState
+                        >(
+                          context: context,
+                          onBtnTap: () {
                             context.read<MasterHotelCubit>().deleteMasterHotel(
                               masterHotel.docId,
                             );
                           },
-                          "Delete Hotel Master",
-                          "Are you sure you want to delete this hotel master?",
-                          "Delete",
+                          title: "Delete Hotel Master",
+                          message:
+                              "Are you sure you want to delete this hotel master?",
+                          btnText: "Delete",
+                          isLoadingSelector: (state) => state.isLoading,
                         );
                       },
                     ),

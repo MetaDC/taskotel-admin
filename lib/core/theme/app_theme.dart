@@ -5,7 +5,7 @@ import 'app_colors.dart';
 class AppTheme {
   static ThemeData lightTheme = ThemeData(
     scaffoldBackgroundColor: Color(0xfffafafa),
-    textTheme: GoogleFonts.interTextTheme(),
+    // textTheme: GoogleFonts.interTextTheme(),
     // scaffoldBackgroundColor: Colors.white,
     primaryColor: AppColors.primary,
     colorScheme: ColorScheme.light(

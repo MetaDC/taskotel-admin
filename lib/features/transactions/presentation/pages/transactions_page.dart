@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
@@ -68,8 +69,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                       _buildTransactionsList(state),
                       const SizedBox(height: 20),
 
-                      if (!state.isSearching && state.searchQuery.isEmpty)
-                        _buildPagination(state),
+                      //if items are more than 10 show pagination
+                      if (state.totalPages > 1) _buildPagination(state),
                     ],
                   ),
                 ),
@@ -141,9 +142,9 @@ class _TransactionsPageState extends State<TransactionsPage> {
   Widget _buildFiltersAndSearch(TransactionState state) {
     return Row(
       children: [
-        const Text(
+        Text(
           "Transactions",
-          style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900),
+          style: GoogleFonts.inter(fontSize: 21, fontWeight: FontWeight.w600),
         ),
         const Spacer(),
 
@@ -185,7 +186,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                 borderSide: BorderSide(color: AppColors.blueGreyBorder),
               ),
 
-              hintStyle: TextStyle(
+              hintStyle: GoogleFonts.inter(
                 color: AppColors.slateGray,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -275,7 +276,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
   }
 
   Widget _buildTransactionsList(TransactionState state) {
-    if (state.isLoading) {
+    if (state.isLoading || state.isSearching) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -290,7 +291,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
               color: Colors.grey[400],
             ),
             const SizedBox(height: 16),
-            Text(state.errorMessage!, style: const TextStyle(fontSize: 16)),
+            Text(state.errorMessage!, style: GoogleFonts.inter(fontSize: 16)),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => context.read<TransactionCubit>().initialize(),
@@ -316,7 +317,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
               state.searchQuery.isNotEmpty
                   ? "No transactions found matching '${state.searchQuery}'"
                   : "No transactions found",
-              style: const TextStyle(fontSize: 16),
+              style: GoogleFonts.inter(fontSize: 16),
             ),
           ],
         ),
@@ -410,7 +411,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                   ),
                   child: Text(
                     transaction.planName,
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                       color: Color(0xff3e85f6),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -483,7 +484,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
       ),
       child: Text(
         status.toUpperCase(),
-        style: TextStyle(
+        style: GoogleFonts.inter(
           color: color,
           fontSize: 10,
           fontWeight: FontWeight.bold,
@@ -546,7 +547,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                   ),
                   child: Text(
                     pageNumber.toString(),
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                       color: state.currentPage == pageNumber
                           ? Colors.white
                           : Colors.black,
@@ -575,7 +576,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
           // Page Info
           Text(
             "Page ${state.currentPage} of ${state.totalPages}",
-            style: const TextStyle(fontSize: 14),
+            style: GoogleFonts.inter(fontSize: 14),
           ),
         ],
       ),

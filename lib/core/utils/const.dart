@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
 
@@ -417,4 +419,41 @@ Future<void> sendTasksToFirestore() async {
   }
 
   print("✅ 20 dummy tasks added to Firestore!");
+}
+
+Future<void> addDummyClients() async {
+  final firestore = FirebaseFirestore.instance;
+  final clientsRef = firestore.collection("clients");
+
+  // 🔹 Create 25 dummy clients
+  for (int i = 1; i <= 30; i++) {
+    final now = DateTime.now();
+    final random = Random();
+
+    final client = ClientModel(
+      docId: "", // Firestore will assign, we don’t need it here
+      name: "Client $i",
+      email: "client$i@example.com",
+      phone: "987654${1000 + i}",
+
+      createdAt: now,
+      updatedAt: now,
+      lastPaymentExpiry: now.add(Duration(days: 30 * (i % 12))),
+      lastLogin: i % 2 == 0 ? now.subtract(Duration(days: i)) : null,
+
+      status: (i % 3 == 0)
+          ? "inactive"
+          : (i % 5 == 0)
+          ? "suspended"
+          : "active",
+
+      totalHotels: random.nextInt(10),
+      totalRevenue: (1000 + random.nextInt(5000)) * 1.0,
+      isDeleted: false,
+    );
+
+    await clientsRef.add(client.toJson());
+  }
+
+  print("✅ 25 Dummy Clients Added to Firestore!");
 }

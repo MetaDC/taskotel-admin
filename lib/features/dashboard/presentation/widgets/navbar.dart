@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/widget/responsive_widget.dart';
@@ -42,9 +43,9 @@ class Navbar extends StatelessWidget {
         children: [
           logo(),
           const SizedBox(width: 10),
-          const Text(
+          Text(
             "Taskotel",
-            style: TextStyle(
+            style: GoogleFonts.inter(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: Colors.white,
@@ -76,7 +77,7 @@ class Navbar extends StatelessWidget {
       ),
       child: Text(
         "T",
-        style: TextStyle(
+        style: GoogleFonts.inter(
           color: AppColors.primary,
           fontSize: 18,
           fontWeight: FontWeight.bold,
@@ -98,7 +99,7 @@ class Navbar extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             "Taskotel",
-            style: TextStyle(
+            style: GoogleFonts.inter(
               fontWeight: FontWeight.bold,
               fontSize: 18,
               color: AppColors.secondary,
@@ -137,9 +138,9 @@ class Navbar extends StatelessWidget {
         ),
         child: Text(
           item.label,
-          style: TextStyle(
+          style: GoogleFonts.inter(
             color: Colors.white,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.bold,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.w600,
             fontSize: isActive ? 15 : 14.5,
           ),
         ),
@@ -148,34 +149,12 @@ class Navbar extends StatelessWidget {
   }
 
   Widget _iconWithBadge(IconData icon, int count) {
-    return true
-        ? count > 0
-              ? Badge(
-                  label: Text("$count"),
-                  child: Icon(icon, color: Colors.white),
-                )
-              : Icon(icon, color: Colors.white)
-        : Stack(
-            alignment: Alignment.topRight,
-            children: [
-              Icon(icon, color: Colors.white),
-              if (count > 0)
-                Positioned(
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                      color: Colors.blue,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text(
-                      "$count",
-                      style: const TextStyle(color: Colors.white, fontSize: 10),
-                    ),
-                  ),
-                ),
-            ],
-          );
+    return count > 0
+        ? Badge(
+            label: Text("$count"),
+            child: Icon(icon, color: Colors.white),
+          )
+        : Icon(icon, color: Colors.white);
   }
 
   Widget mobileDropDown({
@@ -211,9 +190,9 @@ class Navbar extends StatelessWidget {
           ),
           if (!isMobile) ...[
             const SizedBox(width: 8),
-            const Text(
+            Text(
               "Super Admin",
-              style: TextStyle(color: Colors.white, fontSize: 14),
+              style: GoogleFonts.inter(color: Colors.white, fontSize: 14),
             ),
             const Icon(Icons.arrow_drop_down, color: Colors.white),
           ],
@@ -269,7 +248,11 @@ class Navbar extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               "Super Admin",
-              style: TextStyle(color: Colors.white, fontSize: 14),
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const Icon(Icons.arrow_drop_down, color: Colors.white),
           ],

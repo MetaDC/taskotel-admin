@@ -1,6 +1,7 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:taskoteladmin/core/services/image_picker.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
@@ -10,37 +11,49 @@ Color statusColor(String status) {
   return hotelTypeColors[status] ?? Colors.transparent;
 }
 
-Future<dynamic> showConfirmDeletDialog(
-  BuildContext context,
-  Function onBtnTap,
-  String title,
-  String message,
-  String btnText,
-  // ProjectModel project,
-) {
+Future<void> showConfirmDeletDialog<T extends Cubit<S>, S>({
+  required BuildContext context,
+  required VoidCallback onBtnTap,
+  required String title,
+  required String message,
+  required String btnText,
+  required bool Function(S) isLoadingSelector, // 👈 selector for loading state
+}) {
   return showDialog(
     context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: <Widget>[
-          // Cancel button
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Return false if cancelled
-            },
-            child: const Text('Cancel'),
-          ),
-          // Confirm button
-          TextButton(
-            onPressed: () {
-              onBtnTap();
-              Navigator.pop(context);
-            },
-            child: Text(btnText),
-          ),
-        ],
+    barrierDismissible: false,
+    builder: (dialogContext) {
+      return BlocBuilder<T, S>(
+        builder: (context, state) {
+          final isLoading = isLoadingSelector(state);
+
+          return AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: isLoading
+                    ? null
+                    : () => Navigator.of(dialogContext).pop(),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        onBtnTap();
+                      },
+                child: isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(btnText, style: const TextStyle(color: Colors.red)),
+              ),
+            ],
+          );
+        },
       );
     },
   );

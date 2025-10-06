@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/helpers.dart';
+import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
 import 'package:taskoteladmin/core/widget/tabel_widgets.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
@@ -25,30 +27,42 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
   @override
   void initState() {
     super.initState();
-    // Initialize active clients pagination
     context.read<ClientCubit>().initializeActiveClientsPagination();
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ClientCubit, ClientState>(
-      builder: (context, state) {
-        return SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildAnalytics(state),
-              const SizedBox(height: 20),
-              _buildActiveClientTabel(context, state),
-            ],
-          ),
-        );
+    return BlocListener<ClientCubit, ClientState>(
+      listener: (context, state) {
+        print("Message: ${state.message}--${state.selectedTab}");
+        if (state.message == "Client Deleted") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Client deleted successfully'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       },
+      child: BlocBuilder<ClientCubit, ClientState>(
+        builder: (context, state) {
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildAnalytics(state),
+                const SizedBox(height: 20),
+                ResponsiveWid(
+                  mobile: _buildMobileClientList(context, state),
+                  tablet: _buildMobileClientList(context, state),
+                  desktop: _buildActiveClientTabel(context, state),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -86,92 +100,63 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
     );
   }
 
-  Widget _buildActiveClientTabel(BuildContext context, ClientState state) {
+  // Mobile View
+  Widget _buildMobileClientList(BuildContext context, ClientState state) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.blueGreyBorder),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTabelHeading(context),
-
+          Text(
+            "Active Clients List",
+            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: context.read<ClientCubit>().searchController,
+            decoration: InputDecoration(
+              fillColor: Color(0xfffafafa),
+              filled: true,
+              hintText: "Search clients...",
+              prefixIcon: const Icon(CupertinoIcons.search, size: 20),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide(color: AppColors.blueGreyBorder),
+              ),
+              contentPadding: EdgeInsets.symmetric(vertical: 12),
+            ),
+            onChanged: (value) {
+              context.read<ClientCubit>().searchClients(value);
+            },
+          ),
+          const SizedBox(height: 20),
           if (state.isLoading && state.activeClients.isEmpty)
             Center(child: CircularProgressIndicator())
-          // Error state
-          else if (state.message != null && state.activeClients.isEmpty)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    CupertinoIcons.exclamationmark_triangle,
-                    size: 64,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(state.message!, style: const TextStyle(fontSize: 16)),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => context
-                        .read<ClientCubit>()
-                        .initializeActiveClientsPagination(),
-                    child: const Text("Retry"),
-                  ),
-                ],
-              ),
-            )
-          // Clients list
+          else if (state.message != null &&
+              state.activeClients.isEmpty &&
+              state.message != "Client Deleted")
+            _buildErrorState(state.message!)
           else if (state.filteredActiveClients.isEmpty)
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(CupertinoIcons.person_2, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text(
-                    "No active clients found",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            )
+            _buildEmptyState()
           else
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 40),
-                // Table Header
-                _buildTabelHeader(),
-                const SizedBox(height: 13),
-                const Divider(
-                  color: AppColors.slateGray,
-                  thickness: 0.07,
-                  height: 0,
-                ),
-
-                // Table Body
                 ListView.separated(
                   shrinkWrap: true,
-                  separatorBuilder: (context, index) => Divider(
-                    color: AppColors.slateGray,
-                    thickness: 0.07,
-                    height: 0,
-                  ),
                   physics: ClampingScrollPhysics(),
+                  separatorBuilder: (context, index) => SizedBox(height: 12),
                   itemCount: state.filteredActiveClients.length,
                   itemBuilder: (context, index) {
                     final client = state.filteredActiveClients[index];
-                    return _buildClientRow(client);
+                    return _buildMobileClientCard(client);
                   },
                 ),
-
                 const SizedBox(height: 20),
-
-                // Pagination
                 if (state.activeTotalPages > 1 &&
                     context.read<ClientCubit>().searchController.text.isEmpty)
                   DynamicPagination(
@@ -190,12 +175,294 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
     );
   }
 
+  Widget _buildMobileClientCard(ClientModel client) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: AppColors.blueGreyBorder, width: 1),
+      ),
+      child: InkWell(
+        onTap: () => context.go(Routes.clientDetail(client.docId)),
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          client.name,
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          "Joined ${client.createdAt.convertToDDMMYY()}",
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _buildStatusBadge(client.status),
+                  SizedBox(width: 8),
+                  PopupMenuButton(
+                    icon: Icon(Icons.more_vert, size: 20),
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'view',
+                        child: ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(CupertinoIcons.eye, size: 20),
+                          title: Text('View'),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(CupertinoIcons.pencil, size: 20),
+                          title: Text('Edit'),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          leading: Icon(
+                            CupertinoIcons.delete,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                          title: Text(
+                            'Delete',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ),
+                    ],
+                    onSelected: (value) {
+                      Future.delayed(Duration.zero, () {
+                        if (value == 'view') {
+                          context.go(Routes.clientDetail(client.docId));
+                        } else if (value == 'edit') {
+                          _showEditDialog(client);
+                        } else if (value == 'delete') {
+                          _showDeleteDialog(client);
+                        }
+                      });
+                    },
+                  ),
+                ],
+              ),
+              Divider(height: 24, color: AppColors.blueGreyBorder),
+              Row(
+                children: [
+                  Icon(CupertinoIcons.mail, size: 14, color: Colors.grey[600]),
+                  SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      client.email,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Colors.grey[700],
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(CupertinoIcons.phone, size: 14, color: Colors.grey[600]),
+                  SizedBox(width: 6),
+                  Text(
+                    client.phone,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                ],
+              ),
+              Divider(height: 24, color: AppColors.blueGreyBorder),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildInfoChip(
+                    CupertinoIcons.building_2_fill,
+                    "${client.totalHotels} Hotels",
+                  ),
+                  _buildInfoChip(
+                    CupertinoIcons.money_dollar,
+                    "\$${client.totalRevenue.toStringAsFixed(0)}",
+                  ),
+                  _buildInfoChip(
+                    CupertinoIcons.calendar,
+                    client.lastPaymentExpiry?.goodDayDate() ?? 'N/A',
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String label) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: Colors.grey[700]),
+          SizedBox(width: 4),
+          Text(
+            label,
+            style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Desktop Table View
+  Widget _buildActiveClientTabel(BuildContext context, ClientState state) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.blueGreyBorder),
+      ),
+      child: Column(
+        children: [
+          _buildTabelHeading(context),
+          if (state.isLoading && state.activeClients.isEmpty)
+            Center(child: CircularProgressIndicator())
+          else if (state.message != null &&
+              state.activeClients.isEmpty &&
+              state.message != "Client Deleted")
+            _buildErrorState(state.message!)
+          else if (state.filteredActiveClients.isEmpty)
+            _buildEmptyState()
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 40),
+                _buildTabelHeader(),
+                const SizedBox(height: 13),
+                const Divider(
+                  color: AppColors.slateGray,
+                  thickness: 0.07,
+                  height: 0,
+                ),
+                ListView.separated(
+                  shrinkWrap: true,
+                  separatorBuilder: (context, index) => Divider(
+                    color: AppColors.slateGray,
+                    thickness: 0.07,
+                    height: 0,
+                  ),
+                  physics: ClampingScrollPhysics(),
+                  itemCount: state.filteredActiveClients.length,
+                  itemBuilder: (context, index) {
+                    final client = state.filteredActiveClients[index];
+                    return _buildClientRow(client);
+                  },
+                ),
+                const SizedBox(height: 20),
+                if (state.activeTotalPages > 1 &&
+                    context.read<ClientCubit>().searchController.text.isEmpty)
+                  DynamicPagination(
+                    currentPage: state.activeCurrentPage,
+                    totalPages: state.activeTotalPages,
+                    onPageChanged: (page) {
+                      context.read<ClientCubit>().fetchNextActiveClientsPage(
+                        page: page,
+                      );
+                    },
+                  ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String message) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              CupertinoIcons.exclamationmark_triangle,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(message, style: GoogleFonts.inter(fontSize: 16)),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => context
+                  .read<ClientCubit>()
+                  .initializeActiveClientsPagination(),
+              child: const Text("Retry"),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(CupertinoIcons.person_2, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              "No active clients found",
+              style: GoogleFonts.inter(fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Row _buildTabelHeading(BuildContext context) {
     return Row(
       children: [
-        const Text(
+        Text(
           "Active Clients List",
-          style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900),
+          style: GoogleFonts.inter(fontSize: 21, fontWeight: FontWeight.w600),
         ),
         const Spacer(),
         SizedBox(
@@ -214,7 +481,6 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                 size: 20,
               ),
               hoverColor: Colors.transparent,
-
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
                 borderSide: BorderSide(color: AppColors.blueGreyBorder),
@@ -227,16 +493,11 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                 borderRadius: BorderRadius.circular(6),
                 borderSide: BorderSide(color: AppColors.blueGreyBorder),
               ),
-
-              hintStyle: TextStyle(
+              hintStyle: GoogleFonts.inter(
                 color: AppColors.slateGray,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
-              // contentPadding: const EdgeInsets.symmetric(
-              //   horizontal: 12,
-              //   vertical: 8,
-              // ),
             ),
             onChanged: (value) {
               context.read<ClientCubit>().searchClients(value);
@@ -251,7 +512,6 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
     return Row(
       children: [
         SizedBox(width: TableConfig.horizontalSpacing),
-
         Expanded(
           flex: 2,
           child: Text("Client", style: AppTextStyles.tabelHeader),
@@ -265,15 +525,13 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
         Expanded(child: Text("Expiry", style: AppTextStyles.tabelHeader)),
         Expanded(child: Text("Status", style: AppTextStyles.tabelHeader)),
         SizedBox(
-          width: 100,
+          width: TableConfig.viewColumnWidth,
           child: Text("View", style: AppTextStyles.tabelHeader),
         ),
         SizedBox(
-          width: 50,
+          width: TableConfig.actionColumnWidth,
           child: Text("Actions", style: AppTextStyles.tabelHeader),
         ),
-
-        SizedBox(width: 100),
       ],
     );
   }
@@ -284,17 +542,13 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
       child: Row(
         children: [
           SizedBox(width: TableConfig.horizontalSpacing),
-
-          // Client Name & Join Date
           Expanded(
             flex: 2,
             child: TableTwoLineContent(
               primaryText: client.name,
-              secondaryText: "Joined ${client.createdAt.convertToDDMMYY()}",
+              secondaryText: "Joined ${client.createdAt.goodDayDate()}",
             ),
           ),
-
-          // Contact (Email & Phone)
           Expanded(
             flex: 2,
             child: Column(
@@ -309,35 +563,25 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
               ],
             ),
           ),
-
-          // Hotels Count
           Expanded(
             child: Text(
               "${client.totalHotels}",
               style: AppTextStyles.tableRowBoldValue,
             ),
           ),
-
-          // Revenue
           Expanded(
             child: Text(
               "\$${client.totalRevenue.toStringAsFixed(0)}",
               style: AppTextStyles.tableRowBoldValue,
             ),
           ),
-
-          // Expiry Date
           Expanded(
             child: Text(
-              client.lastPaymentExpiry?.convertToDDMMYY() ?? 'N/A',
+              client.lastPaymentExpiry?.goodDayDate() ?? 'N/A',
               style: AppTextStyles.tableRowBoldValue,
             ),
           ),
-
-          // Status Badge
           Expanded(child: Row(children: [_buildStatusBadge(client.status)])),
-
-          // View Button
           SizedBox(
             width: TableConfig.viewColumnWidth,
             child: Row(
@@ -352,8 +596,6 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
               ],
             ),
           ),
-
-          // Actions Menu
           SizedBox(
             width: TableConfig.actionColumnWidth,
             child: PopupMenuButton(
@@ -364,47 +606,61 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
               ),
               itemBuilder: (context) => [
                 PopupMenuItem(
+                  value: 'edit',
                   child: ListTile(
                     leading: Icon(CupertinoIcons.pencil),
                     title: Text('Edit'),
                   ),
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return Dialog(
-                          backgroundColor: Color(0xffFAFAFA),
-
-                          child: ClientFormModal(clientToEdit: client),
-                        );
-                      },
-                    );
-                  },
                 ),
                 PopupMenuItem(
+                  value: 'delete',
                   child: ListTile(
                     leading: Icon(CupertinoIcons.delete, color: Colors.red),
-                    title: Text('Delete', style: TextStyle(color: Colors.red)),
+                    title: Text(
+                      'Delete',
+                      style: GoogleFonts.inter(color: Colors.red),
+                    ),
                   ),
-                  onTap: () {
-                    showConfirmDeletDialog(
-                      context,
-                      () {
-                        context.read<ClientCubit>().deleteClient(client.docId);
-                      },
-                      "Delete Client",
-                      "Are you sure you want to delete this client?",
-                      "Delete",
-                    );
-                  },
                 ),
               ],
+              onSelected: (value) {
+                Future.delayed(Duration.zero, () {
+                  if (value == 'edit') {
+                    _showEditDialog(client);
+                  } else if (value == 'delete') {
+                    _showDeleteDialog(client);
+                  }
+                });
+              },
             ),
           ),
-
-          SizedBox(width: TableConfig.viewColumnWidth),
         ],
       ),
+    );
+  }
+
+  void _showEditDialog(ClientModel client) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return Dialog(
+          backgroundColor: Color(0xffFAFAFA),
+          child: ClientFormModal(clientToEdit: client),
+        );
+      },
+    );
+  }
+
+  void _showDeleteDialog(ClientModel client) {
+    showConfirmDeletDialog<ClientCubit, ClientState>(
+      context: context,
+      onBtnTap: () {
+        context.read<ClientCubit>().deleteClient(client.docId);
+      },
+      title: "Delete Client",
+      message: "Are you sure you want to delete ${client.name}?",
+      btnText: "Delete",
+      isLoadingSelector: (state) => state.isLoading,
     );
   }
 
@@ -420,7 +676,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
       ),
       child: Text(
         status.toUpperCase(),
-        style: TextStyle(
+        style: GoogleFonts.inter(
           color: color,
           fontSize: 10,
           letterSpacing: .5,

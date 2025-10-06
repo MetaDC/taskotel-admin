@@ -1,12 +1,15 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:taskoteladmin/features/auth/presentation/widgets/auth_textfileds.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -66,9 +69,9 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    const Text(
+                    Text(
                       "Welcome back",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -126,23 +129,23 @@ class LoginPage extends StatelessWidget {
                     Text.rich(
                       TextSpan(
                         text: "Developed by ",
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           color: AppColors.slateGray,
                           fontWeight: FontWeight.bold,
                         ),
                         children: [
                           TextSpan(
                             text: "Diwizon",
-                            style: TextStyle(
+                            style: GoogleFonts.inter(
                               decoration: TextDecoration.underline,
                               color: AppColors.primary,
                               fontWeight: FontWeight.bold,
                             ),
-                            // recognizer: TapGestureRecognizer()
-                            //   ..onTap = () {
-                            //     // Use the url_launcher package
-                            //     launchUrl(Uri.parse("https://diwizon.com"));
-                            //   },
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // Use the url_launcher package
+                                launchUrl(Uri.parse("https://diwizon.com"));
+                              },
                           ),
                         ],
                       ),

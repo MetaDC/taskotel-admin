@@ -51,7 +51,7 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
   // }
 
   void loadTasksForHotel(String hotelId, String role) async {
-    emit(state.copyWith(isLoadingTasks: true, allTasks: []));
+    emit(state.copyWith(isLoadingTasks: true, allTasks: [], message: ""));
     taskStream?.cancel();
 
     try {
@@ -98,6 +98,10 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
   }
 
   Future<void> exportTasksToExcel(List<CommonTaskModel> filteredTasks) async {
+    if (filteredTasks.isEmpty) {
+      emit(state.copyWith(message: "No tasks to export"));
+      return;
+    }
     try {
       final excel = Excel.createExcel();
 

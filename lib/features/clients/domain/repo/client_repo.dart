@@ -7,7 +7,7 @@ import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dar
 abstract class ClientRepo {
   //Cients Page
   // --Client CRUD operations
-  Future<void> createAndRegisterClient(ClientModel client, String password);
+  Future<String> createAndRegisterClient(ClientModel client, String password);
   Future<void> updateClient(ClientModel client);
   Future<void> deleteClient(String clientId);
   Future<List<ClientModel>> searchClients(String query);

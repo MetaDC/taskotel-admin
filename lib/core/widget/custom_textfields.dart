@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 
@@ -36,7 +37,7 @@ class CustomTextField extends StatelessWidget {
                 ? Icon(prefixIcon, color: AppColors.slateGray)
                 : null,
             hintText: hintText,
-            hintStyle: TextStyle(color: AppColors.slateGray),
+            hintStyle: GoogleFonts.inter(color: AppColors.slateGray),
 
             // Normal border when not focused
             enabledBorder: OutlineInputBorder(
@@ -138,7 +139,7 @@ class CustomNumTextField extends StatelessWidget {
             // Optional: default border
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             hintText: hintText,
-            hintStyle: TextStyle(
+            hintStyle: GoogleFonts.inter(
               color: AppColors.slateGray,
             ), // Use your AppTextStyles.label
           ),
@@ -206,7 +207,7 @@ class CustomFileUploadField extends StatelessWidget {
                             child: Icon(CupertinoIcons.xmark_circle),
                           )
                         : Icon(CupertinoIcons.add_circled, color: Colors.black),
-                    hintStyle: TextStyle(color: Colors.grey),
+                    hintStyle: GoogleFonts.inter(color: Colors.grey),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -294,7 +295,7 @@ class _CustomDateFieldState extends State<CustomDateField> {
 
             suffixIcon: Icon(CupertinoIcons.calendar),
 
-            hintStyle: TextStyle(
+            hintStyle: GoogleFonts.inter(
               color: widget.initialValue.isEmpty
                   ? AppColors.slateGray
                   : Colors.black,
@@ -375,7 +376,7 @@ class CustomDescTextField extends StatelessWidget {
             // Optional: default border
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             hintText: hintText,
-            hintStyle: TextStyle(color: AppColors.slateGray),
+            hintStyle: GoogleFonts.inter(color: AppColors.slateGray),
           ),
           validator: (value) {
             if (validator == true) {
@@ -472,7 +473,7 @@ class CustomDropDownField extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               hintText: hintText,
-              hintStyle: TextStyle(color: AppColors.slateGray),
+              hintStyle: GoogleFonts.inter(color: AppColors.slateGray),
             ),
             items: items,
             onChanged: (value) => onChanged(value),
@@ -500,14 +501,17 @@ class CustomOutlineFileUploadField extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
       style: OutlinedButton.styleFrom(
-        textStyle: TextStyle(color: Colors.black),
+        textStyle: GoogleFonts.inter(color: Colors.black),
         minimumSize: Size.fromHeight(50),
         side: BorderSide(color: AppColors.slateGray),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
       onPressed: () => onTap(),
       icon: prefixIcon,
-      label: Text(hintText, style: TextStyle(color: AppColors.slateGray)),
+      label: Text(
+        hintText,
+        style: GoogleFonts.inter(color: AppColors.slateGray),
+      ),
     );
   }
 }

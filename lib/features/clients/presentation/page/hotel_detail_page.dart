@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
@@ -195,7 +196,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: GoogleFonts.inter(
             color: AppColors.slateGray,
             fontSize: 14,
             fontWeight: FontWeight.bold,
@@ -212,7 +213,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
             Expanded(
               child: Text(
                 value,
-                style: const TextStyle(
+                style:  GoogleFonts.inter(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
                 ),
@@ -294,7 +295,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Text(
           state.getTabDisplayName(tab),
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          style:  GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       );
     }
@@ -397,21 +401,21 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                 flex: 1,
                 child: Text(
                   task.taskId,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  style:  GoogleFonts.inter(fontWeight: FontWeight.w500),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Text(
                   task.title,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style:  GoogleFonts.inter(fontWeight: FontWeight.w600),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Text(
                   task.desc,
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: GoogleFonts.inter(color: Colors.grey[600]),
                 ),
               ),
               Expanded(flex: 1, child: Text(task.frequency)),
@@ -430,7 +434,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                   ),
                   child: Text(
                     task.fromMasterHotel ?? false ? "Imported" : "Created",
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                       // color: statusColor,
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
@@ -448,7 +452,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
                   },
                   child: Text(
                     task.isActive ? "ON" : "OFF",
-                    style: TextStyle(
+                    style: GoogleFonts.inter(
                       color: task.isActive ? Colors.green : AppColors.slateGray,
                       fontWeight: FontWeight.bold,
                     ),
@@ -501,10 +505,13 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+          Text(
+            label,
+            style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 14),
+          ),
           Text(
             value,
-            style: TextStyle(
+            style: GoogleFonts.inter(
               fontWeight: FontWeight.bold,
               color: valueColor ?? Colors.black,
               fontSize: 14,

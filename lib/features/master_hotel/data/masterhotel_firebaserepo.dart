@@ -28,6 +28,16 @@ class MasterHotelFirebaseRepo extends MasterHotelTaskRepo {
         .update(masterHotel.toJson());
   }
 
+  Future<void> updateMasterHotelTaskCount(
+    String docId,
+    int totalMasterTasks,
+  ) async {
+    print("totalMasterTasks $totalMasterTasks");
+    await masterHotelCollectionRef.doc(docId).update({
+      'totalMasterTasks': totalMasterTasks,
+    });
+  }
+
   @override
   Future<void> updateStatusOfMasterHotel(String docId, bool isActive) async {
     await masterHotelCollectionRef.doc(docId).update({'isActive': isActive});

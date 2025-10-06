@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/features/subscription/domain/model/subscription_model.dart';
@@ -28,7 +29,7 @@ class SubscriptionPlanCard extends StatelessWidget {
             children: [
               Text(
                 plan.title,
-                style: const TextStyle(
+                style: GoogleFonts.inter(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
@@ -58,17 +59,20 @@ class SubscriptionPlanCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           CupertinoIcons.delete,
                           size: 16,
                           color: Colors.red,
                         ),
-                        SizedBox(width: 8),
-                        Text('Delete', style: TextStyle(color: Colors.red)),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Delete',
+                          style: GoogleFonts.inter(color: Colors.red),
+                        ),
                       ],
                     ),
                   ),
@@ -84,9 +88,9 @@ class SubscriptionPlanCard extends StatelessWidget {
               children: [
                 TextSpan(
                   children: [
-                    const TextSpan(
+                    TextSpan(
                       text: "\$",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -95,15 +99,15 @@ class SubscriptionPlanCard extends StatelessWidget {
 
                     TextSpan(
                       text: plan.price['monthly']?.toStringAsFixed(0) ?? '0',
-                      style: const TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                       ),
                     ),
-                    const TextSpan(
+                    TextSpan(
                       text: " /month",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 15,
                         color: AppColors.slateGray,
                         fontWeight: FontWeight.w400,
@@ -119,7 +123,7 @@ class SubscriptionPlanCard extends StatelessWidget {
           // Description
           Text(
             plan.desc,
-            style: const TextStyle(fontSize: 13, color: AppColors.slateGray),
+            style: GoogleFonts.inter(fontSize: 13, color: AppColors.slateGray),
           ),
           const SizedBox(height: 24),
 
@@ -131,16 +135,16 @@ class SubscriptionPlanCard extends StatelessWidget {
                   children: [
                     Text(
                       "${plan.totalSubScribers}",
-                      style: const TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                       ),
                     ),
                     // const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       "Subscribers",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 13,
                         color: AppColors.slateGray,
                       ),
@@ -153,16 +157,16 @@ class SubscriptionPlanCard extends StatelessWidget {
                   children: [
                     Text(
                       "\$${plan.totalRevenue.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}",
-                      style: const TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                       ),
                     ),
                     // const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       "Revenue",
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 13,
                         color: AppColors.slateGray,
                       ),
@@ -186,7 +190,7 @@ class SubscriptionPlanCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   "Up to ${plan.maxRooms} rooms per hotels",
-                  style: TextStyle(
+                  style: GoogleFonts.inter(
                     fontSize: 13.8,
                     color: AppColors.primary,
                     fontWeight: FontWeight.w500,
@@ -211,7 +215,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       feature,
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 13.8,
                         color: AppColors.primary,
                         fontWeight: FontWeight.w500,
@@ -239,7 +243,7 @@ class SubscriptionPlanCard extends StatelessWidget {
             ),
             child: Text(
               plan.isActive ? "Active" : "Inactive",
-              style: TextStyle(
+              style: GoogleFonts.inter(
                 color: plan.isActive ? Color(0xff35c662) : Colors.red,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -264,22 +268,6 @@ class SubscriptionPlanCard extends StatelessWidget {
       return CupertinoIcons.checkmark;
     } else {
       return CupertinoIcons.xmark;
-    }
-  }
-
-  Color _getFeatureColor(String feature) {
-    if (_isFeatureIncluded(feature)) {
-      return Colors.green;
-    } else {
-      return AppColors.slateGray;
-    }
-  }
-
-  Color _getFeatureTextColor(String feature) {
-    if (_isFeatureIncluded(feature)) {
-      return AppColors.primary;
-    } else {
-      return AppColors.slateGray;
     }
   }
 
@@ -332,7 +320,7 @@ class EnhancedSubscriptionPlanCard extends StatelessWidget {
               children: [
                 Text(
                   plan.title,
-                  style: const TextStyle(
+                  style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
@@ -359,15 +347,15 @@ class EnhancedSubscriptionPlanCard extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: "\$${plan.price['monthly']?.toInt() ?? 0}",
-                    style: const TextStyle(
+                    style: GoogleFonts.inter(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
-                  const TextSpan(
+                  TextSpan(
                     text: " /month",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    style: GoogleFonts.inter(fontSize: 16, color: Colors.grey),
                   ),
                 ],
               ),
@@ -377,7 +365,7 @@ class EnhancedSubscriptionPlanCard extends StatelessWidget {
             // Description
             Text(
               plan.desc,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: GoogleFonts.inter(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 32),
 
@@ -389,15 +377,18 @@ class EnhancedSubscriptionPlanCard extends StatelessWidget {
                     children: [
                       Text(
                         "${plan.totalSubScribers}",
-                        style: const TextStyle(
+                        style: GoogleFonts.inter(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
-                      const Text(
+                      Text(
                         "Subscribers",
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -407,15 +398,18 @@ class EnhancedSubscriptionPlanCard extends StatelessWidget {
                     children: [
                       Text(
                         "\$${_formatNumber(plan.totalRevenue)}",
-                        style: const TextStyle(
+                        style: GoogleFonts.inter(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
                         ),
                       ),
-                      const Text(
+                      Text(
                         "Revenue",
-                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -443,7 +437,7 @@ class EnhancedSubscriptionPlanCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         feature,
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           fontSize: 14,
                           color: isIncluded ? Colors.black87 : Colors.grey,
                         ),
@@ -462,9 +456,9 @@ class EnhancedSubscriptionPlanCard extends StatelessWidget {
                 color: Colors.green.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
+              child: Text(
                 "Active",
-                style: TextStyle(
+                style: GoogleFonts.inter(
                   color: Colors.green,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,

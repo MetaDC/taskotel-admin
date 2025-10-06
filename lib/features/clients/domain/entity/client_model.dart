@@ -9,7 +9,7 @@ class ClientStatus {
 }
 
 class ClientModel {
-  final String docId; // Firestore document ID
+  String docId; // Firestore document ID
   final String name;
   final String email;
   final String phone;

@@ -46,9 +46,10 @@ exports.createUser = onCall(async (request) => {
         lastLogin: null,
         totalHotels: request.data.totalHotels,
         totalRevenue: request.data.totalRevenue,
+        isDeleted: false,
       });
       console.log("User Data saved Successfully");
-      return { success: true, msg: dbUser };
+      return { success: true, msg: dbUser, docId: user.uid };
     } catch (error) {
       console.log(
         `Failed to create user doc, need to delete this user again ${error}!`

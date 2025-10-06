@@ -24,7 +24,7 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
 
   // Load subscription plans stream
   Future<void> loadSubscriptionPlans() async {
-    emit(state.copyWith(isLoading: true, message: null));
+    emit(state.copyWith(isLoading: true, message: ""));
     _subscriptionStream?.cancel();
 
     try {

@@ -21,7 +21,7 @@ class TableConfig {
 
   // Action column widths
   static const double viewColumnWidth = 100.0;
-  static const double actionColumnWidth = 50.0;
+  static const double actionColumnWidth = 80.0;
 
   // Border decoration
   static BoxDecoration getRowBorder() {

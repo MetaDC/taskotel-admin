@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
@@ -80,10 +81,13 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
                 if (state.isLoading)
                   const Center(child: CircularProgressIndicator())
                 else if (state.filteredPlans.isEmpty)
-                  const Center(
+                  Center(
                     child: Text(
                       "No subscription plans found",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      ),
                     ),
                   )
                 else
@@ -311,7 +315,7 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
                 plan.docId,
               );
             },
-            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            child: Text("Delete", style: GoogleFonts.inter(color: Colors.red)),
           ),
         ],
       ),

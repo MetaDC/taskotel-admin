@@ -15,7 +15,7 @@ class MasterHotelCubit extends Cubit<MasterhotelState> {
   StreamSubscription<List<MasterHotelModel>>? masterHotelsStream;
 
   void fetchMasterHotels() async {
-    emit(state.copyWith(isLoading: true));
+    emit(state.copyWith(isLoading: true, message: ""));
     masterHotelsStream?.cancel();
     try {
       masterHotelsStream = masterHotelRepo.getMasterHotelsStream().listen((
@@ -33,10 +33,13 @@ class MasterHotelCubit extends Cubit<MasterhotelState> {
     masterHotelRepo.updateStatusOfMasterHotel(docId, isActive);
   }
 
-  void deleteMasterHotel(String docId) {
+  void deleteMasterHotel(String docId) async {
     emit(state.copyWith(isLoading: true, message: null));
     masterHotelRepo.deleteMasterHotel(docId);
+    print("Hotel Deleted--${state.isLoading}");
+    await Future.delayed(Duration(milliseconds: 3000));
     emit(state.copyWith(isLoading: false, message: "Hotel Deleted"));
+    print("Hotel Loader--${state.isLoading}");
   }
 
   @override

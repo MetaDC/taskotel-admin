@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
@@ -123,9 +124,12 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Center(
-                child: const Text(
+                child:  Text(
                   "No Hotels Found",
-                  style: TextStyle(fontSize: 16, color: AppColors.slateGray),
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    color: AppColors.slateGray,
+                  ),
                 ),
               ),
             )

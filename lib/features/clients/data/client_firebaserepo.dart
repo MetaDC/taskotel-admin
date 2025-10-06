@@ -13,7 +13,7 @@ class ClientFirebaseRepo extends ClientRepo {
 
   // CRUD
   @override
-  Future<void> createAndRegisterClient(
+  Future<String> createAndRegisterClient(
     ClientModel client,
     String password,
   ) async {
@@ -34,6 +34,8 @@ class ClientFirebaseRepo extends ClientRepo {
 
       if (res.data?['success'] == false) {
         throw Exception(res.data?['msg']);
+      } else {
+        return res.data['docId'];
       }
     } catch (e) {
       throw Exception("Registration failed: $e");

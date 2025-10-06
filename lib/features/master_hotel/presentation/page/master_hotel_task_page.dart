@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
@@ -109,7 +110,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
         child: Text(
           state.getTabDisplayName(tab),
 
-          style: TextStyle(
+          style: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.bold,
             color: isSelected ? Color(0xff040917) : AppColors.slateGray,
@@ -368,21 +369,26 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
                               SizedBox(width: 8),
                               Text(
                                 'Delete',
-                                style: TextStyle(color: Colors.red),
+                                style: GoogleFonts.inter(color: Colors.red),
                               ),
                             ],
                           ),
                           onTap: () {
-                            showConfirmDeletDialog(
-                              context,
-                              () {
+                            showConfirmDeletDialog<
+                              MasterhotelTaskCubit,
+                              MasterhotelTaskState
+                            >(
+                              context: context,
+                              onBtnTap: () {
                                 context.read<MasterhotelTaskCubit>().deleteTask(
                                   task.docId,
                                 );
                               },
-                              "Delete Task",
-                              "Are you sure you want to delete this task ?",
-                              "Delete",
+                              title: "Delete Task",
+                              message:
+                                  "Are you sure you want to delete this task?",
+                              btnText: "Delete",
+                              isLoadingSelector: (state) => state.isLoading,
                             );
                           },
                         ),

@@ -1,15 +1,78 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
+import 'package:fl_chart/fl_chart.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
   @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  String selectedYear = '2024';
+
+  // TODO: Replace this with actual database data
+  // This structure makes it easy to swap with API/DB data
+  Map<String, List<MonthlyRevenue>> getRevenueData() {
+    return {
+      '2024': [
+        MonthlyRevenue(month: 'Jan', revenue: 45000),
+        MonthlyRevenue(month: 'Feb', revenue: 52000),
+        MonthlyRevenue(month: 'Mar', revenue: 48000),
+        MonthlyRevenue(month: 'Apr', revenue: 62000),
+        MonthlyRevenue(month: 'May', revenue: 55000),
+        MonthlyRevenue(month: 'Jun', revenue: 68000),
+        MonthlyRevenue(month: 'Jul', revenue: 70000),
+        MonthlyRevenue(month: 'Aug', revenue: 75000),
+        MonthlyRevenue(month: 'Sep', revenue: 78000),
+        MonthlyRevenue(month: 'Oct', revenue: 82000),
+        MonthlyRevenue(month: 'Nov', revenue: 88000),
+        MonthlyRevenue(month: 'Dec', revenue: 95000),
+      ],
+      '2023': [
+        MonthlyRevenue(month: 'Jan', revenue: 38000),
+        MonthlyRevenue(month: 'Feb', revenue: 42000),
+        MonthlyRevenue(month: 'Mar', revenue: 40000),
+        MonthlyRevenue(month: 'Apr', revenue: 48000),
+        MonthlyRevenue(month: 'May', revenue: 45000),
+        MonthlyRevenue(month: 'Jun', revenue: 52000),
+        MonthlyRevenue(month: 'Jul', revenue: 55000),
+        MonthlyRevenue(month: 'Aug', revenue: 58000),
+        MonthlyRevenue(month: 'Sep', revenue: 62000),
+        MonthlyRevenue(month: 'Oct', revenue: 65000),
+        MonthlyRevenue(month: 'Nov', revenue: 68000),
+        MonthlyRevenue(month: 'Dec', revenue: 72000),
+      ],
+      '2022': [
+        MonthlyRevenue(month: 'Jan', revenue: 32000),
+        MonthlyRevenue(month: 'Feb', revenue: 35000),
+        MonthlyRevenue(month: 'Mar', revenue: 33000),
+        MonthlyRevenue(month: 'Apr', revenue: 38000),
+        MonthlyRevenue(month: 'May', revenue: 36000),
+        MonthlyRevenue(month: 'Jun', revenue: 42000),
+        MonthlyRevenue(month: 'Jul', revenue: 45000),
+        MonthlyRevenue(month: 'Aug', revenue: 48000),
+        MonthlyRevenue(month: 'Sep', revenue: 50000),
+        MonthlyRevenue(month: 'Oct', revenue: 52000),
+        MonthlyRevenue(month: 'Nov', revenue: 55000),
+        MonthlyRevenue(month: 'Dec', revenue: 58000),
+      ],
+    };
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final revenueData = getRevenueData();
+    final currentYearData = revenueData[selectedYear] ?? [];
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 25),
       child: Column(
@@ -55,26 +118,140 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Revenue Overview - Use regular Container instead of StaggeredGridTile
+          // Revenue Overview
           CustomContainer(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Revenue Overview",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Left section: Heading & Subheading
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Revenue Overview",
+                          style: GoogleFonts.inter(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Monthly revenue performance",
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: const Color(0xFF64748B), // Slate-500
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    Wrap(
+                      children: [
+                        // Year Dropdown
+                        Container(
+                          height: 39,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          margin: const EdgeInsets.only(right: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.blueGreyBorder),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: DropdownButton<String>(
+                            value: selectedYear,
+                            underline: const SizedBox(),
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textBlackColor,
+                            ),
+                            items: ['2024', '2023', '2022'].map((String year) {
+                              return DropdownMenuItem<String>(
+                                value: year,
+                                child: Text(
+                                  year,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                setState(() {
+                                  selectedYear = newValue;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+
+                        // View All Button
+                        ElevatedButton.icon(
+                          label: const Text("Reports"),
+                          icon: const Icon(CupertinoIcons.chart_bar_square),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.resolveWith<Color>((
+                                  Set<WidgetState> states,
+                                ) {
+                                  if (states.contains(WidgetState.hovered)) {
+                                    return Colors.blue;
+                                  }
+                                  return const Color(0xFFFAFAFA);
+                                }),
+                            foregroundColor:
+                                WidgetStateProperty.resolveWith<Color>((
+                                  Set<WidgetState> states,
+                                ) {
+                                  if (states.contains(WidgetState.hovered)) {
+                                    return Colors.white;
+                                  }
+                                  return AppColors.textBlackColor;
+                                }),
+                            elevation: WidgetStateProperty.all(0),
+                            padding: WidgetStateProperty.all(
+                              const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 18,
+                              ),
+                            ),
+                            side: WidgetStateProperty.all(
+                              BorderSide(color: AppColors.blueGreyBorder),
+                            ),
+                            textStyle: WidgetStateProperty.all(
+                              GoogleFonts.inter(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            shape: WidgetStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            context.go(Routes.reports);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 1),
-                const Text(
-                  "Monthly revenue performance",
-                  style: TextStyle(fontSize: 14, color: Color(0xff64748b)),
-                ),
-                const SizedBox(height: 16),
-                Container(
+                const SizedBox(height: 24),
+
+                // Chart widget
+                SizedBox(
                   height: 300,
-                  width: double.infinity,
-                  // color: Colors.grey[200],
-                  child: const Center(child: Text("Revenue Chart Here")),
+                  child: RevenueChart(data: currentYearData),
                 ),
               ],
             ),
@@ -82,7 +259,7 @@ class DashboardPage extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Unsubscribed / Not Renewed - Use regular Container instead of StaggeredGridTile
+          // Unsubscribed / Not Renewed
           CustomContainer(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,33 +267,32 @@ class DashboardPage extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Icon(
+                          const Icon(
                             CupertinoIcons.person_2,
                             color: Color(0xff64748b),
                             size: 24,
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   "Unsubscribed / Not Renewed",
-                                  style: TextStyle(
+                                  style: GoogleFonts.inter(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                // SizedBox(height: 4),
                                 Text(
                                   "Clients who registered but haven't subscribed or renewed",
-                                  style: TextStyle(
+                                  style: GoogleFonts.inter(
                                     fontSize: 13,
-                                    color: Color(0xff64748b),
+                                    color: const Color(0xff64748b),
                                     fontWeight: FontWeight.w500,
                                   ),
                                   softWrap: true,
@@ -126,10 +302,10 @@ class DashboardPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 18),
+                      const SizedBox(height: 18),
                       Text(
                         "147 clients",
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
                           color: Colors.red,
@@ -137,39 +313,210 @@ class DashboardPage extends StatelessWidget {
                       ),
                       Text(
                         "Lost clients this month",
-                        style: TextStyle(
+                        style: GoogleFonts.inter(
                           fontSize: 14,
-                          color: Color(0xff64748b),
+                          color: const Color(0xff64748b),
                         ),
                       ),
                     ],
                   ),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xfafafa),
-                    foregroundColor: AppColors.textBlackColor,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 18,
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.resolveWith<Color>((
+                      Set<WidgetState> states,
+                    ) {
+                      if (states.contains(WidgetState.hovered)) {
+                        return Colors.blue; // Background on hover
+                      }
+                      return const Color(0xFFFAFAFA); // Default background
+                    }),
+                    foregroundColor: WidgetStateProperty.resolveWith<Color>((
+                      Set<WidgetState> states,
+                    ) {
+                      if (states.contains(WidgetState.hovered)) {
+                        return Colors.white; // Text color on hover
+                      }
+                      return AppColors.textBlackColor; // Default text color
+                    }),
+                    elevation: WidgetStateProperty.all(0),
+                    padding: WidgetStateProperty.all(
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
                     ),
-                    side: BorderSide(color: AppColors.blueGreyBorder),
-                    textStyle: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                    side: WidgetStateProperty.all(
+                      BorderSide(color: AppColors.blueGreyBorder),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
+                    textStyle: WidgetStateProperty.all(
+                      GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    shape: WidgetStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    context.go(Routes.clients);
+                  },
                   child: const Text("View All"),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Data model for monthly revenue
+class MonthlyRevenue {
+  final String month;
+  final double revenue;
+
+  MonthlyRevenue({required this.month, required this.revenue});
+
+  // Factory constructor for easy database/API integration
+  factory MonthlyRevenue.fromJson(Map<String, dynamic> json) {
+    return MonthlyRevenue(
+      month: json['month'] as String,
+      revenue: (json['revenue'] as num).toDouble(),
+    );
+  }
+}
+
+// Revenue Chart Widget
+class RevenueChart extends StatelessWidget {
+  final List<MonthlyRevenue> data;
+
+  const RevenueChart({super.key, required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    if (data.isEmpty) {
+      return const Center(child: Text('No data available'));
+    }
+
+    final maxRevenue = data
+        .map((e) => e.revenue)
+        .reduce((a, b) => a > b ? a : b);
+    final minRevenue = data
+        .map((e) => e.revenue)
+        .reduce((a, b) => a < b ? a : b);
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 16, top: 16),
+      child: LineChart(
+        LineChartData(
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: 25000,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(color: const Color(0xffe2e8f0), strokeWidth: 1);
+            },
+          ),
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 60,
+                interval: 25000,
+                getTitlesWidget: (value, meta) {
+                  return Text(
+                    '\$${(value / 1000).toStringAsFixed(0)}k',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: const Color(0xff64748b),
+                    ),
+                  );
+                },
+              ),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 30,
+                interval: 1,
+                getTitlesWidget: (value, meta) {
+                  final index = value.toInt();
+                  if (index >= 0 && index < data.length) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        data[index].month,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: const Color(0xff64748b),
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ),
+          borderData: FlBorderData(show: false),
+          minX: 0,
+          maxX: (data.length - 1).toDouble(),
+          minY: 0,
+          maxY: (maxRevenue * 1.1).ceilToDouble(),
+          lineBarsData: [
+            LineChartBarData(
+              spots: data.asMap().entries.map((entry) {
+                return FlSpot(entry.key.toDouble(), entry.value.revenue);
+              }).toList(),
+              isCurved: true,
+              color: const Color(0xff3b82f6),
+              barWidth: 3,
+              isStrokeCapRound: true,
+              dotData: FlDotData(
+                show: true,
+                getDotPainter: (spot, percent, barData, index) {
+                  return FlDotCirclePainter(
+                    radius: 4,
+                    color: const Color(0xff3b82f6),
+                    strokeWidth: 2,
+                    strokeColor: Colors.white,
+                  );
+                },
+              ),
+              belowBarData: BarAreaData(
+                show: true,
+                color: const Color(0xff3b82f6).withOpacity(0.1),
+              ),
+            ),
+          ],
+          lineTouchData: LineTouchData(
+            touchTooltipData: LineTouchTooltipData(
+              tooltipBorder: const BorderSide(color: Color(0xffe2e8f0)),
+              tooltipRoundedRadius: 8,
+              getTooltipItems: (touchedSpots) {
+                return touchedSpots.map((spot) {
+                  return LineTooltipItem(
+                    '\$${spot.y.toStringAsFixed(0)}',
+                    GoogleFonts.inter(
+                      color: const Color(0xff3b82f6),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  );
+                }).toList();
+              },
+            ),
+            handleBuiltInTouches: true,
+          ),
+        ),
       ),
     );
   }

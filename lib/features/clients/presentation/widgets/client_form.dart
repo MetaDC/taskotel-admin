@@ -132,7 +132,7 @@ class _ClientFormModalState extends State<ClientFormModal> {
         const SizedBox(height: 16),
 
         CustomTextField(
-          title: "Full Name",
+          title: "Full Name *",
           hintText: "Enter full name",
           prefixIcon: CupertinoIcons.person,
           controller: cubit.nameController,
@@ -141,9 +141,9 @@ class _ClientFormModalState extends State<ClientFormModal> {
         const SizedBox(height: 16),
 
         IgnorePointer(
-          ignoring: true,
+          ignoring: widget.clientToEdit != null,
           child: CustomTextField(
-            title: "Email",
+            title: "Email *",
             hintText: "Enter email",
             prefixIcon: CupertinoIcons.mail,
             controller: cubit.emailController,
@@ -153,7 +153,7 @@ class _ClientFormModalState extends State<ClientFormModal> {
         const SizedBox(height: 16),
 
         CustomTextField(
-          title: "Phone Number",
+          title: "Phone Number *",
           hintText: "Enter phone number",
           controller: cubit.phoneController,
           prefixIcon: CupertinoIcons.phone,
