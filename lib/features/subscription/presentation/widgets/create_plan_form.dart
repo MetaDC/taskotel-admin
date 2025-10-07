@@ -130,14 +130,14 @@ class CreatePlanForm extends StatelessWidget {
         const SizedBox(height: 16),
         CustomTextField(
           controller: cubit.titleController,
-          title: "Plan Title",
+          title: "Plan Title *",
           hintText: "Enter plan title",
           validator: true,
         ),
         const SizedBox(height: 16),
         CustomTextField(
           controller: cubit.descController,
-          title: "Description",
+          title: "Description *",
           hintText: "Enter plan description",
           validator: true,
         ),
@@ -156,7 +156,7 @@ class CreatePlanForm extends StatelessWidget {
             Expanded(
               child: CustomNumTextField(
                 controller: cubit.minRoomsController,
-                title: "Min Rooms",
+                title: "Min Rooms *",
                 hintText: "1",
               ),
             ),
@@ -164,7 +164,7 @@ class CreatePlanForm extends StatelessWidget {
             Expanded(
               child: CustomNumTextField(
                 controller: cubit.maxRoomsController,
-                title: "Max Rooms",
+                title: "Max Rooms *",
                 hintText: "100",
               ),
             ),
@@ -185,7 +185,7 @@ class CreatePlanForm extends StatelessWidget {
             Expanded(
               child: CustomTextField(
                 controller: cubit.monthlyPriceController,
-                title: "Monthly Price (\$)",
+                title: "Monthly Price (\$) *",
                 hintText: "29.99",
                 validator: true,
               ),
@@ -194,7 +194,7 @@ class CreatePlanForm extends StatelessWidget {
             Expanded(
               child: CustomTextField(
                 controller: cubit.yearlyPriceController,
-                title: "Yearly Price (\$)",
+                title: "Yearly Price (\$) *",
                 hintText: "299.99",
                 validator: true,
               ),
@@ -212,7 +212,7 @@ class CreatePlanForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Features", style: AppTextStyles.textFieldTitle),
+        Text("Features *", style: AppTextStyles.textFieldTitle),
         const SizedBox(height: 16),
         Row(
           children: [

@@ -159,6 +159,7 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Initialize active clients pagination
   Future<void> initializeActiveClientsPagination() async {
+    searchController.clear();
     // Don't re-initialize if we already have data and we're on the active tab
     if (state.activeClients.isNotEmpty &&
         state.selectedTab == ClientTab.active) {
@@ -207,6 +208,7 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Initialize lost clients pagination
   Future<void> initializeLostClientsPagination() async {
+    searchController.clear();
     // Don't re-initialize if we already have data and we're on the lost tab
     if (state.lostClients.isNotEmpty && state.selectedTab == ClientTab.lost) {
       // Just update the filtered clients to show the current page

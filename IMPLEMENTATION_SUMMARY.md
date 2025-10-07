@@ -186,6 +186,133 @@ BlocConsumer<MasterTaskFormCubit, MasterTaskFormState>(
 
 ---
 
+## ✅ **Dialog Auto-Close & Master Hotel Task Count Updates**
+
+### Issues Fixed
+
+#### 1. **Dialog Not Closing on Delete** ✅
+
+**Problem**: Confirmation dialogs were not closing automatically after successful deletion operations.
+
+**Solution**: Enhanced `showConfirmDeletDialog` function:
+
+- Added `BlocConsumer` instead of `BlocBuilder` for state listening
+- Added optional `successMessageSelector` parameter
+- Dialog automatically closes when operation completes successfully
+- Shows success SnackBar message
+- Updated all dialog usages to include success message selector
+
+**Files Modified**:
+
+- `lib/core/utils/helpers.dart` - Enhanced dialog function
+- `lib/features/master_hotel/presentation/page/master_hotel_task_page.dart` - Added success selector
+- `lib/features/master_hotel/presentation/page/master_hotels_page.dart` - Added success selector
+
+#### 2. **Master Hotel totalMasterTasks Count Updates** ✅
+
+**Problem**: The `totalMasterTasks` field in `MasterHotelModel` was not being updated when importing or deleting master tasks.
+
+**Solution**: Implemented automatic task count updates:
+
+- Added `_updateMasterHotelTaskCount()` helper method in both cubits
+- Updates count after importing tasks from Excel
+- Updates count after deleting individual tasks
+- Updates count after creating new individual tasks
+- Uses existing `updateMasterHotelTaskCount()` method in repository
+
+**Implementation Details**:
+
+```dart
+// Helper method to update master hotel task count
+Future<void> _updateMasterHotelTaskCount(String masterHotelId) async {
+  try {
+    // Get all tasks for this hotel
+    final allTasksSnapshot = await FBFireStore.tasks
+        .where('hotelId', isEqualTo: masterHotelId)
+        .get();
+
+    final totalTasks = allTasksSnapshot.docs.length;
+
+    // Update the master hotel document
+    await masterHotelRepo.updateMasterHotelTaskCount(masterHotelId, totalTasks);
+  } catch (e) {
+    print('Error updating master hotel task count: $e');
+  }
+}
+```
+
+**Files Modified**:
+
+- `lib/features/master_hotel/presentation/cubit/master-task/master_task_form_cubit.dart`
+  - Added `_updateMasterHotelTaskCount()` method
+  - Updates count after Excel import
+  - Updates count after single task creation
+- `lib/features/master_hotel/presentation/cubit/master-task/masterhotel_task_cubit.dart`
+  - Added `_updateMasterHotelTaskCount()` method
+  - Updates count after task deletion
+  - Added Firebase import
+
+### Enhanced Dialog Function
+
+**New Signature**:
+
+```dart
+Future<void> showConfirmDeletDialog<T extends Cubit<S>, S>({
+  required BuildContext context,
+  required VoidCallback onBtnTap,
+  required String title,
+  required String message,
+  required String btnText,
+  required bool Function(S) isLoadingSelector,
+  String Function(S)? successMessageSelector, // 👈 NEW: Optional success selector
+})
+```
+
+**Usage Example**:
+
+```dart
+showConfirmDeletDialog<MasterhotelTaskCubit, MasterhotelTaskState>(
+  context: context,
+  onBtnTap: () {
+    context.read<MasterhotelTaskCubit>().deleteTask(task.docId);
+  },
+  title: "Delete Task",
+  message: "Are you sure you want to delete this task?",
+  btnText: "Delete",
+  isLoadingSelector: (state) => state.isLoading,
+  successMessageSelector: (state) => state.message ?? "", // 👈 NEW
+);
+```
+
+### Task Count Update Triggers
+
+**When `totalMasterTasks` Gets Updated**:
+
+1. **Excel Import** (`MasterTaskFormCubit.createMasterTasksFromExcel`)
+
+   - After all tasks are imported successfully
+   - Counts all tasks for the hotel and updates the master hotel document
+
+2. **Single Task Creation** (`MasterTaskFormCubit.submitForm`)
+
+   - After a new task is created (not when editing existing tasks)
+   - Counts all tasks for the hotel and updates the master hotel document
+
+3. **Task Deletion** (`MasterhotelTaskCubit.deleteTask`)
+   - After a task is successfully deleted
+   - Gets hotel ID from the task before deletion
+   - Counts remaining tasks and updates the master hotel document
+
+### Benefits
+
+1. **Accurate Counts**: Master hotel always shows correct number of tasks
+2. **Real-time Updates**: Count updates immediately after operations
+3. **Better UX**: Dialogs close automatically with success feedback
+4. **Consistent Behavior**: All delete dialogs now behave the same way
+5. **Error Handling**: Graceful handling if count update fails
+
+---
+
 ## 🎉 Complete Implementation of Transaction Pagination Fix & Reports Page
 
 ### ✅ Issues Fixed

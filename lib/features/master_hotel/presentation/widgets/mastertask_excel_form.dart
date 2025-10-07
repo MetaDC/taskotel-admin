@@ -126,7 +126,7 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Step 1: Select User Category",
+          "Step 1: Select User Category ",
           style: AppTextStyles.textFieldTitle.copyWith(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -139,7 +139,7 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         CustomDropDownField(
-          title: "User Category",
+          title: "User Category *",
           hintText: "Select user category",
           initialValue: state.selectedCategory,
           validatorText: "Please select a user category",
@@ -296,7 +296,7 @@ class MasterTaskExcelFormScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Upload Excel File",
+                "Upload Excel File *",
                 style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

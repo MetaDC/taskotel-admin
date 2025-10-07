@@ -318,6 +318,8 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                               "Are you sure you want to delete this hotel master?",
                           btnText: "Delete",
                           isLoadingSelector: (state) => state.isLoading,
+                          successMessageSelector: (state) =>
+                              state.message ?? "",
                         );
                       },
                     ),

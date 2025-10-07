@@ -228,6 +228,8 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
         await masterHotelRepo.updateTaskForHotel(taskToEdit.docId, task);
       } else {
         await masterHotelRepo.createTaskForHotel(task);
+        // Update master hotel task count for new tasks
+        await _updateMasterHotelTaskCount(masterHotelId);
       }
 
       emit(state.copyWith(isCreating: false, isSuccess: true));
@@ -360,6 +362,9 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
         }
       }
 
+      // Update master hotel task count
+      await _updateMasterHotelTaskCount(masterHotelId);
+
       emit(state.copyWith(isCreating: false, isSuccess: true));
 
       // Navigate back or show success message
@@ -373,6 +378,26 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
           errorMessage: 'Failed to import tasks: ${e.toString()}',
         ),
       );
+    }
+  }
+
+  // Helper method to update master hotel task count
+  Future<void> _updateMasterHotelTaskCount(String masterHotelId) async {
+    try {
+      // Get all tasks for this hotel
+      final allTasksSnapshot = await FBFireStore.tasks
+          .where('hotelId', isEqualTo: masterHotelId)
+          .get();
+
+      final totalTasks = allTasksSnapshot.docs.length;
+
+      // Update the master hotel document
+      await masterHotelRepo.updateMasterHotelTaskCount(
+        masterHotelId,
+        totalTasks,
+      );
+    } catch (e) {
+      print('Error updating master hotel task count: $e');
     }
   }
 

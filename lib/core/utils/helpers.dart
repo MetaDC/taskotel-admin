@@ -18,12 +18,33 @@ Future<void> showConfirmDeletDialog<T extends Cubit<S>, S>({
   required String message,
   required String btnText,
   required bool Function(S) isLoadingSelector, // 👈 selector for loading state
+  String Function(S)?
+  successMessageSelector, // 👈 optional success message selector
 }) {
   return showDialog(
     context: context,
     barrierDismissible: false,
     builder: (dialogContext) {
-      return BlocBuilder<T, S>(
+      return BlocConsumer<T, S>(
+        listener: (context, state) {
+          // Check if operation completed successfully
+          if (!isLoadingSelector(state) && successMessageSelector != null) {
+            final successMessage = successMessageSelector(state);
+            if (successMessage.isNotEmpty) {
+              // Close dialog on success
+              Navigator.of(dialogContext).pop();
+
+              // Show success message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(successMessage),
+                  backgroundColor: Colors.green,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            }
+          }
+        },
         builder: (context, state) {
           final isLoading = isLoadingSelector(state);
 

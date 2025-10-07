@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
+import 'package:taskoteladmin/core/services/firebase.dart';
 import 'package:taskoteladmin/features/master_hotel/domain/entity/masterhotel_model.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -91,10 +92,46 @@ class MasterhotelTaskCubit extends Cubit<MasterhotelTaskState> {
     masterHotelRepo.updateTaskForHotel(task.docId, task);
   }
 
-  void deleteTask(String taskId) {
+  void deleteTask(String taskId) async {
     emit(state.copyWith(isLoading: true, message: null));
-    masterHotelRepo.deleteTask(taskId);
-    emit(state.copyWith(isLoading: false, message: "Task Deleted"));
+
+    try {
+      // Get the task to find the hotel ID before deleting
+      final taskDoc = await FBFireStore.tasks.doc(taskId).get();
+      final hotelId = taskDoc.data()?['hotelId'] as String?;
+
+      // Delete the task
+      await masterHotelRepo.deleteTask(taskId);
+
+      // Update master hotel task count if hotelId exists
+      if (hotelId != null) {
+        await _updateMasterHotelTaskCount(hotelId);
+      }
+
+      emit(state.copyWith(isLoading: false, message: "Task Deleted"));
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, message: "Failed to delete task"));
+    }
+  }
+
+  // Helper method to update master hotel task count
+  Future<void> _updateMasterHotelTaskCount(String masterHotelId) async {
+    try {
+      // Get all tasks for this hotel
+      final allTasksSnapshot = await FBFireStore.tasks
+          .where('hotelId', isEqualTo: masterHotelId)
+          .get();
+
+      final totalTasks = allTasksSnapshot.docs.length;
+
+      // Update the master hotel document
+      await masterHotelRepo.updateMasterHotelTaskCount(
+        masterHotelId,
+        totalTasks,
+      );
+    } catch (e) {
+      print('Error updating master hotel task count: $e');
+    }
   }
 
   Future<void> exportTasksToExcel(List<CommonTaskModel> filteredTasks) async {

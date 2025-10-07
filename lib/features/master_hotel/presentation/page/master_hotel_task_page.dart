@@ -389,6 +389,8 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
                                   "Are you sure you want to delete this task?",
                               btnText: "Delete",
                               isLoadingSelector: (state) => state.isLoading,
+                              successMessageSelector: (state) =>
+                                  state.message ?? "",
                             );
                           },
                         ),

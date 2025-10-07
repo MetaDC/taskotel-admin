@@ -70,7 +70,13 @@ class _TransactionsPageState extends State<TransactionsPage> {
                       const SizedBox(height: 20),
 
                       //if items are more than 10 show pagination
-                      if (state.totalPages > 1) _buildPagination(state),
+                      if (state.totalPages > 1 &&
+                          context
+                              .read<TransactionCubit>()
+                              .state
+                              .searchQuery
+                              .isEmpty)
+                        _buildPagination(state),
                     ],
                   ),
                 ),
