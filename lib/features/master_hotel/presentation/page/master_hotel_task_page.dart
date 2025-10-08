@@ -188,6 +188,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
             ),
           ),
         ),
+
         SizedBox(width: 12),
         IconButton(
           onPressed: () {
