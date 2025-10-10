@@ -242,7 +242,7 @@ class LoginPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      constraints: const BoxConstraints(maxWidth: 480),
+                      constraints: const BoxConstraints(maxWidth: 600),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -251,14 +251,15 @@ class LoginPage extends StatelessWidget {
                             width: double.infinity,
                             padding: const EdgeInsets.all(48),
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  AppColors.primary,
-                                  AppColors.primary.withValues(alpha: 0.8),
-                                ],
-                              ),
+                              // gradient: LinearGradient(
+                              //   begin: Alignment.topLeft,
+                              //   end: Alignment.bottomRight,
+                              //   colors: [
+                              //     AppColors.primary,
+                              //     AppColors.primary.withValues(alpha: 1),
+                              //   ],
+                              // ),
+                              color: AppColors.primary.withValues(alpha: 0.7),
                               borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(24),
                                 topRight: Radius.circular(24),

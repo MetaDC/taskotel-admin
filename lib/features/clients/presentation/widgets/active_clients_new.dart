@@ -300,8 +300,10 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                 ],
               ),
               Divider(height: 24, color: AppColors.blueGreyBorder),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Wrap(
+                spacing: 5,
+                runSpacing: 5,
+                alignment: WrapAlignment.start,
                 children: [
                   _buildInfoChip(
                     CupertinoIcons.building_2_fill,

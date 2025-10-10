@@ -21,7 +21,7 @@ class AuthTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 430,
+      // width: 430,
       child: TextFormField(
         onFieldSubmitted: (value) {
           if (onSubmit != null) {
