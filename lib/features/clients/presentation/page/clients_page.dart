@@ -34,7 +34,10 @@ class _ClientsPageState extends State<ClientsPage> {
     double spacing = isDesktop ? 15 : 8;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: 20,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

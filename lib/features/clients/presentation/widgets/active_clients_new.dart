@@ -102,76 +102,68 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
 
   // Mobile View
   Widget _buildMobileClientList(BuildContext context, ClientState state) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.blueGreyBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Active Clients List",
-            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: context.read<ClientCubit>().searchController,
-            decoration: InputDecoration(
-              fillColor: Color(0xfffafafa),
-              filled: true,
-              hintText: "Search clients...",
-              prefixIcon: const Icon(CupertinoIcons.search, size: 20),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: AppColors.blueGreyBorder),
-              ),
-              contentPadding: EdgeInsets.symmetric(vertical: 12),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Active Clients List",
+          style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 16),
+        TextField(
+          controller: context.read<ClientCubit>().searchController,
+          decoration: InputDecoration(
+            fillColor: Color(0xfffafafa),
+            filled: true,
+            hintText: "Search clients...",
+            prefixIcon: const Icon(CupertinoIcons.search, size: 20),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide(color: AppColors.blueGreyBorder),
             ),
-            onChanged: (value) {
-              context.read<ClientCubit>().searchClients(value);
-            },
+            contentPadding: EdgeInsets.symmetric(vertical: 12),
           ),
-          const SizedBox(height: 20),
-          if (state.isLoading && state.activeClients.isEmpty)
-            Center(child: CircularProgressIndicator())
-          else if (state.message != null &&
-              state.activeClients.isEmpty &&
-              state.message != "Client Deleted")
-            _buildErrorState(state.message!)
-          else if (state.filteredActiveClients.isEmpty)
-            _buildEmptyState()
-          else
-            Column(
-              children: [
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: ClampingScrollPhysics(),
-                  separatorBuilder: (context, index) => SizedBox(height: 12),
-                  itemCount: state.filteredActiveClients.length,
-                  itemBuilder: (context, index) {
-                    final client = state.filteredActiveClients[index];
-                    return _buildMobileClientCard(client);
+          onChanged: (value) {
+            context.read<ClientCubit>().searchClients(value);
+          },
+        ),
+        const SizedBox(height: 20),
+        if (state.isLoading && state.activeClients.isEmpty)
+          Center(child: CircularProgressIndicator())
+        else if (state.message != null &&
+            state.activeClients.isEmpty &&
+            state.message != "Client Deleted")
+          _buildErrorState(state.message!)
+        else if (state.filteredActiveClients.isEmpty)
+          _buildEmptyState()
+        else
+          Column(
+            children: [
+              ListView.separated(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                separatorBuilder: (context, index) => SizedBox(height: 12),
+                itemCount: state.filteredActiveClients.length,
+                itemBuilder: (context, index) {
+                  final client = state.filteredActiveClients[index];
+                  return _buildMobileClientCard(client);
+                },
+              ),
+              const SizedBox(height: 20),
+              if (state.activeTotalPages > 1 &&
+                  context.read<ClientCubit>().searchController.text.isEmpty)
+                DynamicPagination(
+                  currentPage: state.activeCurrentPage,
+                  totalPages: state.activeTotalPages,
+                  onPageChanged: (page) {
+                    context.read<ClientCubit>().fetchNextActiveClientsPage(
+                      page: page,
+                    );
                   },
                 ),
-                const SizedBox(height: 20),
-                if (state.activeTotalPages > 1 &&
-                    context.read<ClientCubit>().searchController.text.isEmpty)
-                  DynamicPagination(
-                    currentPage: state.activeCurrentPage,
-                    totalPages: state.activeTotalPages,
-                    onPageChanged: (page) {
-                      context.read<ClientCubit>().fetchNextActiveClientsPage(
-                        page: page,
-                      );
-                    },
-                  ),
-              ],
-            ),
-        ],
-      ),
+            ],
+          ),
+      ],
     );
   }
 

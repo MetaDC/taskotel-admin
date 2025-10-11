@@ -1,7 +1,3 @@
-// ============================================
-// MASTER HOTEL FORM - Modern & Responsive
-// ============================================
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -68,24 +64,24 @@ class _MasterHotelFormState extends State<MasterHotelForm> {
   ) {
     return Container(
       constraints: const BoxConstraints(maxWidth: 400),
-      height: MediaQuery.of(context).size.height * 0.9,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildHeader(context, cubit, state, isMobile: true),
-          Expanded(
+          Flexible(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Form(
                 key: cubit.formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildBasicInfoSection(cubit, state, isMobile: true),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     _buildBrandAssetsSection(cubit, state, isMobile: true),
                   ],
                 ),
@@ -106,15 +102,15 @@ class _MasterHotelFormState extends State<MasterHotelForm> {
   ) {
     return Container(
       constraints: const BoxConstraints(maxWidth: 650),
-      height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(16)),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildHeader(context, cubit, state),
-          Expanded(
+          Flexible(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: Form(
@@ -144,15 +140,15 @@ class _MasterHotelFormState extends State<MasterHotelForm> {
   ) {
     return Container(
       constraints: const BoxConstraints(maxWidth: 700),
-      height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(16)),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildHeader(context, cubit, state),
-          Expanded(
+          Flexible(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(28),
               child: Form(
