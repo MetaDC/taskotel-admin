@@ -7,8 +7,11 @@ import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:taskoteladmin/features/auth/presentation/cubit/auth_cubit.dart';
 
-class Navbar extends StatelessWidget {
+class Navbar extends StatelessWidget implements PreferredSizeWidget {
   const Navbar({super.key});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(60);
 
   // ---------------------------
   // Dynamic Nav Items List
@@ -38,7 +41,6 @@ class Navbar extends StatelessWidget {
       backgroundColor: const Color(0xFF1C1C1E),
       elevation: 0,
       titleSpacing: 20,
-
       title: Row(
         children: [
           logo(),
@@ -53,7 +55,7 @@ class Navbar extends StatelessWidget {
           ),
           const SizedBox(width: 30),
           // loop through navItems
-          ...navItems.map((item) => buildNavItem(context, item)).toList(),
+          ...navItems.map((item) => _NavItemWidget(item: item)).toList(),
           const Spacer(),
           _iconWithBadge(Icons.notifications, 0),
           const SizedBox(width: 20),
@@ -68,12 +70,7 @@ class Navbar extends StatelessWidget {
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: AppColors.secondary,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(8),
-          bottomLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
-          bottomRight: Radius.circular(8),
-        ),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         "T",
@@ -117,37 +114,6 @@ class Navbar extends StatelessWidget {
     );
   }
 
-  // ---------------------------
-  // Helper Widgets
-  // ---------------------------
-  Widget buildNavItem(BuildContext context, NavItem item) {
-    final currentRoute = GoRouterState.of(context).uri.toString();
-    final isActive =
-        currentRoute == item.route || currentRoute.startsWith("${item.route}/");
-
-    return GestureDetector(
-      onTap: () {
-        if (!isActive) context.go(item.route);
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isActive ? Color(0xff3c83f6) : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Text(
-          item.label,
-          style: GoogleFonts.inter(
-            color: Colors.white,
-            fontWeight: isActive ? FontWeight.w600 : FontWeight.w600,
-            fontSize: isActive ? 15 : 14.5,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _iconWithBadge(IconData icon, int count) {
     return count > 0
         ? Badge(
@@ -185,7 +151,6 @@ class Navbar extends StatelessWidget {
         children: [
           const InkWell(
             radius: 16,
-
             child: Icon(Icons.settings, color: Colors.white, size: 23),
           ),
           if (!isMobile) ...[
@@ -207,7 +172,6 @@ class Navbar extends StatelessWidget {
       offset: const Offset(0, 40),
       onSelected: (value) {
         if (value == "Settings") {
-          // 👉 Navigate to settings page
           // context.go("/settings");
         } else if (value == "Logout") {
           context.read<AuthCubit>().logout(context);
@@ -239,7 +203,7 @@ class Navbar extends StatelessWidget {
       },
       child: Row(
         children: [
-          CircleAvatar(
+          const CircleAvatar(
             radius: 15,
             backgroundColor: Color(0xFF4f4f53),
             child: Icon(Icons.person_outlined, color: Colors.white, size: 20),
@@ -262,8 +226,58 @@ class Navbar extends StatelessWidget {
   }
 }
 
-@override
-Size get preferredSize => const Size.fromHeight(60);
+// ---------------------------
+// ✅ Hoverable NavItem Widget
+// ---------------------------
+class _NavItemWidget extends StatefulWidget {
+  final NavItem item;
+  const _NavItemWidget({required this.item});
+
+  @override
+  State<_NavItemWidget> createState() => _NavItemWidgetState();
+}
+
+class _NavItemWidgetState extends State<_NavItemWidget> {
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final currentRoute = GoRouterState.of(context).uri.toString();
+    final isActive =
+        currentRoute == widget.item.route ||
+        currentRoute.startsWith("${widget.item.route}/");
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          if (!isActive) context.go(widget.item.route);
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: isActive
+                ? const Color(0xff3c83f6)
+                : (isHovered ? const Color(0xFF2A2A2D) : Colors.transparent),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            widget.item.label,
+            style: GoogleFonts.inter(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: isActive ? 15 : 14.5,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 // ---------------------------
 // Helper Model
