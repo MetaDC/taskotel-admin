@@ -30,6 +30,18 @@ class AppTextStyles {
     color: AppColors.primary,
   );
 
+  //CustomConatiner
+  static final customContainerTitle = GoogleFonts.inter(
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    color: AppColors.primary,
+  );
+  static final customContainerSubTitle = GoogleFonts.inter(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: AppColors.slateGray,
+  );
+
   // Navigation
   static final navBarItems = GoogleFonts.inter(
     fontSize: 34,

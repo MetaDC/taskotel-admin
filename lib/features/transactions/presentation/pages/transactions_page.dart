@@ -221,10 +221,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Transactions",
-            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
+          Text("Transactions", style: AppTextStyles.customContainerTitle),
           const SizedBox(height: 12),
           SizedBox(
             height: 43,
@@ -322,13 +319,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
 
     return Row(
       children: [
-        Text(
-          "Transactions",
-          style: GoogleFonts.inter(
-            fontSize: isTablet ? 19 : 21,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text("Transactions", style: AppTextStyles.customContainerTitle),
         const Spacer(),
         SizedBox(
           width: isTablet ? 200 : 300,

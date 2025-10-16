@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/widget/page_header.dart';
 import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
 import 'package:taskoteladmin/features/report/presentation/cubit/report_cubit.dart';
+import 'package:taskoteladmin/features/report/presentation/services/report_services.dart';
 
 class ReportsPage extends StatefulWidget {
   const ReportsPage({super.key});
@@ -60,10 +62,13 @@ class _ReportsPageState extends State<ReportsPage> {
           );
         }
 
-        return ResponsiveCustomBuilder(
-          mobileBuilder: (width) => _buildMobileLayout(state, width),
-          tabletBuilder: (width) => _buildTabletLayout(state, width),
-          desktopBuilder: (width) => _buildDesktopLayout(state, width),
+        return RepaintBoundary(
+          key: ReportExportService.screenshotKey,
+          child: ResponsiveCustomBuilder(
+            mobileBuilder: (width) => _buildMobileLayout(state, width),
+            tabletBuilder: (width) => _buildTabletLayout(state, width),
+            desktopBuilder: (width) => _buildDesktopLayout(state, width),
+          ),
         );
       },
     );
@@ -240,7 +245,9 @@ class _ReportsPageState extends State<ReportsPage> {
               _buildStyledContainer(
                 isButton: true,
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    ReportExportService.showExportDialog(context);
+                  },
                   borderRadius: BorderRadius.circular(8),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -338,7 +345,9 @@ class _ReportsPageState extends State<ReportsPage> {
               _buildStyledContainer(
                 isButton: true,
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    ReportExportService.showExportDialog(context);
+                  },
                   borderRadius: BorderRadius.circular(8),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
@@ -425,7 +434,9 @@ class _ReportsPageState extends State<ReportsPage> {
           _buildStyledContainer(
             isButton: true,
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                ReportExportService.showExportDialog(context);
+              },
               borderRadius: BorderRadius.circular(8),
               child: const Row(
                 children: [
@@ -502,10 +513,7 @@ class _ReportsPageState extends State<ReportsPage> {
               Expanded(
                 child: Text(
                   "Revenue Trend",
-                  style: GoogleFonts.inter(
-                    fontSize: isMobile ? 16 : 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTextStyles.customContainerTitle,
                 ),
               ),
               IconButton(
@@ -613,13 +621,7 @@ class _ReportsPageState extends State<ReportsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Plan Distribution",
-            style: GoogleFonts.inter(
-              fontSize: isMobile ? 16 : 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text("Plan Distribution", style: AppTextStyles.customContainerTitle),
           SizedBox(height: isMobile ? 16 : 20),
           SizedBox(
             height: isMobile ? 200 : 250,
@@ -704,10 +706,7 @@ class _ReportsPageState extends State<ReportsPage> {
         children: [
           Text(
             "New Client Acquisition",
-            style: GoogleFonts.inter(
-              fontSize: isMobile ? 16 : 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTextStyles.customContainerTitle,
           ),
           SizedBox(height: isMobile ? 16 : 20),
           SizedBox(
@@ -807,13 +806,7 @@ class _ReportsPageState extends State<ReportsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Churn vs Retention",
-            style: GoogleFonts.inter(
-              fontSize: isMobile ? 16 : 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text("Churn vs Retention", style: AppTextStyles.customContainerTitle),
           SizedBox(height: isMobile ? 16 : 20),
           SizedBox(
             height: isMobile ? 200 : 250,

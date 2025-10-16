@@ -77,6 +77,8 @@ dependencies:
   path_provider: ^2.1.1
   permission_handler: ^11.0.1
   web: ^1.0.0
+  pdf: ^3.10.4
+  screenshot: ^3.0.0
 
 dev_dependencies:
   flutter_test:

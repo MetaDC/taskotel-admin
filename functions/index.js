@@ -19,22 +19,23 @@ var transporter = nodemailer.createTransport({
   auth: {
     user: "teammetadc@gmail.com",
     pass: "skfbnyjbyotmfvmw",
-    // pass: 'zniorhjmhmatlzfd'
   },
 });
 
 // AUTH FUNCTIONS
 exports.createUser = onCall(async (request) => {
-  // let data = req.body;
   try {
     if (!request.auth)
       return { status: "error", code: 401, message: "Not signed in" };
+
+    // Create the user
     let user = await auth.createUser({
       email: request.data.email,
       password: request.data.password,
     });
 
     try {
+      // Save user data to Firestore
       let dbUser = await db.collection("clients").doc(user.uid).create({
         name: request.data.name,
         email: request.data.email,
@@ -48,7 +49,24 @@ exports.createUser = onCall(async (request) => {
         totalRevenue: request.data.totalRevenue,
         isDeleted: false,
       });
+
       console.log("User Data saved Successfully");
+
+      // Send credentials email
+      try {
+        console.log("Sending credentials email");
+        await sendCredentialsEmail(
+          request.data.email,
+          request.data.name,
+          request.data.email,
+          request.data.password
+        );
+        console.log("Credentials email sent successfully");
+      } catch (emailError) {
+        console.error("Failed to send credentials email:", emailError);
+        // Don't fail the user creation if email fails
+      }
+
       return { success: true, msg: dbUser, docId: user.uid };
     } catch (error) {
       console.log(
@@ -67,6 +85,157 @@ exports.createUser = onCall(async (request) => {
     };
   }
 });
+
+exports.sendCredentialToUserEmail = onCall(async (request) => {
+  const emailText = `<html>
+    <body>
+    <p>${request.data.otp} is your OTP. Valid for 5 minutes.</p>
+    </body>
+    </html>`;
+  sendEmailToUser(request.data.email, "Taskotel", emailText);
+});
+
+// Function to send credentials email
+async function sendCredentialsEmail(email, name, userEmail, password) {
+  console.log("Sending credentials email to: ", email);
+  const emailHtml = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+        }
+        .container {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #f9f9f9;
+        }
+        .header {
+          background-color: #4a90e2;
+          color: white;
+          padding: 20px;
+          text-align: center;
+          border-radius: 5px 5px 0 0;
+        }
+        .content {
+          background-color: white;
+          padding: 30px;
+          border-radius: 0 0 5px 5px;
+        }
+        .credentials {
+          background-color: #f0f7ff;
+          border-left: 4px solid #4a90e2;
+          padding: 15px;
+          margin: 20px 0;
+        }
+        .credential-item {
+          margin: 10px 0;
+        }
+        .credential-label {
+          font-weight: bold;
+          color: #4a90e2;
+        }
+        .credential-value {
+          color: #333;
+          font-family: monospace;
+          font-size: 14px;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 20px;
+          font-size: 12px;
+          color: #666;
+        }
+        .button {
+          display: inline-block;
+          padding: 12px 24px;
+          background-color: #4a90e2;
+          color: white;
+          text-decoration: none;
+          border-radius: 5px;
+          margin: 20px 0;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Welcome to Taskotel!</h1>
+        </div>
+        <div class="content">
+          <p>Hi ${name || "there"},</p>
+          <p>Your account has been successfully created. Below are your login credentials:</p>
+          
+          <div class="credentials">
+            <div class="credential-item">
+              <span class="credential-label">Email:</span>
+              <br>
+              <span class="credential-value">${userEmail}</span>
+            </div>
+            <div class="credential-item">
+              <span class="credential-label">Password:</span>
+              <br>
+              <span class="credential-value">${password}</span>
+            </div>
+          </div>
+          
+          <p><strong>Important:</strong> For security reasons, please change your password after your first login.</p>
+          
+          <center>
+            <a href="https://yourapp.com/login" class="button">Login to Your Account</a>
+          </center>
+          
+          <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+          
+          <p>Best regards,<br>The Taskotel Team</p>
+        </div>
+        <div class="footer">
+          <p>This is an automated email. Please do not reply to this message.</p>
+          <p>&copy; ${new Date().getFullYear()} Taskotel. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  return sendEmailToUser(
+    email,
+    "Welcome to Taskotel - Your Login Credentials",
+    emailHtml
+  );
+}
+
+async function sendEmailToUser(to, subject, html) {
+  try {
+    const mailOptions = {
+      from: {
+        name: "Taskotel",
+        address: "taskotel.ops@gmail.com",
+      },
+      to: to,
+      subject: subject,
+      html: html,
+    };
+
+    console.log(`Sending email to: ${to}`);
+
+    return transporter.sendMail(mailOptions, (error, data) => {
+      if (error) {
+        console.error("Email sending error:", error);
+        throw error;
+      }
+      console.log("Email sent successfully!");
+      return data;
+    });
+  } catch (error) {
+    console.error("Error in sendEmailToUser:", error);
+    throw error;
+  }
+}
 
 exports.deleteUser = onCall(async (request) => {
   try {

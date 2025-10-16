@@ -577,7 +577,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
                     PopupMenuItem(
                       child: Row(
                         children: [
-                          Icon(CupertinoIcons.pencil, size: 16),
+                          Icon(Icons.edit, size: 18),
                           SizedBox(width: 8),
                           Text('Edit'),
                         ],
@@ -714,7 +714,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
                     PopupMenuItem(
                       child: Row(
                         children: [
-                          Icon(CupertinoIcons.pencil, size: 14),
+                          Icon(Icons.edit, size: 18),
                           SizedBox(width: 6),
                           Text('Edit', style: GoogleFonts.inter(fontSize: 12)),
                         ],
@@ -859,7 +859,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
                       PopupMenuItem(
                         child: Row(
                           children: [
-                            Icon(CupertinoIcons.pencil, size: 16),
+                            Icon(Icons.edit, size: 18),
                             SizedBox(width: 8),
                             Text('Edit'),
                           ],
@@ -1293,7 +1293,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
 //                         PopupMenuItem(
 //                           child: Row(
 //                             children: [
-//                               Icon(CupertinoIcons.pencil, size: 16),
+//                               Icon(Icons.edit, size: 16),
 //                               SizedBox(width: 8),
 //                               Text('Edit'),
 //                             ],

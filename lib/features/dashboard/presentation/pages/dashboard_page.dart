@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:taskoteladmin/core/routes/routes.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
+import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
 import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:taskoteladmin/core/widget/stats_card.dart';
@@ -117,12 +118,12 @@ class _DashboardPageState extends State<DashboardPage> {
               iconColor: Colors.orange,
             ),
             const SizedBox(height: 12),
-            StatCardIconRight(
-              icon: CupertinoIcons.star_fill,
-              label: "Top Selling Plan",
-              value: "Premium",
-              iconColor: Colors.amber,
-            ),
+            // StatCardIconRight(
+            //   icon: CupertinoIcons.star_fill,
+            //   label: "Top Selling Plan",
+            //   value: "Premium",
+            //   iconColor: Colors.amber,
+            // ),
           ],
 
           const SizedBox(height: 16),
@@ -177,12 +178,12 @@ class _DashboardPageState extends State<DashboardPage> {
                 value: "4",
                 iconColor: Colors.orange,
               ),
-              StatCardIconRight(
-                icon: CupertinoIcons.star_fill,
-                label: "Top Selling Plan",
-                value: "Premium",
-                iconColor: Colors.amber,
-              ),
+              // StatCardIconRight(
+              //   icon: CupertinoIcons.star_fill,
+              //   label: "Top Selling Plan",
+              //   value: "Premium",
+              //   iconColor: Colors.amber,
+              // ),
             ],
           ),
 
@@ -238,12 +239,12 @@ class _DashboardPageState extends State<DashboardPage> {
                 value: "4",
                 iconColor: Colors.orange,
               ),
-              StatCardIconRight(
-                icon: CupertinoIcons.star_fill,
-                label: "Top Selling Plan",
-                value: "Premium",
-                iconColor: Colors.amber,
-              ),
+              // StatCardIconRight(
+              //   icon: CupertinoIcons.star_fill,
+              //   label: "Top Selling Plan",
+              //   value: "Premium",
+              //   iconColor: Colors.amber,
+              // ),
             ],
           ),
 
@@ -278,20 +279,12 @@ class _DashboardPageState extends State<DashboardPage> {
                   children: [
                     Text(
                       "Revenue Overview",
-                      style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        height: 1.2,
-                      ),
+                      style: AppTextStyles.customContainerTitle,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       "Monthly revenue performance",
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: const Color(0xFF64748B),
-                        height: 1.5,
-                      ),
+                      style: AppTextStyles.customContainerSubTitle,
                     ),
                   ],
                 ),
@@ -309,20 +302,12 @@ class _DashboardPageState extends State<DashboardPage> {
                     children: [
                       Text(
                         "Revenue Overview",
-                        style: GoogleFonts.inter(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          height: 1.2,
-                        ),
+                        style: AppTextStyles.customContainerTitle,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Monthly revenue performance",
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: const Color(0xFF64748B),
-                          height: 1.5,
-                        ),
+                        style: AppTextStyles.customContainerSubTitle,
                       ),
                     ],
                   ),
@@ -341,20 +326,12 @@ class _DashboardPageState extends State<DashboardPage> {
                     children: [
                       Text(
                         "Revenue Overview",
-                        style: GoogleFonts.inter(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          height: 1.2,
-                        ),
+                        style: AppTextStyles.customContainerTitle,
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Monthly revenue performance",
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: const Color(0xFF64748B),
-                          height: 1.5,
-                        ),
+                        style: AppTextStyles.customContainerSubTitle,
                       ),
                     ],
                   ),
@@ -508,18 +485,11 @@ class _DashboardPageState extends State<DashboardPage> {
                     children: [
                       Text(
                         "Unsubscribed / Not Renewed",
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTextStyles.customContainerTitle,
                       ),
                       Text(
                         "Clients who registered but haven't subscribed or renewed",
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: const Color(0xff64748b),
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppTextStyles.customContainerSubTitle,
                         softWrap: true,
                       ),
                     ],
@@ -578,18 +548,11 @@ class _DashboardPageState extends State<DashboardPage> {
                           children: [
                             Text(
                               "Unsubscribed / Not Renewed",
-                              style: GoogleFonts.inter(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: AppTextStyles.customContainerTitle,
                             ),
                             Text(
                               "Clients who registered but haven't subscribed or renewed",
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                color: const Color(0xff64748b),
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: AppTextStyles.customContainerSubTitle,
                               softWrap: true,
                             ),
                           ],
@@ -648,18 +611,11 @@ class _DashboardPageState extends State<DashboardPage> {
                           children: [
                             Text(
                               "Unsubscribed / Not Renewed",
-                              style: GoogleFonts.inter(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: AppTextStyles.customContainerTitle,
                             ),
                             Text(
                               "Clients who registered but haven't subscribed or renewed",
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                color: const Color(0xff64748b),
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: AppTextStyles.customContainerSubTitle,
                               softWrap: true,
                             ),
                           ],

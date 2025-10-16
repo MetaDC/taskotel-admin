@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/question_model.dart';
 import 'package:taskoteladmin/features/master_hotel/data/masterhotel_firebaserepo.dart';
 import 'package:excel/excel.dart';
 import 'package:web/web.dart' as web;
@@ -128,15 +129,23 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
       'required': true,
     };
 
-    final updatedQuestions = List<Map<String, dynamic>>.from(state.questions)
-      ..add(question);
+    final updatedQuestions = List<QuestionModel>.from(state.questions)
+      ..add(
+        QuestionModel(
+          questionId: UniqueKey().toString(),
+          question: questionText,
+          type: 'text',
+          options: null,
+          answer: null,
+        ),
+      );
 
     questionController.clear();
     emit(state.copyWith(questions: updatedQuestions, validationMessage: null));
   }
 
   void removeQuestion(int index) {
-    final updatedQuestions = List<Map<String, dynamic>>.from(state.questions)
+    final updatedQuestions = List<QuestionModel>.from(state.questions)
       ..removeAt(index);
     emit(state.copyWith(questions: updatedQuestions));
   }
@@ -219,7 +228,9 @@ class MasterTaskFormCubit extends Cubit<MasterTaskFormState> {
         dayOrDate: dayOrDateController.text.trim(),
         duration: durationController.text.trim(),
         place: placeController.text.trim(),
-        questions: state.questions,
+        questions: state.questions
+            .map((e) => QuestionModel.fromMap(e.toMap()))
+            .toList(),
         fromMasterHotel: null,
         isActive: state.isActive,
       );

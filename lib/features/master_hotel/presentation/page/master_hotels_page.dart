@@ -240,7 +240,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                     PopupMenuItem(
                       child: Row(
                         children: [
-                          const Icon(CupertinoIcons.pencil, size: 16),
+                          const Icon(Icons.edit, size: 18),
                           const SizedBox(width: 8),
                           Text('Edit'),
                         ],
@@ -436,10 +436,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
             children: [
               Text(
                 "Franchise Directory",
-                style: GoogleFonts.inter(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTextStyles.customContainerTitle,
               ),
             ],
           ),
@@ -616,10 +613,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
             children: [
               Text(
                 "Franchise Directory",
-                style: GoogleFonts.inter(
-                  fontSize: 21,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTextStyles.customContainerTitle,
               ),
             ],
           ),
@@ -815,7 +809,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
       PopupMenuItem(
         child: Row(
           children: [
-            const Icon(CupertinoIcons.pencil, size: 16),
+            const Icon(Icons.edit, size: 18),
             const SizedBox(width: 8),
             Text('Edit'),
           ],
@@ -1130,7 +1124,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
 //                     PopupMenuItem(
 //                       child: Row(
 //                         children: [
-//                           Icon(CupertinoIcons.pencil, size: 16),
+//                           Icon(Icons.edit, size: 16),
 //                           SizedBox(width: 8),
 //                           Text('Edit'),
 //                         ],

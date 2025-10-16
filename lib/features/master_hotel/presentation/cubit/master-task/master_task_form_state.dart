@@ -13,7 +13,7 @@ class MasterTaskFormState {
   final String? selectedFrequency;
   final String? selectedDepartment;
   final String? selectedServiceType;
-  final List<Map<String, dynamic>> questions;
+  final List<QuestionModel> questions;
   final bool isActive;
   final bool isEditMode;
 
@@ -51,7 +51,7 @@ class MasterTaskFormState {
     String? selectedFrequency,
     String? selectedDepartment,
     String? selectedServiceType,
-    List<Map<String, dynamic>>? questions,
+    List<QuestionModel>? questions,
     bool? isActive,
     bool? isEditMode,
     bool? isCreateNewTasks,

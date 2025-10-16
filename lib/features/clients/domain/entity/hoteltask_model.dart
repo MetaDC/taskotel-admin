@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:taskoteladmin/features/clients/domain/entity/question_model.dart';
 
 class CommonTaskModel {
   final String docId;
@@ -20,7 +21,7 @@ class CommonTaskModel {
   final String dayOrDate;
   final String duration;
   final String place;
-  final List<Map<String, dynamic>> questions; // or List<QuestionModel>
+  final List<QuestionModel> questions; // or List<QuestionModel>
   final DateTime? startDate; // null for master hotel
   final DateTime? endDate; // null if not to end this
   final bool? fromMasterHotel;
@@ -80,7 +81,7 @@ class CommonTaskModel {
       dayOrDate: json["dayOrDate"] ?? "",
       duration: json["duration"] ?? "",
       place: json["place"] ?? "",
-      questions: List<Map<String, dynamic>>.from(json["questions"] ?? []),
+      questions: List<QuestionModel>.from(json["questions"] ?? []),
       startDate: json["startDate"] != null
           ? DateTime.fromMillisecondsSinceEpoch(json["startDate"])
           : null,
@@ -112,7 +113,7 @@ class CommonTaskModel {
       "dayOrDate": dayOrDate,
       "duration": duration,
       "place": place,
-      "questions": questions,
+      "questions": questions.map((e) => e.toMap()).toList(),
       "startDate": startDate?.millisecondsSinceEpoch,
       "endDate": endDate?.millisecondsSinceEpoch,
       "fromMasterHotel": fromMasterHotel,
@@ -127,7 +128,7 @@ class CommonTaskModel {
     String? dayOrDate,
     String? duration,
     String? place,
-    List<Map<String, dynamic>>? questions,
+    List<QuestionModel>? questions,
     DateTime? startDate,
     DateTime? endDate,
     bool? fromMasterHotel,

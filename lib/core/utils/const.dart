@@ -326,134 +326,134 @@ List<Map<String, dynamic>> dummyHotels = [
 /////////
 ///import 'dart:math';
 
-final List<String> hotelIds = [
-  "1pXsRBLGOOKbsCOyr9w7",
-  "FkLSSqfWcnbWw6lLiWJ7",
-  "PO4u5X67G4skSOzWU6xG",
-  "U563QAV89FOKXRw8ZGEX",
-  "WZx7K6yaoxAQNh686TQL",
-  "ZkUUxjAzB6cMq3c4nhga",
-  "jLtLrzPd3XjMekduITJV",
-  "vEypYc3dGDBps8bzScmt",
-];
+// final List<String> hotelIds = [
+//   "1pXsRBLGOOKbsCOyr9w7",
+//   "FkLSSqfWcnbWw6lLiWJ7",
+//   "PO4u5X67G4skSOzWU6xG",
+//   "U563QAV89FOKXRw8ZGEX",
+//   "WZx7K6yaoxAQNh686TQL",
+//   "ZkUUxjAzB6cMq3c4nhga",
+//   "jLtLrzPd3XjMekduITJV",
+//   "vEypYc3dGDBps8bzScmt",
+// ];
 
-final List<String> roles1 = ["rm", "gm", "dm", "operators"];
+// final List<String> roles1 = ["rm", "gm", "dm", "operators"];
 
-final List<String> serviceTypes = ["Cleaning", "Check-in", "Repair", "Cooking"];
+// final List<String> serviceTypes = ["Cleaning", "Check-in", "Repair", "Cooking"];
 
-final List<String> places = [
-  "Lobby",
-  "Room 101",
-  "Kitchen",
-  "Conference Hall",
-  "Gym",
-];
+// final List<String> places = [
+//   "Lobby",
+//   "Room 101",
+//   "Kitchen",
+//   "Conference Hall",
+//   "Gym",
+// ];
 
-final Random random = Random();
+// final Random random = Random();
 
-/// Generate 20 dummy tasks
-List<CommonTaskModel> generateDummyTasks() {
-  List<CommonTaskModel> tasks = [];
+// /// Generate 20 dummy tasks
+// List<CommonTaskModel> generateDummyTasks() {
+//   List<CommonTaskModel> tasks = [];
 
-  for (int i = 0; i < 20; i++) {
-    String hotelId = hotelIds[random.nextInt(hotelIds.length)];
-    String role = roles1[random.nextInt(roles1.length)];
-    String? dept = random.nextBool()
-        ? departments[random.nextInt(departments.length)]
-        : null;
-    String? service = random.nextBool()
-        ? serviceTypes[random.nextInt(serviceTypes.length)]
-        : null;
-    String frequency = frequencies[random.nextInt(frequencies.length)];
-    String place = places[random.nextInt(places.length)];
+//   for (int i = 0; i < 20; i++) {
+//     String hotelId = hotelIds[random.nextInt(hotelIds.length)];
+//     String role = roles1[random.nextInt(roles1.length)];
+//     String? dept = random.nextBool()
+//         ? departments[random.nextInt(departments.length)]
+//         : null;
+//     String? service = random.nextBool()
+//         ? serviceTypes[random.nextInt(serviceTypes.length)]
+//         : null;
+//     String frequency = frequencies[random.nextInt(frequencies.length)];
+//     String place = places[random.nextInt(places.length)];
 
-    final createdAt = DateTime.now().subtract(
-      Duration(days: random.nextInt(1000)),
-    );
-    final updatedAt = createdAt.add(Duration(days: random.nextInt(30)));
+//     final createdAt = DateTime.now().subtract(
+//       Duration(days: random.nextInt(1000)),
+//     );
+//     final updatedAt = createdAt.add(Duration(days: random.nextInt(30)));
 
-    CommonTaskModel task = CommonTaskModel(
-      docId: "", // Firestore will generate
-      taskId: "${role.toUpperCase()}${i + 1}",
+//     CommonTaskModel task = CommonTaskModel(
+//       docId: "", // Firestore will generate
+//       taskId: "${role.toUpperCase()}${i + 1}",
 
-      title: "Task ${i + 1} for Hotel $hotelId",
-      desc: "Description for task ${i + 1}",
-      createdAt: createdAt,
-      createdByDocId: "system",
-      createdByName: "System",
-      updatedAt: updatedAt,
-      updatedBy: "system",
-      updatedByName: "System",
+//       title: "Task ${i + 1} for Hotel $hotelId",
+//       desc: "Description for task ${i + 1}",
+//       createdAt: createdAt,
+//       createdByDocId: "system",
+//       createdByName: "System",
+//       updatedAt: updatedAt,
+//       updatedBy: "system",
+//       updatedByName: "System",
 
-      hotelId: hotelId,
-      assignedRole: role,
-      assignedDepartmentId: dept,
-      serviceType: service,
-      frequency: frequency,
-      dayOrDate: DateTime.now().add(Duration(days: i)).toIso8601String(),
-      duration: "${1 + random.nextInt(5)} hrs",
-      place: place,
-      questions: [
-        {"question": "Sample question 1", "type": "text"},
-        {"question": "Sample question 2", "type": "checkbox"},
-      ],
-      startDate: null,
-      endDate: null,
-      fromMasterHotel: false,
-      isActive: true,
-    );
+//       hotelId: hotelId,
+//       assignedRole: role,
+//       assignedDepartmentId: dept,
+//       serviceType: service,
+//       frequency: frequency,
+//       dayOrDate: DateTime.now().add(Duration(days: i)).toIso8601String(),
+//       duration: "${1 + random.nextInt(5)} hrs",
+//       place: place,
+//       questions: [
+//         {"question": "Sample question 1", "type": "text"},
+//         {"question": "Sample question 2", "type": "checkbox"},
+//       ],
+//       startDate: null,
+//       endDate: null,
+//       fromMasterHotel: false,
+//       isActive: true,
+//     );
 
-    tasks.add(task);
-  }
+//     tasks.add(task);
+//   }
 
-  return tasks;
-}
+//   return tasks;
+// }
 
-/// Function to send tasks to Firestore
-Future<void> sendTasksToFirestore() async {
-  final tasks = generateDummyTasks();
-  final collectionRef = FBFireStore.tasks;
+// /// Function to send tasks to Firestore
+// Future<void> sendTasksToFirestore() async {
+//   final tasks = generateDummyTasks();
+//   final collectionRef = FBFireStore.tasks;
 
-  for (var task in tasks) {
-    await collectionRef.add(task.toMap());
-  }
+//   for (var task in tasks) {
+//     await collectionRef.add(task.toMap());
+//   }
 
-  print("✅ 20 dummy tasks added to Firestore!");
-}
+//   print("✅ 20 dummy tasks added to Firestore!");
+// }
 
-Future<void> addDummyClients() async {
-  final firestore = FirebaseFirestore.instance;
-  final clientsRef = firestore.collection("clients");
+// Future<void> addDummyClients() async {
+//   final firestore = FirebaseFirestore.instance;
+//   final clientsRef = firestore.collection("clients");
 
-  // 🔹 Create 25 dummy clients
-  for (int i = 1; i <= 30; i++) {
-    final now = DateTime.now();
-    final random = Random();
+//   // 🔹 Create 25 dummy clients
+//   for (int i = 1; i <= 30; i++) {
+//     final now = DateTime.now();
+//     final random = Random();
 
-    final client = ClientModel(
-      docId: "", // Firestore will assign, we don’t need it here
-      name: "Client $i",
-      email: "client$i@example.com",
-      phone: "987654${1000 + i}",
+//     final client = ClientModel(
+//       docId: "", // Firestore will assign, we don’t need it here
+//       name: "Client $i",
+//       email: "client$i@example.com",
+//       phone: "987654${1000 + i}",
 
-      createdAt: now,
-      updatedAt: now,
-      lastPaymentExpiry: now.add(Duration(days: 30 * (i % 12))),
-      lastLogin: i % 2 == 0 ? now.subtract(Duration(days: i)) : null,
+//       createdAt: now,
+//       updatedAt: now,
+//       lastPaymentExpiry: now.add(Duration(days: 30 * (i % 12))),
+//       lastLogin: i % 2 == 0 ? now.subtract(Duration(days: i)) : null,
 
-      status: (i % 3 == 0)
-          ? "inactive"
-          : (i % 5 == 0)
-          ? "suspended"
-          : "active",
+//       status: (i % 3 == 0)
+//           ? "inactive"
+//           : (i % 5 == 0)
+//           ? "suspended"
+//           : "active",
 
-      totalHotels: random.nextInt(10),
-      totalRevenue: (1000 + random.nextInt(5000)) * 1.0,
-      isDeleted: false,
-    );
+//       totalHotels: random.nextInt(10),
+//       totalRevenue: (1000 + random.nextInt(5000)) * 1.0,
+//       isDeleted: false,
+//     );
 
-    await clientsRef.add(client.toJson());
-  }
+//     await clientsRef.add(client.toJson());
+//   }
 
-  print("✅ 25 Dummy Clients Added to Firestore!");
-}
+//   print("✅ 25 Dummy Clients Added to Firestore!");
+// }

@@ -536,6 +536,15 @@ class CreatePlanForm extends StatelessWidget {
                           ),
                         ),
                       ),
+                      const SizedBox(width: 12),
+                      IconButton(
+                        onPressed: () => cubit.removeFeature(feature),
+                        icon: const Icon(
+                          CupertinoIcons.minus_circle,
+                          size: 16,
+                          color: Colors.red,
+                        ),
+                      ),
                     ],
                   ),
                 );

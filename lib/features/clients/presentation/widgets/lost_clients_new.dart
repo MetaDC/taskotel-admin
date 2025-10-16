@@ -100,10 +100,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Lost Clients List",
-            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
+          Text("Lost Clients List", style: AppTextStyles.customContainerTitle),
           const SizedBox(height: 16),
           TextField(
             controller: context.read<ClientCubit>().searchController,
@@ -221,7 +218,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
                         child: ListTile(
                           dense: true,
                           contentPadding: EdgeInsets.zero,
-                          leading: Icon(CupertinoIcons.pencil, size: 20),
+                          leading: Icon(Icons.edit, size: 15),
                           title: Text('Edit'),
                         ),
                       ),
@@ -447,10 +444,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
   Row _buildTabelHeading(BuildContext context) {
     return Row(
       children: [
-        Text(
-          "Lost Clients List",
-          style: GoogleFonts.inter(fontSize: 21, fontWeight: FontWeight.w600),
-        ),
+        Text("Lost Clients List", style: AppTextStyles.customContainerTitle),
         const Spacer(),
         SizedBox(
           width: 300,
@@ -588,7 +582,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
                 PopupMenuItem(
                   value: 'edit',
                   child: ListTile(
-                    leading: Icon(CupertinoIcons.pencil),
+                    leading: Icon(Icons.edit),
                     title: Text('Edit'),
                   ),
                 ),

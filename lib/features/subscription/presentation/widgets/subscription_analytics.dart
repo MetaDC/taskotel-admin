@@ -5,6 +5,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/features/subscription/domain/model/subscription_model.dart';
 
 class SubscriberDistributionChart extends StatelessWidget {
@@ -32,10 +33,7 @@ class SubscriberDistributionChart extends StatelessWidget {
       children: [
         Text(
           'Subscriber Distribution',
-          style: GoogleFonts.inter(
-            fontSize: isMobile ? 16 : 18,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.customContainerTitle,
         ),
         SizedBox(height: isMobile ? 12 : 20),
         Expanded(
@@ -229,13 +227,7 @@ class RevenueByPlanChart extends StatelessWidget {
 
     return Column(
       children: [
-        Text(
-          'Revenue by Plan',
-          style: GoogleFonts.inter(
-            fontSize: isMobile ? 16 : 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        Text('Revenue by Plan', style: AppTextStyles.customContainerTitle),
         SizedBox(height: isMobile ? 12 : 20),
         Expanded(
           child: BarChart(

@@ -53,7 +53,7 @@ class SubscriptionPlanCard extends StatelessWidget {
                     value: 'edit',
                     child: Row(
                       children: [
-                        Icon(CupertinoIcons.pencil, size: 16),
+                        Icon(Icons.edit, size: 18),
                         SizedBox(width: 8),
                         Text('Edit'),
                       ],

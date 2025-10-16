@@ -8,27 +8,31 @@ class ReportState extends Equatable {
   final ReportTimeFilter timeFilter;
   final int selectedYear;
   final int selectedMonth;
-  
+
+  // Export related fields
+  final bool isExporting;
+  final String? exportMessage;
+
   // Revenue data
   final double totalRevenue;
   final List<Map<String, dynamic>> revenueByMonth;
-  
+
   // Subscription data
   final int activeSubscribers;
   final int totalSubscribers;
   final double churnRate;
   final double avgRevenuePerUser;
-  
+
   // Plan distribution
   final Map<String, int> planDistribution;
   final Map<String, double> planRevenue;
-  
+
   // Client data
   final int newClientsThisMonth;
   final int churnedClientsThisMonth;
   final List<Map<String, dynamic>> clientAcquisitionByMonth;
   final List<Map<String, dynamic>> churnVsRetention;
-  
+
   // Transaction data
   final int successfulTransactions;
   final int failedTransactions;
@@ -41,6 +45,8 @@ class ReportState extends Equatable {
     this.timeFilter = ReportTimeFilter.yearly,
     required this.selectedYear,
     required this.selectedMonth,
+    this.isExporting = false,
+    this.exportMessage,
     this.totalRevenue = 0,
     this.revenueByMonth = const [],
     this.activeSubscribers = 0,
@@ -61,10 +67,7 @@ class ReportState extends Equatable {
 
   factory ReportState.initial() {
     final now = DateTime.now();
-    return ReportState(
-      selectedYear: now.year,
-      selectedMonth: now.month,
-    );
+    return ReportState(selectedYear: now.year, selectedMonth: now.month);
   }
 
   ReportState copyWith({
@@ -73,6 +76,8 @@ class ReportState extends Equatable {
     ReportTimeFilter? timeFilter,
     int? selectedYear,
     int? selectedMonth,
+    bool? isExporting,
+    String? exportMessage,
     double? totalRevenue,
     List<Map<String, dynamic>>? revenueByMonth,
     int? activeSubscribers,
@@ -96,6 +101,8 @@ class ReportState extends Equatable {
       timeFilter: timeFilter ?? this.timeFilter,
       selectedYear: selectedYear ?? this.selectedYear,
       selectedMonth: selectedMonth ?? this.selectedMonth,
+      isExporting: isExporting ?? this.isExporting,
+      exportMessage: exportMessage,
       totalRevenue: totalRevenue ?? this.totalRevenue,
       revenueByMonth: revenueByMonth ?? this.revenueByMonth,
       activeSubscribers: activeSubscribers ?? this.activeSubscribers,
@@ -105,39 +112,44 @@ class ReportState extends Equatable {
       planDistribution: planDistribution ?? this.planDistribution,
       planRevenue: planRevenue ?? this.planRevenue,
       newClientsThisMonth: newClientsThisMonth ?? this.newClientsThisMonth,
-      churnedClientsThisMonth: churnedClientsThisMonth ?? this.churnedClientsThisMonth,
-      clientAcquisitionByMonth: clientAcquisitionByMonth ?? this.clientAcquisitionByMonth,
+      churnedClientsThisMonth:
+          churnedClientsThisMonth ?? this.churnedClientsThisMonth,
+      clientAcquisitionByMonth:
+          clientAcquisitionByMonth ?? this.clientAcquisitionByMonth,
       churnVsRetention: churnVsRetention ?? this.churnVsRetention,
-      successfulTransactions: successfulTransactions ?? this.successfulTransactions,
+      successfulTransactions:
+          successfulTransactions ?? this.successfulTransactions,
       failedTransactions: failedTransactions ?? this.failedTransactions,
       pendingTransactions: pendingTransactions ?? this.pendingTransactions,
-      totalTransactionAmount: totalTransactionAmount ?? this.totalTransactionAmount,
+      totalTransactionAmount:
+          totalTransactionAmount ?? this.totalTransactionAmount,
     );
   }
 
   @override
   List<Object?> get props => [
-        isLoading,
-        errorMessage,
-        timeFilter,
-        selectedYear,
-        selectedMonth,
-        totalRevenue,
-        revenueByMonth,
-        activeSubscribers,
-        totalSubscribers,
-        churnRate,
-        avgRevenuePerUser,
-        planDistribution,
-        planRevenue,
-        newClientsThisMonth,
-        churnedClientsThisMonth,
-        clientAcquisitionByMonth,
-        churnVsRetention,
-        successfulTransactions,
-        failedTransactions,
-        pendingTransactions,
-        totalTransactionAmount,
-      ];
+    isLoading,
+    errorMessage,
+    timeFilter,
+    selectedYear,
+    selectedMonth,
+    isExporting,
+    exportMessage,
+    totalRevenue,
+    revenueByMonth,
+    activeSubscribers,
+    totalSubscribers,
+    churnRate,
+    avgRevenuePerUser,
+    planDistribution,
+    planRevenue,
+    newClientsThisMonth,
+    churnedClientsThisMonth,
+    clientAcquisitionByMonth,
+    churnVsRetention,
+    successfulTransactions,
+    failedTransactions,
+    pendingTransactions,
+    totalTransactionAmount,
+  ];
 }
-

@@ -317,4 +317,24 @@ class ReportCubit extends Cubit<ReportState> {
     ];
     return months[month - 1];
   }
+
+  // Set error message
+  void setError(String? error) {
+    emit(state.copyWith(errorMessage: error, isLoading: false));
+  }
+
+  // Set export loading state
+  void setExportLoading(bool loading) {
+    emit(state.copyWith(isExporting: loading, exportMessage: null));
+  }
+
+  // Set export message (success or error)
+  void setExportMessage(String message) {
+    emit(state.copyWith(exportMessage: message));
+  }
+
+  // Clear export message
+  void clearExportMessage() {
+    emit(state.copyWith(exportMessage: null));
+  }
 }
