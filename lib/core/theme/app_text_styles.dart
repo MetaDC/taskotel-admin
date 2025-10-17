@@ -24,6 +24,11 @@ class AppTextStyles {
     fontWeight: FontWeight.w700,
     color: AppColors.primary,
   );
+  static final dialogSubheading = GoogleFonts.inter(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: AppColors.slateGray,
+  );
   static final textFieldTitle = GoogleFonts.inter(
     fontWeight: FontWeight.bold,
     fontSize: 14,

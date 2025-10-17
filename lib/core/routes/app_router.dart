@@ -6,6 +6,8 @@ import 'package:taskoteladmin/features/auth/presentation/pages/login_page.dart';
 import 'package:taskoteladmin/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:taskoteladmin/features/clients/data/client_firebaserepo.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
+import 'package:taskoteladmin/features/subscription/data/subscription_firebaserepo.dart';
+import 'package:taskoteladmin/features/subscription/presentation/cubit/susbcription_cubit.dart';
 import 'package:taskoteladmin/features/clients/presentation/page/hotel_detail_page.dart';
 import 'package:taskoteladmin/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:taskoteladmin/features/dashboard/presentation/pages/dashboard_page.dart';
@@ -68,11 +70,19 @@ final GoRouter appRoute = GoRouter(
               builder: (context, state, child) {
                 final clientId = state.pathParameters['clientId'];
                 if (clientId != null) {
-                  return BlocProvider(
-                    create: (context) =>
-                        ClientDetailCubit(clientRepo: ClientFirebaseRepo())
-                          ..loadClientDetails(clientId),
-
+                  return MultiBlocProvider(
+                    providers: [
+                      BlocProvider(
+                        create: (context) =>
+                            ClientDetailCubit(clientRepo: ClientFirebaseRepo())
+                              ..loadClientDetails(clientId),
+                      ),
+                      BlocProvider(
+                        create: (context) => SubscriptionCubit(
+                          subscriptionRepo: SubscriptionFirebaserepo(),
+                        ),
+                      ),
+                    ],
                     child: child,
                   );
                 }

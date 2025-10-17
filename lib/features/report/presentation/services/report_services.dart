@@ -93,6 +93,9 @@ class ReportExportService {
       // Set loading state
       cubit.setExportLoading(true);
 
+      // Allow UI to update
+      await Future.delayed(const Duration(milliseconds: 100));
+
       // Request permission (only for mobile)
       if (!kIsWeb) {
         final hasPermission = await _requestStoragePermission();
@@ -103,7 +106,8 @@ class ReportExportService {
         }
       }
 
-      // Capture screenshot
+      // Capture screenshot with delay to allow UI update
+      await Future.delayed(const Duration(milliseconds: 200));
       final image = await _captureWidget();
       if (image == null) {
         cubit.setExportLoading(false);
@@ -114,6 +118,9 @@ class ReportExportService {
       // Generate filename
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final fileName = 'report_$timestamp.png';
+
+      // Process file operations in background
+      await Future.delayed(const Duration(milliseconds: 100));
 
       // Save or download based on platform
       if (kIsWeb) {
@@ -146,9 +153,13 @@ class ReportExportService {
       // Set loading state
       cubit.setExportLoading(true);
 
+      // Allow UI to update
+      await Future.delayed(const Duration(milliseconds: 100));
+
       final pdf = pw.Document();
 
-      // Capture screenshot for PDF
+      // Capture screenshot for PDF with delay
+      await Future.delayed(const Duration(milliseconds: 200));
       final image = await _captureWidget();
       if (image == null) {
         cubit.setExportLoading(false);
@@ -156,6 +167,8 @@ class ReportExportService {
         return;
       }
 
+      // Allow UI to update before heavy processing
+      await Future.delayed(const Duration(milliseconds: 100));
       final pdfImage = pw.MemoryImage(image);
 
       pdf.addPage(
@@ -376,7 +389,8 @@ class ReportExportService {
         }
       }
 
-      // Generate PDF bytes
+      // Generate PDF bytes with delay to allow UI updates
+      await Future.delayed(const Duration(milliseconds: 100));
       final pdfBytes = await pdf.save();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final fileName = 'report_$timestamp.pdf';
@@ -411,6 +425,9 @@ class ReportExportService {
 
       // Set loading state
       cubit.setExportLoading(true);
+
+      // Allow UI to update
+      await Future.delayed(const Duration(milliseconds: 100));
 
       final excel = Excel.createExcel();
       final sheet = excel['Report'];
@@ -608,7 +625,8 @@ class ReportExportService {
         }
       }
 
-      // Generate Excel bytes
+      // Generate Excel bytes with delay to allow UI updates
+      await Future.delayed(const Duration(milliseconds: 100));
       final excelBytes = excel.encode()!;
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final fileName = 'report_$timestamp.xlsx';
@@ -735,6 +753,7 @@ class ReportExportService {
                             title: Text('Export as PNG'),
                             subtitle: Text('Image format'),
                             onTap: () {
+                              Navigator.pop(dialogContext);
                               exportAsPNG(context);
                             },
                           ),
@@ -747,8 +766,8 @@ class ReportExportService {
                             title: Text('Export as PDF'),
                             subtitle: Text('Portable Document Format'),
                             onTap: () {
-                              exportAsPDF(context);
                               Navigator.pop(dialogContext);
+                              exportAsPDF(context);
                             },
                           ),
                           Divider(),
@@ -760,8 +779,8 @@ class ReportExportService {
                             title: Text('Export as Excel'),
                             subtitle: Text('Spreadsheet format'),
                             onTap: () {
-                              exportAsExcel(context);
                               Navigator.pop(dialogContext);
+                              exportAsExcel(context);
                             },
                           ),
                         ],

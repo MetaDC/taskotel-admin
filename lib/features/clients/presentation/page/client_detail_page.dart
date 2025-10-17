@@ -16,6 +16,9 @@ import 'package:taskoteladmin/core/widget/tabel_widgets.dart';
 import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
+import 'package:taskoteladmin/features/subscription/presentation/widgets/subscription_assignment_dialog.dart';
+import 'package:taskoteladmin/features/transactions/presentation/widgets/client_transactions_view.dart';
+import 'package:taskoteladmin/features/transactions/presentation/cubit/client_transaction_cubit.dart';
 
 const double mobileMinSize = 768;
 const double desktopMinSize = 1024;
@@ -58,6 +61,8 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
             _buildAnalytics(state),
             const SizedBox(height: 20),
             _buildHotelPortfolioTable(context, state, width),
+            const SizedBox(height: 20),
+            _buildTransactionSection(state),
           ],
         ),
       ),
@@ -77,6 +82,8 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
             _buildAnalytics(state),
             const SizedBox(height: 16),
             _buildHotelPortfolioTable(context, state, width),
+            const SizedBox(height: 16),
+            _buildTransactionSection(state),
           ],
         ),
       ),
@@ -96,6 +103,8 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
             _buildAnalytics(state),
             const SizedBox(height: 12),
             _buildHotelPortfolioTable(context, state, width),
+            const SizedBox(height: 12),
+            _buildTransactionSection(state),
           ],
         ),
       ),
@@ -344,23 +353,45 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
             ],
           ),
           const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                context.go(Routes.hotelDetail(widget.clientId, hotel.docId));
-              },
-              icon: const Icon(CupertinoIcons.eye, size: 18),
-              label: const Text("View Details"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    context.go(
+                      Routes.hotelDetail(widget.clientId, hotel.docId),
+                    );
+                  },
+                  icon: const Icon(CupertinoIcons.eye, size: 16),
+                  label: const Text("View Details"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () =>
+                      _showSubscriptionAssignmentDialog(context, hotel),
+                  icon: const Icon(CupertinoIcons.doc_text, size: 16),
+                  label: const Text("Assign Plan"),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -441,7 +472,7 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
           child: Text("Hotel Name", style: AppTextStyles.tabelHeader),
         ),
         Expanded(
-          flex: 2,
+          flex: 1,
           child: Text("Location", style: AppTextStyles.tabelHeader),
         ),
         if (!isTablet)
@@ -456,9 +487,17 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
           Expanded(child: Text("Tasks", style: AppTextStyles.tabelHeader)),
         Expanded(child: Text("Rooms", style: AppTextStyles.tabelHeader)),
         Expanded(child: Text("Revenue", style: AppTextStyles.tabelHeader)),
+
         SizedBox(
-          width: 100,
-          child: Text("View", style: AppTextStyles.tabelHeader),
+          width: 140,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(child: Text("View", style: AppTextStyles.tabelHeader)),
+              const SizedBox(width: 4),
+              Expanded(child: Text("Plan", style: AppTextStyles.tabelHeader)),
+            ],
+          ),
         ),
       ],
     );
@@ -487,7 +526,7 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
 
           // Location
           Expanded(
-            flex: 2,
+            flex: 1,
             child: TableIconTextRow(
               icon: CupertinoIcons.placemark,
               text: "${hotel.addressModel.city}, ${hotel.addressModel.state}",
@@ -555,17 +594,81 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
             ),
           ),
 
-          // View Button
+          // Action Buttons
           SizedBox(
-            width: 100,
-            child: TableActionButton(
-              icon: CupertinoIcons.eye,
-              onPressed: () {
-                context.go(Routes.hotelDetail(widget.clientId, hotel.docId));
-              },
+            width: 140,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.only(left: 3),
+                    child: TableActionButton(
+                      icon: CupertinoIcons.eye,
+                      onPressed: () {
+                        context.go(
+                          Routes.hotelDetail(widget.clientId, hotel.docId),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: TableActionButton(
+                    icon: CupertinoIcons.doc_text,
+                    onPressed: () =>
+                        _showSubscriptionAssignmentDialog(context, hotel),
+                    color: AppColors.primary,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Show subscription assignment dialog
+  // Fixed method to show subscription assignment dialog
+  void _showSubscriptionAssignmentDialog(
+    BuildContext context,
+    HotelModel hotel,
+  ) {
+    final state = context.read<ClientDetailCubit>().state;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => BlocProvider.value(
+        // Provide the existing SubscriptionCubit to the dialog
+        value: context.read<ClientDetailCubit>(),
+        child: SubscriptionAssignmentDialog(
+          hotel: hotel,
+          clientName: state.client?.name ?? '',
+          clientEmail: state.client?.email ?? '',
+          onAssignmentComplete: (purchaseId) {
+            // Use the original context for refreshing
+            context.read<ClientDetailCubit>().loadClientDetails(
+              widget.clientId,
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  // Build transaction section
+  Widget _buildTransactionSection(ClientDetailState state) {
+    if (state.client == null) {
+      return const SizedBox.shrink();
+    }
+
+    return BlocProvider(
+      create: (context) => ClientTransactionCubit(),
+      child: ClientTransactionsView(
+        clientId: widget.clientId,
+        clientName: state.client!.name,
       ),
     );
   }
@@ -854,10 +957,3 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
 //               onPressed: () {
 //                 context.go(Routes.hotelDetail(widget.clientId, hotel.docId));
 //               },
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

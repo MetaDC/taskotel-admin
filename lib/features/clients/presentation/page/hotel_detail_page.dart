@@ -11,6 +11,8 @@ import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
+import 'package:taskoteladmin/features/transactions/presentation/widgets/hotel_transactions_view.dart';
+import 'package:taskoteladmin/features/transactions/presentation/cubit/hotel_transaction_cubit.dart';
 
 class HotelDetailPage extends StatefulWidget {
   final String hotelId;
@@ -113,6 +115,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
               ],
             ),
           ),
+          const SizedBox(height: 20),
+
+          // Transaction Section
+          _buildTransactionSection(hotel),
         ],
       ),
     );
@@ -160,6 +166,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
 
           // Task Management Section
           Expanded(
+            flex: 3,
             child: CustomContainer(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,6 +185,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
+
+          // Transaction Section
+          Expanded(flex: 2, child: _buildTransactionSection(hotel)),
         ],
       ),
     );
@@ -218,6 +229,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
 
           // Task Management Section
           Expanded(
+            flex: 3,
             child: CustomContainer(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,6 +245,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
               ),
             ),
           ),
+          const SizedBox(height: 20),
+
+          // Transaction Section
+          Expanded(flex: 2, child: _buildTransactionSection(hotel)),
         ],
       ),
     );
@@ -981,6 +997,17 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
           title,
           style: AppTextStyles.tabelHeader.copyWith(fontSize: fontSize),
         ),
+      ),
+    );
+  }
+
+  // Build transaction section
+  Widget _buildTransactionSection(HotelModel hotel) {
+    return BlocProvider(
+      create: (context) => HotelTransactionCubit(),
+      child: HotelTransactionsView(
+        hotelId: widget.hotelId,
+        hotelName: hotel.name,
       ),
     );
   }

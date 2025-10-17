@@ -121,13 +121,25 @@ class TableActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(
-        icon,
-        size: TableConfig.mediumIconSize,
-        color: color ?? AppColors.textBlackColor,
-      ),
-      onPressed: onPressed,
-    );
+    return true
+        ? Align(
+            alignment: Alignment.centerLeft,
+            child: InkWell(
+              onTap: onPressed,
+              child: Icon(
+                icon,
+                size: TableConfig.mediumIconSize,
+                color: color ?? AppColors.textBlackColor,
+              ),
+            ),
+          )
+        : IconButton(
+            icon: Icon(
+              icon,
+              size: TableConfig.mediumIconSize,
+              color: color ?? AppColors.textBlackColor,
+            ),
+            onPressed: onPressed,
+          );
   }
 }
