@@ -203,28 +203,28 @@ class SubscriptionFirebaserepo extends SubscriptionRepo {
       // Create subscription purchase record
       final purchaseId = await createSubscriptionPurchase(subscriptionPurchase);
 
-      // Create transaction record
-      final transaction = TransactionModel(
-        docId: '',
-        clientId: clientId,
-        hotelId: hotelId,
-        clientName: '', // Will be filled by the calling function
-        hotelName: hotelName,
-        email: email,
-        purchaseModelId: purchaseId,
-        planName: subscriptionPlan.title,
-        amount: amount,
-        status: 'success',
-        paymentMethod: paymentMethod,
-        isPaid: true,
-        paidAt: now,
-        createdAt: now,
-        transactionId: transactionId,
-        subscriptionModel: subscriptionPlan,
-      );
+      // // Create transaction record
+      // final transaction = TransactionModel(
+      //   docId: '',
+      //   clientId: clientId,
+      //   hotelId: hotelId,
+      //   clientName: '', // Will be filled by the calling function
+      //   hotelName: hotelName,
+      //   email: email,
+      //   purchaseModelId: purchaseId,
+      //   planName: subscriptionPlan.title,
+      //   amount: amount,
+      //   status: 'success',
+      //   paymentMethod: paymentMethod,
+      //   isPaid: true,
+      //   paidAt: now,
+      //   createdAt: now,
+      //   transactionId: transactionId,
+      //   subscriptionModel: subscriptionPlan,
+      // );
 
-      // Add transaction to Firestore
-      await FBFireStore.transactions.add(transaction.toMap());
+      // // Add transaction to Firestore
+      // await FBFireStore.transactions.add(transaction.toMap());
 
       // Update hotel with subscription details
       await FBFireStore.hotels.doc(hotelId).update({

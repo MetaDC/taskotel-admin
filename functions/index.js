@@ -23,7 +23,7 @@ var transporter = nodemailer.createTransport({
 });
 
 // AUTH FUNCTIONS
-exports.createUser = onCall(async (request) => {
+exports.createClient = onCall(async (request) => {
   try {
     if (!request.auth)
       return { status: "error", code: 401, message: "Not signed in" };
@@ -48,6 +48,20 @@ exports.createUser = onCall(async (request) => {
         totalHotels: request.data.totalHotels,
         totalRevenue: request.data.totalRevenue,
         isDeleted: false,
+      });
+
+      //save in user collection
+      await db.collection("users").doc(user.uid).create({
+        name: request.data.name,
+        email: request.data.email,
+        phone: request.data.phone,
+        role: "client",
+        hotelIds: [],
+        departmentId: "",
+        isActive: true,
+        lastLogin: null,
+        createdAt: request.data.createdAt,
+        updatedAt: request.data.updatedAt,
       });
 
       console.log("User Data saved Successfully");
@@ -85,14 +99,66 @@ exports.createUser = onCall(async (request) => {
     };
   }
 });
+exports.createUser = onCall(async (request) => {
+  try {
+    if (!request.auth)
+      return { status: "error", code: 401, message: "Not signed in" };
 
-exports.sendCredentialToUserEmail = onCall(async (request) => {
-  const emailText = `<html>
-    <body>
-    <p>${request.data.otp} is your OTP. Valid for 5 minutes.</p>
-    </body>
-    </html>`;
-  sendEmailToUser(request.data.email, "Taskotel", emailText);
+    // Create the user
+    let user = await auth.createUser({
+      email: request.data.email,
+      password: request.data.password,
+    });
+
+    try {
+      //save in user collection
+      await db.collection("users").doc(user.uid).create({
+        name: request.data.name,
+        email: request.data.email,
+        phone: request.data.phone,
+        role: request.data.role,
+        hotelIds: request.data.hotelIds,
+        departmentId: request.data.departmentId,
+        isActive: true,
+        lastLogin: null,
+        createdAt: request.data.createdAt,
+        updatedAt: request.data.updatedAt,
+      });
+
+      console.log("User Data saved Successfully");
+
+      // Send credentials email
+      try {
+        console.log("Sending credentials email");
+        await sendCredentialsEmail(
+          request.data.email,
+          request.data.name,
+          request.data.email,
+          request.data.password
+        );
+        console.log("Credentials email sent successfully");
+      } catch (emailError) {
+        console.error("Failed to send credentials email:", emailError);
+        // Don't fail the user creation if email fails
+      }
+
+      return { success: true, msg: dbUser, docId: user.uid };
+    } catch (error) {
+      console.log(
+        `Failed to create user doc, need to delete this user again ${error}!`
+      );
+      await auth.deleteUser(user.uid);
+      console.log(`User deleted successfully ${error} !`);
+      return { success: false, msg: error };
+    }
+  } catch (error) {
+    console.log("Error creating new user:", error);
+    return {
+      success: false,
+      msg: error["errorInfo"]["message"],
+      code: error["errorInfo"]["code"],
+    };
+  }
 });
 
 // Function to send credentials email

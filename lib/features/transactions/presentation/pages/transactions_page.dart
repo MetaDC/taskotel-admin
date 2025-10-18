@@ -894,36 +894,39 @@ class _TransactionsPageState extends State<TransactionsPage> {
                           pageNumber = state.currentPage - 2 + index;
                         }
 
-                        return InkWell(
-                          onTap: () => context
-                              .read<TransactionCubit>()
-                              .fetchPage(pageNumber),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: state.currentPage == pageNumber
-                                  ? AppColors.primary
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: InkWell(
+                            onTap: () => context
+                                .read<TransactionCubit>()
+                                .fetchPage(pageNumber),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
                                 color: state.currentPage == pageNumber
                                     ? AppColors.primary
-                                    : Colors.grey[300]!,
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: state.currentPage == pageNumber
+                                      ? AppColors.primary
+                                      : Colors.grey[300]!,
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              pageNumber.toString(),
-                              style: GoogleFonts.inter(
-                                color: state.currentPage == pageNumber
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontWeight: state.currentPage == pageNumber
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                fontSize: 13,
+                              child: Text(
+                                pageNumber.toString(),
+                                style: GoogleFonts.inter(
+                                  color: state.currentPage == pageNumber
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontWeight: state.currentPage == pageNumber
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  fontSize: 13,
+                                ),
                               ),
                             ),
                           ),

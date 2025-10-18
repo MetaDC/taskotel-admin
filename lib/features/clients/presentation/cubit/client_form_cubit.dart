@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
+import 'package:taskoteladmin/core/utils/helpers.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_cubit.dart';
@@ -87,7 +88,10 @@ class ClientFormCubit extends Cubit<ClientFormState> {
         );
       } else {
         // Create new client
-        final res = await clientRepo.createAndRegisterClient(client, "1234567");
+        final res = await clientRepo.createAndRegisterClient(
+          client,
+          genStrongPassword(),
+        );
         client.docId = res;
         context.read<ClientCubit>().addClientToList(client);
         emit(

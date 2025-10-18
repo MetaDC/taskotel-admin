@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:taskoteladmin/core/services/image_picker.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
+import 'dart:math';
 
 /// Return color based on hotel type
 Color statusColor(String status) {
@@ -154,6 +155,12 @@ extension MetaWid on DateTime {
   }
 }
 
+String genStrongPassword() {
+  const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#\$%^&*()-_=+[]{};:,.<>?';
+  final rnd = Random.secure();
+  return List.generate(8, (_) => chars[rnd.nextInt(chars.length)]).join();
+}
 
 
 // Client Task Helper Function 

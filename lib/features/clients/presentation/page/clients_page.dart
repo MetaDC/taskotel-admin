@@ -46,15 +46,7 @@ class _ClientsPageState extends State<ClientsPage> {
             subHeading: 'Manage your hotel clients and their subscriptions',
             buttonText: 'Add Client',
             onButtonPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return const Dialog(
-                    backgroundColor: Color(0xffFAFAFA),
-                    child: ClientFormModal(),
-                  );
-                },
-              );
+              _showCreateClientModal(context, isDesktop);
             },
           ),
           const SizedBox(height: 25),
@@ -126,6 +118,31 @@ class _ClientsPageState extends State<ClientsPage> {
         ],
       ),
     );
+  }
+
+  void _showCreateClientModal(BuildContext context, bool isDesktop) {
+    if (isDesktop) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return const Dialog(
+            backgroundColor: Color(0xffFAFAFA),
+            child: ClientFormModal(),
+          );
+        },
+      );
+    } else {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: const ClientFormModal(),
+          );
+        },
+      );
+    }
   }
 }
 

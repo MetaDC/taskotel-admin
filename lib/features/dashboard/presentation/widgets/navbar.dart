@@ -90,6 +90,7 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: const Color(0xFF1C1C1E),
       elevation: 0,
+
       title: Row(
         children: [
           logo(),

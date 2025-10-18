@@ -56,7 +56,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeaderMobile(context),
+          _buildHeader(context, true),
           const SizedBox(height: 20),
           CustomContainer(
             child: Column(
@@ -87,7 +87,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(context, isTablet: true),
+          _buildHeader(context, true),
           const SizedBox(height: 24),
           Expanded(
             child: CustomContainer(
@@ -120,7 +120,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(context),
+          _buildHeader(context, false),
           const SizedBox(height: 30),
           Expanded(
             child: CustomContainer(
@@ -144,19 +144,39 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
   }
 
   // Header for Desktop/Tablet
-  Widget _buildHeader(BuildContext context, {bool isTablet = false}) {
+  Widget _buildHeader(BuildContext context, bool isMobile) {
     return PageHeaderWithButton(
       heading: widget.HotelName,
       subHeading: "Manage master tasks and franchise details",
       buttonText: "Create Task",
       onButtonPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) =>
-              Dialog(child: MasterTaskExcelFormScreen(hotelId: widget.hotelId)),
-        );
+        _showCreateTaskDialog(context, isMobile);
       },
     );
+  }
+
+  _showCreateTaskDialog(BuildContext context, bool isMobile) {
+    if (isMobile) {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: MasterTaskExcelFormScreen(hotelId: widget.hotelId),
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: MasterTaskExcelFormScreen(hotelId: widget.hotelId),
+          );
+        },
+      );
+    }
   }
 
   // Header for Mobile

@@ -18,7 +18,7 @@ class ClientFirebaseRepo extends ClientRepo {
     String password,
   ) async {
     try {
-      final res = await FBFunctions.ff.httpsCallable('createUser').call({
+      final res = await FBFunctions.ff.httpsCallable('createClient').call({
         "name": client.name,
         "email": client.email,
         "password": password,

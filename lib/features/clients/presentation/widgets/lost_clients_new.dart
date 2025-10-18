@@ -34,7 +34,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
   Widget build(BuildContext context) {
     return BlocListener<ClientCubit, ClientState>(
       listener: (context, state) {
-        print("Message: ${state.message}--${state.selectedTab}");
+        // print("Message: ${state.message}--${state.selectedTab}");
         if (state.message == "Client Deleted") {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -90,73 +90,65 @@ class _LostClientsNewState extends State<LostClientsNew> {
 
   // Mobile View
   Widget _buildMobileClientList(BuildContext context, ClientState state) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.blueGreyBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Lost Clients List", style: AppTextStyles.customContainerTitle),
-          const SizedBox(height: 16),
-          TextField(
-            controller: context.read<ClientCubit>().searchController,
-            decoration: InputDecoration(
-              fillColor: Color(0xfffafafa),
-              filled: true,
-              hintText: "Search clients...",
-              prefixIcon: const Icon(CupertinoIcons.search, size: 20),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: AppColors.blueGreyBorder),
-              ),
-              contentPadding: EdgeInsets.symmetric(vertical: 12),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Lost Clients List", style: AppTextStyles.customContainerTitle),
+        const SizedBox(height: 16),
+        TextField(
+          controller: context.read<ClientCubit>().searchController,
+          decoration: InputDecoration(
+            fillColor: Color(0xfffafafa),
+            filled: true,
+            hintText: "Search clients...",
+            prefixIcon: const Icon(CupertinoIcons.search, size: 20),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide(color: AppColors.blueGreyBorder),
             ),
-            onChanged: (value) {
-              context.read<ClientCubit>().searchClients(value);
-            },
+            contentPadding: EdgeInsets.symmetric(vertical: 12),
           ),
-          const SizedBox(height: 20),
-          if (state.isLoading && state.lostClients.isEmpty)
-            Center(child: CircularProgressIndicator())
-          else if (state.message != null &&
-              state.lostClients.isEmpty &&
-              state.message != "Client Deleted")
-            _buildErrorState(state.message!)
-          else if (state.filteredLostClients.isEmpty)
-            _buildEmptyState()
-          else
-            Column(
-              children: [
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: ClampingScrollPhysics(),
-                  separatorBuilder: (context, index) => SizedBox(height: 12),
-                  itemCount: state.filteredLostClients.length,
-                  itemBuilder: (context, index) {
-                    final client = state.filteredLostClients[index];
-                    return _buildMobileClientCard(client);
+          onChanged: (value) {
+            context.read<ClientCubit>().searchClients(value);
+          },
+        ),
+        const SizedBox(height: 20),
+        if (state.isLoading && state.lostClients.isEmpty)
+          Center(child: CircularProgressIndicator())
+        else if (state.message != null &&
+            state.lostClients.isEmpty &&
+            state.message != "Client Deleted")
+          _buildErrorState(state.message!)
+        else if (state.filteredLostClients.isEmpty)
+          _buildEmptyState()
+        else
+          Column(
+            children: [
+              ListView.separated(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                separatorBuilder: (context, index) => SizedBox(height: 12),
+                itemCount: state.filteredLostClients.length,
+                itemBuilder: (context, index) {
+                  final client = state.filteredLostClients[index];
+                  return _buildMobileClientCard(client);
+                },
+              ),
+              const SizedBox(height: 20),
+              if (state.lostTotalPages > 1 &&
+                  context.read<ClientCubit>().searchController.text.isEmpty)
+                DynamicPagination(
+                  currentPage: state.lostCurrentPage,
+                  totalPages: state.lostTotalPages,
+                  onPageChanged: (page) {
+                    context.read<ClientCubit>().fetchNextLostClientsPage(
+                      page: page,
+                    );
                   },
                 ),
-                const SizedBox(height: 20),
-                if (state.lostTotalPages > 1 &&
-                    context.read<ClientCubit>().searchController.text.isEmpty)
-                  DynamicPagination(
-                    currentPage: state.lostCurrentPage,
-                    totalPages: state.lostTotalPages,
-                    onPageChanged: (page) {
-                      context.read<ClientCubit>().fetchNextLostClientsPage(
-                        page: page,
-                      );
-                    },
-                  ),
-              ],
-            ),
-        ],
-      ),
+            ],
+          ),
+      ],
     );
   }
 
@@ -200,57 +192,58 @@ class _LostClientsNewState extends State<LostClientsNew> {
                     ),
                   ),
                   _buildStatusBadge(client.status),
-                  SizedBox(width: 8),
-                  PopupMenuButton(
-                    icon: Icon(Icons.more_vert, size: 20),
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'view',
-                        child: ListTile(
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(CupertinoIcons.eye, size: 20),
-                          title: Text('View'),
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'edit',
-                        child: ListTile(
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(Icons.edit, size: 15),
-                          title: Text('Edit'),
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'delete',
-                        child: ListTile(
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          leading: Icon(
-                            CupertinoIcons.delete,
-                            color: Colors.red,
-                            size: 20,
-                          ),
-                          title: Text(
-                            'Delete',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ),
-                    ],
-                    onSelected: (value) {
-                      Future.delayed(Duration.zero, () {
-                        if (value == 'view') {
-                          context.go(Routes.clientDetail(client.docId));
-                        } else if (value == 'edit') {
-                          _showEditDialog(client);
-                        } else if (value == 'delete') {
-                          _showDeleteDialog(client);
-                        }
-                      });
-                    },
-                  ),
+
+                  // SizedBox(width: 8),
+                  // PopupMenuButton(
+                  //   icon: Icon(Icons.more_vert, size: 20),
+                  //   itemBuilder: (context) => [
+                  //     PopupMenuItem(
+                  //       value: 'view',
+                  //       child: ListTile(
+                  //         dense: true,
+                  //         contentPadding: EdgeInsets.zero,
+                  //         leading: Icon(CupertinoIcons.eye, size: 20),
+                  //         title: Text('View'),
+                  //       ),
+                  //     ),
+                  //     PopupMenuItem(
+                  //       value: 'edit',
+                  //       child: ListTile(
+                  //         dense: true,
+                  //         contentPadding: EdgeInsets.zero,
+                  //         leading: Icon(Icons.edit, size: 15),
+                  //         title: Text('Edit'),
+                  //       ),
+                  //     ),
+                  //     PopupMenuItem(
+                  //       value: 'delete',
+                  //       child: ListTile(
+                  //         dense: true,
+                  //         contentPadding: EdgeInsets.zero,
+                  //         leading: Icon(
+                  //           CupertinoIcons.delete,
+                  //           color: Colors.red,
+                  //           size: 20,
+                  //         ),
+                  //         title: Text(
+                  //           'Delete',
+                  //           style: TextStyle(color: Colors.red),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  //   onSelected: (value) {
+                  //     Future.delayed(Duration.zero, () {
+                  //       if (value == 'view') {
+                  //         context.go(Routes.clientDetail(client.docId));
+                  //       } else if (value == 'edit') {
+                  //         _showEditDialog(client);
+                  //       } else if (value == 'delete') {
+                  //         _showDeleteDialog(client);
+                  //       }
+                  //     });
+                  //   },
+                  // ),
                 ],
               ),
               Divider(height: 24, color: AppColors.blueGreyBorder),
@@ -295,6 +288,32 @@ class _LostClientsNewState extends State<LostClientsNew> {
                   _buildInfoChip(
                     CupertinoIcons.money_dollar,
                     "\$${client.totalRevenue.toStringAsFixed(0)}",
+                  ),
+                ],
+              ),
+              Divider(height: 24, color: AppColors.blueGreyBorder),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        context.go(Routes.clientDetail(client.docId));
+                      },
+                      icon: const Icon(CupertinoIcons.eye, size: 16),
+                      label: const Text("View Details"),
+                      style: OutlinedButton.styleFrom(
+                        // backgroundColor: AppColors.primary,
+                        side: BorderSide(
+                          width: .7,
+                          color: AppColors.primary.withAlpha(80),
+                        ),
+                        foregroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

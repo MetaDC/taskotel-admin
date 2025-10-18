@@ -6,8 +6,12 @@ import 'package:intl/intl.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/widget/tabel_widgets.dart';
+import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:taskoteladmin/features/transactions/domain/entity/transactions_model.dart';
 import 'package:taskoteladmin/features/transactions/presentation/cubit/client_transaction_cubit.dart';
+
+const double mobileMinSize = 768;
+const double desktopMinSize = 1024;
 
 class ClientTransactionsView extends StatefulWidget {
   final String clientId;
@@ -34,29 +38,82 @@ class _ClientTransactionsViewState extends State<ClientTransactionsView> {
   Widget build(BuildContext context) {
     return BlocBuilder<ClientTransactionCubit, ClientTransactionState>(
       builder: (context, state) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.blueGreyBorder),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(state),
-              const SizedBox(height: 16),
-              _buildSearchAndFilter(state),
-              const SizedBox(height: 16),
-              _buildTransactionsList(state),
-              if (state.totalPages > 1) ...[
-                const SizedBox(height: 16),
-                _buildPagination(state),
-              ],
-            ],
-          ),
+        return ResponsiveCustomBuilder(
+          mobileBuilder: (width) => _buildMobileLayout(state, width),
+          tabletBuilder: (width) => _buildTabletLayout(state, width),
+          desktopBuilder: (width) => _buildDesktopLayout(state, width),
         );
       },
+    );
+  }
+
+  // Desktop Layout (>1024px)
+  Widget _buildDesktopLayout(ClientTransactionState state, double width) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.blueGreyBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(state),
+          const SizedBox(height: 16),
+          _buildSearchAndFilter(state, width),
+          const SizedBox(height: 16),
+          _buildTransactionsList(state, width),
+          if (state.totalPages > 1) ...[
+            const SizedBox(height: 16),
+            _buildPagination(state, width),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // Tablet Layout (768-1024px)
+  Widget _buildTabletLayout(ClientTransactionState state, double width) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.blueGreyBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(state),
+          const SizedBox(height: 16),
+          _buildSearchAndFilter(state, width),
+          const SizedBox(height: 16),
+          _buildTransactionsList(state, width),
+          if (state.totalPages > 1) ...[
+            const SizedBox(height: 16),
+            _buildPagination(state, width),
+          ],
+        ],
+      ),
+    );
+  }
+
+  // Mobile Layout (<768px)
+  Widget _buildMobileLayout(ClientTransactionState state, double width) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildHeader(state),
+        const SizedBox(height: 12),
+        _buildSearchAndFilter(state, width),
+        const SizedBox(height: 12),
+        _buildTransactionsList(state, width),
+        if (state.totalPages > 1) ...[
+          const SizedBox(height: 12),
+          _buildPagination(state, width),
+        ],
+      ],
     );
   }
 
@@ -91,31 +148,134 @@ class _ClientTransactionsViewState extends State<ClientTransactionsView> {
     );
   }
 
-  Widget _buildSearchAndFilter(ClientTransactionState state) {
+  Widget _buildSearchAndFilter(ClientTransactionState state, double width) {
+    final isMobile = width < mobileMinSize;
+    final isTablet = width >= mobileMinSize && width < desktopMinSize;
+
+    if (isMobile) {
+      return Column(
+        children: [
+          SizedBox(
+            height: 43,
+            child: TextField(
+              onChanged: (value) {
+                context.read<ClientTransactionCubit>().searchTransactions(
+                  value,
+                );
+              },
+              decoration: InputDecoration(
+                hintText: "Search transactions...",
+                prefixIcon: const Icon(CupertinoIcons.search, size: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppColors.blueGreyBorder),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: AppColors.slateGray,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            height: 43,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.blueGreyBorder),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: state.statusFilter,
+                isExpanded: true,
+                hint: Text(
+                  "All Status",
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+                items: [
+                  DropdownMenuItem(
+                    value: 'all',
+                    child: Text(
+                      "All Status",
+                      style: GoogleFonts.inter(fontSize: 14),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'success',
+                    child: Text(
+                      "Success",
+                      style: GoogleFonts.inter(fontSize: 14),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'failed',
+                    child: Text(
+                      "Failed",
+                      style: GoogleFonts.inter(fontSize: 14),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'pending',
+                    child: Text(
+                      "Pending",
+                      style: GoogleFonts.inter(fontSize: 14),
+                    ),
+                  ),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    context.read<ClientTransactionCubit>().filterByStatus(
+                      value,
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Row(
       children: [
         Expanded(
           flex: 2,
-          child: TextField(
-            onChanged: (value) {
-              context.read<ClientTransactionCubit>().searchTransactions(value);
-            },
-            decoration: InputDecoration(
-              hintText: "Search transactions...",
-              prefixIcon: const Icon(CupertinoIcons.search, size: 20),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: AppColors.blueGreyBorder),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
+          child: SizedBox(
+            height: 43,
+            child: TextField(
+              onChanged: (value) {
+                context.read<ClientTransactionCubit>().searchTransactions(
+                  value,
+                );
+              },
+              decoration: InputDecoration(
+                hintText: isTablet ? "Search..." : "Search transactions...",
+                prefixIcon: const Icon(CupertinoIcons.search, size: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppColors.blueGreyBorder),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: AppColors.slateGray,
+                ),
               ),
             ),
           ),
         ),
         const SizedBox(width: 12),
         Container(
+          height: 43,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             border: Border.all(color: AppColors.blueGreyBorder),
@@ -164,7 +324,7 @@ class _ClientTransactionsViewState extends State<ClientTransactionsView> {
     );
   }
 
-  Widget _buildTransactionsList(ClientTransactionState state) {
+  Widget _buildTransactionsList(ClientTransactionState state, double width) {
     if (state.isLoading && state.transactions.isEmpty) {
       return const Center(
         child: Padding(
@@ -231,9 +391,23 @@ class _ClientTransactionsViewState extends State<ClientTransactionsView> {
       );
     }
 
+    final isMobile = width < mobileMinSize;
+
+    if (isMobile) {
+      return ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        itemCount: state.transactions.length,
+        itemBuilder: (context, index) {
+          return _buildMobileTransactionCard(state.transactions[index]);
+        },
+      );
+    }
+
     return Column(
       children: [
-        _buildTableHeader(),
+        _buildTableHeader(width),
         const SizedBox(height: 8),
         const Divider(color: AppColors.slateGray, thickness: 0.5, height: 0),
         ListView.separated(
@@ -246,14 +420,123 @@ class _ClientTransactionsViewState extends State<ClientTransactionsView> {
           ),
           itemCount: state.transactions.length,
           itemBuilder: (context, index) {
-            return _buildTransactionRow(state.transactions[index]);
+            return _buildTransactionRow(state.transactions[index], width);
           },
         ),
       ],
     );
   }
 
-  Widget _buildTableHeader() {
+  Widget _buildMobileTransactionCard(TransactionModel transaction) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.blueGreyBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  transaction.transactionId,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              _buildStatusBadge(transaction.status),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            transaction.hotelName,
+            style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: const Color(0xff3e85f6).withOpacity(0.1),
+                  border: Border.all(
+                    color: const Color(0xff3e85f6),
+                    width: 0.7,
+                  ),
+                ),
+                child: Text(
+                  transaction.planName,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xff3e85f6),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Amount",
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: AppColors.slateGray,
+                    ),
+                  ),
+                  Text(
+                    "\$${transaction.amount.toStringAsFixed(2)}",
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    transaction.paymentMethod.toUpperCase(),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: AppColors.slateGray,
+                    ),
+                  ),
+                  Text(
+                    DateFormat('MMM dd, yyyy').format(transaction.createdAt),
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: AppColors.slateGray,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTableHeader(double width) {
+    final isTablet = width >= mobileMinSize && width < desktopMinSize;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       child: Row(
@@ -266,16 +549,21 @@ class _ClientTransactionsViewState extends State<ClientTransactionsView> {
             flex: 2,
             child: Text("Hotel", style: AppTextStyles.tabelHeader),
           ),
-          Expanded(child: Text("Plan", style: AppTextStyles.tabelHeader)),
+          if (!isTablet)
+            Expanded(child: Text("Plan", style: AppTextStyles.tabelHeader)),
           Expanded(child: Text("Amount", style: AppTextStyles.tabelHeader)),
-          Expanded(child: Text("Date", style: AppTextStyles.tabelHeader)),
           Expanded(child: Text("Status", style: AppTextStyles.tabelHeader)),
+          if (!isTablet)
+            Expanded(child: Text("Payment", style: AppTextStyles.tabelHeader)),
+          Expanded(child: Text("Date", style: AppTextStyles.tabelHeader)),
         ],
       ),
     );
   }
 
-  Widget _buildTransactionRow(TransactionModel transaction) {
+  Widget _buildTransactionRow(TransactionModel transaction, double width) {
+    final isTablet = width >= mobileMinSize && width < desktopMinSize;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       child: Row(
@@ -310,13 +598,36 @@ class _ClientTransactionsViewState extends State<ClientTransactionsView> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Expanded(
-            child: Text(
-              transaction.planName,
-              style: GoogleFonts.inter(fontSize: 13),
-              overflow: TextOverflow.ellipsis,
+          if (!isTablet)
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: const Color(0xff3e85f6).withOpacity(0.1),
+                      border: Border.all(
+                        color: const Color(0xff3e85f6),
+                        width: 0.7,
+                      ),
+                    ),
+                    child: Text(
+                      transaction.planName,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xff3e85f6),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
           Expanded(
             child: Text(
               "\$${transaction.amount.toStringAsFixed(2)}",
@@ -327,13 +638,20 @@ class _ClientTransactionsViewState extends State<ClientTransactionsView> {
             ),
           ),
           Expanded(
+            child: Row(children: [_buildStatusBadge(transaction.status)]),
+          ),
+          if (!isTablet)
+            Expanded(
+              child: Text(
+                transaction.paymentMethod.toUpperCase(),
+                style: GoogleFonts.inter(fontSize: 13),
+              ),
+            ),
+          Expanded(
             child: Text(
               DateFormat('MMM dd, yyyy').format(transaction.createdAt),
               style: GoogleFonts.inter(fontSize: 13),
             ),
-          ),
-          Expanded(
-            child: Row(children: [_buildStatusBadge(transaction.status)]),
           ),
         ],
       ),
@@ -379,33 +697,123 @@ class _ClientTransactionsViewState extends State<ClientTransactionsView> {
     );
   }
 
-  Widget _buildPagination(ClientTransactionState state) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          onPressed: state.currentPage > 1
-              ? () => context.read<ClientTransactionCubit>().goToPage(
-                  state.currentPage - 1,
-                )
-              : null,
-          icon: const Icon(CupertinoIcons.chevron_left),
-        ),
-        const SizedBox(width: 16),
-        Text(
-          "Page ${state.currentPage} of ${state.totalPages}",
-          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(width: 16),
-        IconButton(
-          onPressed: state.currentPage < state.totalPages
-              ? () => context.read<ClientTransactionCubit>().goToPage(
-                  state.currentPage + 1,
-                )
-              : null,
-          icon: const Icon(CupertinoIcons.chevron_right),
-        ),
-      ],
+  Widget _buildPagination(ClientTransactionState state, double width) {
+    final isMobile = width < 600;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: isMobile
+          ? Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: state.currentPage > 1
+                          ? () => context
+                                .read<ClientTransactionCubit>()
+                                .goToPage(state.currentPage - 1)
+                          : null,
+                      icon: const Icon(CupertinoIcons.chevron_left),
+                    ),
+                    Text(
+                      "Page ${state.currentPage} of ${state.totalPages}",
+                      style: GoogleFonts.inter(fontSize: 14),
+                    ),
+                    IconButton(
+                      onPressed: state.currentPage < state.totalPages
+                          ? () => context
+                                .read<ClientTransactionCubit>()
+                                .goToPage(state.currentPage + 1)
+                          : null,
+                      icon: const Icon(CupertinoIcons.chevron_right),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
+                  alignment: WrapAlignment.center,
+                  children: _buildPageNumbers(state),
+                ),
+              ],
+            )
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(CupertinoIcons.chevron_left),
+                  onPressed: state.currentPage > 1
+                      ? () => context.read<ClientTransactionCubit>().goToPage(
+                          state.currentPage - 1,
+                        )
+                      : null,
+                ),
+                const SizedBox(width: 16),
+                ..._buildPageNumbers(state).map(
+                  (widget) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: widget,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                IconButton(
+                  icon: const Icon(CupertinoIcons.chevron_right),
+                  onPressed: state.currentPage < state.totalPages
+                      ? () => context.read<ClientTransactionCubit>().goToPage(
+                          state.currentPage + 1,
+                        )
+                      : null,
+                ),
+              ],
+            ),
     );
+  }
+
+  List<Widget> _buildPageNumbers(ClientTransactionState state) {
+    return List.generate(state.totalPages > 5 ? 5 : state.totalPages, (index) {
+      int pageNumber;
+      if (state.totalPages <= 5) {
+        pageNumber = index + 1;
+      } else if (state.currentPage <= 3) {
+        pageNumber = index + 1;
+      } else if (state.currentPage >= state.totalPages - 2) {
+        pageNumber = state.totalPages - 4 + index;
+      } else {
+        pageNumber = state.currentPage - 2 + index;
+      }
+
+      return InkWell(
+        onTap: () =>
+            context.read<ClientTransactionCubit>().goToPage(pageNumber),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: state.currentPage == pageNumber
+                ? AppColors.primary
+                : Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(
+              color: state.currentPage == pageNumber
+                  ? AppColors.primary
+                  : Colors.grey[300]!,
+            ),
+          ),
+          child: Text(
+            pageNumber.toString(),
+            style: GoogleFonts.inter(
+              color: state.currentPage == pageNumber
+                  ? Colors.white
+                  : Colors.black,
+              fontWeight: state.currentPage == pageNumber
+                  ? FontWeight.bold
+                  : FontWeight.normal,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      );
+    });
   }
 }

@@ -44,6 +44,7 @@ class _SubscriptionAssignmentDialogState
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      insetPadding: EdgeInsets.all(0),
       backgroundColor: Colors.transparent,
       child: ResponsiveCustomBuilder(
         mobileBuilder: (width) => _buildMobileLayout(),
@@ -54,70 +55,54 @@ class _SubscriptionAssignmentDialogState
   }
 
   Widget _buildMobileLayout() {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 400),
-      height: MediaQuery.of(context).size.height * 0.9,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          _buildHeader(isMobile: true),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHotelInfoSection(isMobile: true),
-                  const SizedBox(height: 20),
-                  _buildPlanSelector(isMobile: true),
-                  const SizedBox(height: 20),
-                  _buildBillingCycleSection(isMobile: true),
-                  const SizedBox(height: 20),
-                  _buildPaymentMethodSection(isMobile: true),
-                ],
-              ),
+    return Column(
+      children: [
+        _buildHeader(isMobile: true),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHotelInfoSection(isMobile: true),
+                const SizedBox(height: 20),
+                _buildPlanSelector(isMobile: true),
+                const SizedBox(height: 20),
+                _buildBillingCycleSection(isMobile: true),
+                const SizedBox(height: 20),
+                _buildPaymentMethodSection(isMobile: true),
+              ],
             ),
           ),
-          _buildActionButtons(isMobile: true),
-        ],
-      ),
+        ),
+        _buildActionButtons(isMobile: true),
+      ],
     );
   }
 
   Widget _buildTabletLayout() {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 650),
-      height: MediaQuery.of(context).size.height * 0.85,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
-      child: Column(
-        children: [
-          _buildHeader(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHotelInfoSection(),
-                  const SizedBox(height: 24),
-                  _buildPlanSelector(),
-                  const SizedBox(height: 24),
-                  _buildBillingCycleSection(),
-                  const SizedBox(height: 24),
-                  _buildPaymentMethodSection(),
-                ],
-              ),
+    return Column(
+      children: [
+        _buildHeader(),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHotelInfoSection(),
+                const SizedBox(height: 24),
+                _buildPlanSelector(),
+                const SizedBox(height: 24),
+                _buildBillingCycleSection(),
+                const SizedBox(height: 24),
+                _buildPaymentMethodSection(),
+              ],
             ),
           ),
-          _buildActionButtons(),
-        ],
-      ),
+        ),
+        _buildActionButtons(),
+      ],
     );
   }
 

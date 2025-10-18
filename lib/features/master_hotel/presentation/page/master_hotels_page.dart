@@ -95,25 +95,42 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
           : "Manage hotel franchises and their master tasks",
       buttonText: isMobile ? "Add Hotel" : "Add Hotel Master",
       onButtonPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return Dialog(
-              backgroundColor: const Color(0xffFAFAFA),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: isMobile ? 350 : 600),
-                  child: MasterHotelForm(),
-                ),
-              ),
-            );
-          },
-        );
+        _showCreateMasterHotelModal(context, isMobile);
       },
     );
+  }
+
+  _showCreateMasterHotelModal(BuildContext context, bool isMobile) {
+    if (isMobile) {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: const MasterHotelForm(),
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            backgroundColor: const Color(0xffFAFAFA),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: isMobile ? 350 : 600),
+                child: MasterHotelForm(),
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
 
   // Mobile Cards View
@@ -390,9 +407,98 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                 ),
               ],
             ),
+            // const SizedBox(height: 12),
+
+            // const Divider(height: 1),
+            // const SizedBox(height: 12),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       flex: 2,
+            //       child: OutlinedButton.icon(
+            //         onPressed: () {
+            //           context.go(
+            //             '/master-hotels/${masterHotel.docId}/tasks?hotelName=${Uri.encodeComponent(masterHotel.franchiseName)}',
+            //           );
+            //         },
+            //         icon: const Icon(CupertinoIcons.eye, size: 16),
+            //         label: const Text("View Tasks"),
+            //         style: OutlinedButton.styleFrom(
+            //           // backgroundColor: AppColors.primary,
+            //           side: BorderSide(
+            //             width: .7,
+            //             color: AppColors.primary.withAlpha(80),
+            //           ),
+            //           foregroundColor: AppColors.primary,
+            //           padding: const EdgeInsets.symmetric(vertical: 10),
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(6),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //     Spacer(),
+            //     const SizedBox(width: 20),
+            //     InkWell(
+            //       onTap: () => _showEditAndAddDialog(masterHotel, true),
+            //       child: Icon(Icons.edit, size: 18),
+            //     ),
+            //     const SizedBox(width: 12),
+            //     InkWell(
+            //       onTap: () => _showDeleteDialog(masterHotel),
+            //       child: Icon(
+            //         CupertinoIcons.delete,
+            //         size: 18,
+            //         color: Colors.red,
+            //       ),
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),
+    );
+  }
+
+  _showEditAndAddDialog(MasterHotelModel masterHotel, bool isMobile) {
+    if (isMobile) {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: MasterHotelForm(editMasterHotel: masterHotel),
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            backgroundColor: const Color(0xffFAFAFA),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: MasterHotelForm(editMasterHotel: masterHotel),
+          );
+        },
+      );
+    }
+  }
+
+  _showDeleteDialog(MasterHotelModel masterHotel) {
+    showConfirmDeletDialog<MasterHotelCubit, MasterhotelState>(
+      context: context,
+      onBtnTap: () {
+        context.read<MasterHotelCubit>().deleteMasterHotel(masterHotel.docId);
+      },
+      title: "Delete Hotel Master",
+      message: "Are you sure you want to delete this hotel master?",
+      btnText: "Delete",
+      isLoadingSelector: (state) => state.isLoading,
+      successMessageSelector: (state) => state.message ?? "",
     );
   }
 
@@ -723,11 +829,8 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
             ),
           ),
           Expanded(
-            child: Text(
-              masterHotel.propertyType,
-              style: AppTextStyles.tableRowBoldValue.copyWith(
-                color: statusColor(masterHotel.propertyType),
-              ),
+            child: Row(
+              children: [_buildHotelTypeBadge(masterHotel.propertyType)],
             ),
           ),
           Expanded(
@@ -854,6 +957,44 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
         },
       ),
     ];
+  }
+
+  Widget _buildHotelTypeBadge(String hotelType) {
+    Color color;
+    switch (hotelType) {
+      case HotelTypes.hotel:
+        color = Colors.purple;
+        break;
+      case HotelTypes.resort:
+        color = Colors.green;
+        break;
+      case HotelTypes.motel:
+        color = Colors.orange;
+        break;
+      case HotelTypes.villa:
+        color = Colors.blue;
+        break;
+
+      default:
+        color = Colors.grey;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color),
+      ),
+      child: Text(
+        hotelType.toUpperCase(),
+        style: GoogleFonts.inter(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
   }
 }
 

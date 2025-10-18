@@ -1,13 +1,6 @@
-import 'dart:math';
-import 'dart:ui';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:taskoteladmin/core/services/firebase.dart';
-import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
-import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
-import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
 
+// Client Constants
 class ClientStatus {
   static const String active = 'active';
   static const String inactive = 'inactive';
@@ -24,7 +17,20 @@ final clientStatus = [
   ClientStatus.churned,
 ];
 
-final hotelTypes = ["Hotel", "Resort", "Motel", "Villa"];
+// Hotel Constants
+class HotelTypes {
+  static const String hotel = 'Hotel';
+  static const String resort = 'Resort';
+  static const String motel = 'Motel';
+  static const String villa = 'Villa';
+}
+
+final hotelTypes = [
+  HotelTypes.hotel,
+  HotelTypes.resort,
+  HotelTypes.motel,
+  HotelTypes.villa,
+];
 
 final List<String> departments = [
   'Housekeeping',

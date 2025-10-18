@@ -103,7 +103,7 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
             _buildAnalytics(state),
             const SizedBox(height: 12),
             _buildHotelPortfolioTable(context, state, width),
-            const SizedBox(height: 12),
+            const SizedBox(height: 30),
             _buildTransactionSection(state),
           ],
         ),
@@ -378,7 +378,7 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () =>
-                      _showSubscriptionAssignmentDialog(context, hotel),
+                      _showSubscriptionAssignmentDialog(context, hotel, true),
                   icon: const Icon(CupertinoIcons.doc_text, size: 16),
                   label: const Text("Assign Plan"),
                   style: OutlinedButton.styleFrom(
@@ -617,8 +617,11 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
                 Expanded(
                   child: TableActionButton(
                     icon: CupertinoIcons.doc_text,
-                    onPressed: () =>
-                        _showSubscriptionAssignmentDialog(context, hotel),
+                    onPressed: () => _showSubscriptionAssignmentDialog(
+                      context,
+                      hotel,
+                      isTablet,
+                    ),
                     color: AppColors.primary,
                   ),
                 ),
@@ -635,27 +638,54 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
   void _showSubscriptionAssignmentDialog(
     BuildContext context,
     HotelModel hotel,
+    bool isTablet,
   ) {
     final state = context.read<ClientDetailCubit>().state;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => BlocProvider.value(
-        // Provide the existing SubscriptionCubit to the dialog
-        value: context.read<ClientDetailCubit>(),
-        child: SubscriptionAssignmentDialog(
-          hotel: hotel,
-          clientName: state.client?.name ?? '',
-          clientEmail: state.client?.email ?? '',
-          onAssignmentComplete: (purchaseId) {
-            // Use the original context for refreshing
-            context.read<ClientDetailCubit>().loadClientDetails(
-              widget.clientId,
-            );
-          },
+    if (isTablet) {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+      
+        builder: (context) {
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: BlocProvider.value(
+              value: context.read<ClientDetailCubit>(),
+              child: SubscriptionAssignmentDialog(
+                hotel: hotel,
+                clientName: state.client?.name ?? '',
+                clientEmail: state.client?.email ?? '',
+                onAssignmentComplete: (purchaseId) {
+                  // Use the original context for refreshing
+                  context.read<ClientDetailCubit>().loadClientDetails(
+                    widget.clientId,
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => BlocProvider.value(
+          // Provide the existing SubscriptionCubit to the dialog
+          value: context.read<ClientDetailCubit>(),
+          child: SubscriptionAssignmentDialog(
+            hotel: hotel,
+            clientName: state.client?.name ?? '',
+            clientEmail: state.client?.email ?? '',
+            onAssignmentComplete: (purchaseId) {
+              // Use the original context for refreshing
+              context.read<ClientDetailCubit>().loadClientDetails(
+                widget.clientId,
+              );
+            },
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   // Build transaction section

@@ -26,24 +26,68 @@ class PageHeaderWithButton extends StatelessWidget {
     );
   }
 
+  // Widget _buildMobileLayout() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text(
+  //         heading,
+  //         style: AppTextStyles.headerHeading.copyWith(fontSize: 24),
+  //       ),
+  //       Text(
+  //         subHeading,
+  //         style: AppTextStyles.headerSubheading.copyWith(fontSize: 14),
+  //       ),
+  //       const SizedBox(height: 12),
+  //       Row(
+  //         children: [
+  //           Expanded(
+  //             child: ElevatedButton.icon(
+  //               style: _buttonStyle(),
+  //               onPressed: onButtonPressed,
+  //               icon: const Icon(Icons.add, size: 16, color: Colors.white),
+  //               label: Text(buttonText),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
   Widget _buildMobileLayout() {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(heading, style: AppTextStyles.headerHeading),
-        Text(subHeading, style: AppTextStyles.headerSubheading),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: ElevatedButton.icon(
-                style: _buttonStyle(),
-                onPressed: onButtonPressed,
-                icon: const Icon(Icons.add, size: 16, color: Colors.white),
-                label: Text(buttonText),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                heading,
+                style: AppTextStyles.headerHeading.copyWith(fontSize: 24),
               ),
-            ),
-          ],
+              Text(
+                subHeading,
+                style: AppTextStyles.headerSubheading.copyWith(fontSize: 14),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+        const SizedBox(width: 20),
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xff3c83f6),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 1.5),
+          ),
+          child: IconButton(
+            onPressed: onButtonPressed,
+            icon: const Icon(Icons.add, size: 20, color: Colors.white),
+            padding: const EdgeInsets.all(8),
+            constraints: const BoxConstraints(),
+          ),
         ),
       ],
     );

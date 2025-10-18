@@ -145,7 +145,9 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
       heading: "Subscription Plans",
       subHeading: "Manage subscription plans and pricing",
       buttonText: "Create Plan",
-      onButtonPressed: () => _showCreatePlanModal(context),
+      onButtonPressed: () {
+        _showCreatePlanModal(context);
+      },
     );
   }
 
@@ -293,46 +295,83 @@ class _SubscriptionPlansViewState extends State<_SubscriptionPlansView> {
 
   void _showCreatePlanModal(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < mobileMinSize;
+    if (isMobile) {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (dialogContext) {
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: BlocProvider(
+              create: (context) => SubscriptionFormCubit(
+                subscriptionRepo: SubscriptionFirebaserepo(),
+              ),
+              child: BlocListener<SubscriptionFormCubit, SubscriptionFormState>(
+                listener: (formContext, formState) {
+                  if (formState.isSubmitted &&
+                      formState.successMessage != null) {
+                    Navigator.of(dialogContext).pop();
+                    context.read<SubscriptionCubit>().loadSubscriptionPlans();
+                    context.read<SubscriptionCubit>().loadAnalytics();
 
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return Dialog(
-          backgroundColor: const Color(0xffFAFAFA),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          insetPadding: isMobile
-              ? const EdgeInsets.symmetric(horizontal: 16, vertical: 24)
-              : const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
-          child: BlocProvider(
-            create: (context) => SubscriptionFormCubit(
-              subscriptionRepo: SubscriptionFirebaserepo(),
-            ),
-            child: BlocListener<SubscriptionFormCubit, SubscriptionFormState>(
-              listener: (formContext, formState) {
-                if (formState.isSubmitted && formState.successMessage != null) {
-                  Navigator.of(dialogContext).pop();
-                  context.read<SubscriptionCubit>().loadSubscriptionPlans();
-                  context.read<SubscriptionCubit>().loadAnalytics();
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(formState.successMessage!),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }
-              },
-              child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: isMobile ? double.infinity : 600,
-                ),
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(formState.successMessage!),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                },
                 child: const CreatePlanForm(planToEdit: null),
               ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return Dialog(
+            backgroundColor: const Color(0xffFAFAFA),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            insetPadding: isMobile
+                ? const EdgeInsets.symmetric(horizontal: 16, vertical: 24)
+                : const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+            child: BlocProvider(
+              create: (context) => SubscriptionFormCubit(
+                subscriptionRepo: SubscriptionFirebaserepo(),
+              ),
+              child: BlocListener<SubscriptionFormCubit, SubscriptionFormState>(
+                listener: (formContext, formState) {
+                  if (formState.isSubmitted &&
+                      formState.successMessage != null) {
+                    Navigator.of(dialogContext).pop();
+                    context.read<SubscriptionCubit>().loadSubscriptionPlans();
+                    context.read<SubscriptionCubit>().loadAnalytics();
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(formState.successMessage!),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                },
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxWidth: isMobile ? double.infinity : 600,
+                  ),
+                  child: const CreatePlanForm(planToEdit: null),
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
 
   void _showEditPlanModal(BuildContext context, SubscriptionPlanModel plan) {

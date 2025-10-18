@@ -34,7 +34,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
   Widget build(BuildContext context) {
     return BlocListener<ClientCubit, ClientState>(
       listener: (context, state) {
-        print("Message: ${state.message}--${state.selectedTab}");
+        // print("Message: ${state.message}--${state.selectedTab}");
         if (state.message == "Client Deleted") {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -204,7 +204,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                     ),
                   ),
                   _buildStatusBadge(client.status),
-                  SizedBox(width: 8),
+                  /*  SizedBox(width: 8),
                   PopupMenuButton(
                     icon: Icon(Icons.more_vert, size: 20),
                     itemBuilder: (context) => [
@@ -255,6 +255,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                       });
                     },
                   ),
+                 */
                 ],
               ),
               Divider(height: 24, color: AppColors.blueGreyBorder),
@@ -305,6 +306,48 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                   _buildInfoChip(
                     CupertinoIcons.calendar,
                     client.lastPaymentExpiry?.goodDayDate() ?? 'N/A',
+                  ),
+                ],
+              ),
+              Divider(height: 24, color: AppColors.blueGreyBorder),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        context.go(Routes.clientDetail(client.docId));
+                      },
+                      icon: const Icon(CupertinoIcons.eye, size: 16),
+                      label: const Text("View Details"),
+                      style: OutlinedButton.styleFrom(
+                        // backgroundColor: AppColors.primary,
+                        side: BorderSide(
+                          width: .7,
+                          color: AppColors.primary.withAlpha(80),
+                        ),
+                        foregroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  const SizedBox(width: 20),
+                  InkWell(
+                    onTap: () => _showEditDialog(client),
+                    child: Icon(Icons.edit, size: 18),
+                  ),
+                  const SizedBox(width: 12),
+                  InkWell(
+                    onTap: () => _showDeleteDialog(client),
+                    child: Icon(
+                      CupertinoIcons.delete,
+                      size: 18,
+                      color: Colors.red,
+                    ),
                   ),
                 ],
               ),
