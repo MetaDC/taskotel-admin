@@ -142,7 +142,11 @@ exports.createUser = onCall(async (request) => {
         // Don't fail the user creation if email fails
       }
 
-      return { success: true, msg: dbUser, docId: user.uid };
+      return {
+        success: true,
+        msg: "User created successfully",
+        docId: user.uid,
+      };
     } catch (error) {
       console.log(
         `Failed to create user doc, need to delete this user again ${error}!`
