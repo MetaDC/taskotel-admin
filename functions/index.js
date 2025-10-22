@@ -101,16 +101,18 @@ exports.createClient = onCall(async (request) => {
 });
 exports.createUser = onCall(async (request) => {
   try {
-    if (!request.auth)
-      return { status: "error", code: 401, message: "Not signed in" };
-
+    // if (!request.auth)
+    //   return { status: "error", code: 401, message: "Not signed in" };
+    console.log("Creating user:-" + request.data.email);
     // Create the user
     let user = await auth.createUser({
       email: request.data.email,
       password: request.data.password,
     });
+    console.log("User created:-" + user.uid);
 
     try {
+      console.log("Saving user data:-" + user.uid);
       //save in user collection
       await db.collection("users").doc(user.uid).create({
         name: request.data.name,
@@ -125,18 +127,18 @@ exports.createUser = onCall(async (request) => {
         updatedAt: request.data.updatedAt,
       });
 
-      console.log("User Data saved Successfully");
+      console.log("User Data saved Successfully:-" + user.uid);
 
       // Send credentials email
       try {
-        console.log("Sending credentials email");
+        console.log("Sending credentials email:-" + user.uid);
         await sendCredentialsEmail(
           request.data.email,
           request.data.name,
           request.data.email,
           request.data.password
         );
-        console.log("Credentials email sent successfully");
+        console.log("Credentials email sent successfully:-" + user.uid);
       } catch (emailError) {
         console.error("Failed to send credentials email:", emailError);
         // Don't fail the user creation if email fails
