@@ -601,18 +601,20 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
                         ],
                       ),
                       onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => Dialog(
-                            child: Container(
-                              constraints: BoxConstraints(maxWidth: 600),
-                              child: TaskEditCreateForm(
-                                hotelId: widget.hotelId,
-                                taskToEdit: task,
-                              ),
-                            ),
-                          ),
-                        );
+                        true
+                            ? _showEditTaskDialog(context, task, false)
+                            : showDialog(
+                                context: context,
+                                builder: (context) => Dialog(
+                                  child: Container(
+                                    constraints: BoxConstraints(maxWidth: 600),
+                                    child: TaskEditCreateForm(
+                                      hotelId: widget.hotelId,
+                                      taskToEdit: task,
+                                    ),
+                                  ),
+                                ),
+                              );
                       },
                     ),
                     PopupMenuItem(
@@ -658,6 +660,41 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
         ],
       ),
     );
+  }
+
+  _showEditTaskDialog(
+    BuildContext context,
+    CommonTaskModel task,
+    bool isMobile,
+  ) {
+    if (isMobile) {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: TaskEditCreateForm(
+              hotelId: widget.hotelId,
+              taskToEdit: task,
+            ),
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => Dialog(
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 600),
+            child: TaskEditCreateForm(
+              hotelId: widget.hotelId,
+              taskToEdit: task,
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   // Tablet Task Row (Compact)
@@ -738,18 +775,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
                         ],
                       ),
                       onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => Dialog(
-                            child: Container(
-                              constraints: BoxConstraints(maxWidth: 600),
-                              child: TaskEditCreateForm(
-                                hotelId: widget.hotelId,
-                                taskToEdit: task,
-                              ),
-                            ),
-                          ),
-                        );
+                        _showEditTaskDialog(context, task, false);
                       },
                     ),
                     PopupMenuItem(
@@ -883,18 +909,7 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
                           ],
                         ),
                         onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => Dialog(
-                              child: Container(
-                                constraints: BoxConstraints(maxWidth: 600),
-                                child: TaskEditCreateForm(
-                                  hotelId: widget.hotelId,
-                                  taskToEdit: task,
-                                ),
-                              ),
-                            ),
-                          );
+                          _showEditTaskDialog(context, task, true);
                         },
                       ),
                       PopupMenuItem(
