@@ -71,15 +71,20 @@ class UserRoles {
 }
 
 final List<Map<String, String>> roles = [
-  {'key': UserRoles.rm, 'name': 'Regional Manager'},
-  {'key': UserRoles.gm, 'name': 'General Manager'},
-  {'key': UserRoles.dm, 'name': 'Department Manager'},
-  {'key': UserRoles.operators, 'name': 'Operators'},
+  {'key': UserRoles.rm, 'name': RoleTab.regionalManager},
+  {'key': UserRoles.gm, 'name': RoleTab.generalManager},
+  {'key': UserRoles.dm, 'name': RoleTab.departmentManager},
+  {'key': UserRoles.operators, 'name': RoleTab.operators},
 ];
 
 List<String> userRole = roles.map((role) => role['key']!).toList();
 
-enum RoleTab { regionalManager, generalManager, departmentManager, operators }
+class RoleTab {
+  static const String regionalManager = 'Regional Manager';
+  static const String generalManager = 'General Manager';
+  static const String departmentManager = 'Department Manager';
+  static const String operators = 'Operators';
+}
 
 // Client Hotel Task Constants
 

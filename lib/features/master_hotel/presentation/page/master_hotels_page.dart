@@ -263,27 +263,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
                         ],
                       ),
                       onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return Dialog(
-                              backgroundColor: const Color(0xffFAFAFA),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: SingleChildScrollView(
-                                child: ConstrainedBox(
-                                  constraints: const BoxConstraints(
-                                    maxWidth: 350,
-                                  ),
-                                  child: MasterHotelForm(
-                                    editMasterHotel: masterHotel,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
+                        _showEditAndAddDialog(masterHotel, true);
                       },
                     ),
                     PopupMenuItem(
@@ -327,7 +307,7 @@ class _MasterHotelsPageState extends State<MasterHotelsPage> {
               ],
             ),
             const SizedBox(height: 12),
-            const Divider(height: 1),
+            Divider(color: Colors.grey.shade300, thickness: 1, height: 1),
             const SizedBox(height: 12),
 
             // Property Type & Status

@@ -6,7 +6,6 @@ import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/core/widget/custom_container.dart';
-import 'package:taskoteladmin/core/utils/helpers.dart';
 import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
@@ -396,9 +395,16 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
 
   // Role Tabs for Desktop/Tablet
   Widget _buildRoleTabs(ClientDetailState state) {
-    Map<RoleTab, Widget> segmentedControlTabs = {};
+    Map<String, Widget> segmentedControlTabs = {};
 
-    for (RoleTab tab in RoleTab.values) {
+    final tabList = [
+      RoleTab.regionalManager,
+      RoleTab.generalManager,
+      RoleTab.departmentManager,
+      RoleTab.operators,
+    ];
+
+    for (String tab in tabList) {
       segmentedControlTabs[tab] = Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Text(
@@ -408,10 +414,10 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
       );
     }
 
-    return CupertinoSlidingSegmentedControl<RoleTab>(
+    return CupertinoSlidingSegmentedControl<String>(
       children: segmentedControlTabs,
       groupValue: state.selectedTab,
-      onValueChanged: (RoleTab? value) {
+      onValueChanged: (String? value) {
         if (value != null) {
           context.read<ClientDetailCubit>().switchTab(value);
         }
@@ -424,6 +430,13 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
 
   // Role Dropdown for Mobile
   Widget _buildRoleDropdownMobile(ClientDetailState state) {
+    final tabList = [
+      RoleTab.regionalManager,
+      RoleTab.generalManager,
+      RoleTab.departmentManager,
+      RoleTab.operators,
+    ];
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
@@ -432,7 +445,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButton<RoleTab>(
+        child: DropdownButton<String>(
           value: state.selectedTab,
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down, size: 20),
@@ -442,8 +455,8 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
             color: Colors.black,
           ),
           dropdownColor: Colors.white,
-          items: RoleTab.values.map((tab) {
-            return DropdownMenuItem<RoleTab>(
+          items: tabList.map((tab) {
+            return DropdownMenuItem<String>(
               value: tab,
               child: Row(
                 children: [
@@ -464,7 +477,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
               ),
             );
           }).toList(),
-          onChanged: (RoleTab? value) {
+          onChanged: (String? value) {
             if (value != null) {
               context.read<ClientDetailCubit>().switchTab(value);
             }
@@ -475,7 +488,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
   }
 
   // Helper method to get icons for each role
-  IconData _getIconForRole(RoleTab tab) {
+  IconData _getIconForRole(String tab) {
     switch (tab) {
       case RoleTab.regionalManager:
         return CupertinoIcons.person_3_fill;

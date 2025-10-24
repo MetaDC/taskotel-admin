@@ -1,6 +1,5 @@
 // ClientDetailCubit
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:taskoteladmin/core/utils/const.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/%20analytics_models.dart';
@@ -67,7 +66,7 @@ class ClientDetailCubit extends Cubit<ClientDetailState> {
   }
 
   // Tab management methods
-  void switchTab(RoleTab tab) {
+  void switchTab(String tab) {
     if (state.selectedTab != tab) {
       emit(state.copyWith(selectedTab: tab));
     }

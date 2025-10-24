@@ -8,7 +8,7 @@ class ClientDetailState {
   final bool isLoading;
   final bool isLoadingTasks;
   final String? message;
-  final RoleTab selectedTab;
+  final String selectedTab;
   final List<CommonTaskModel> allTasks; // Keep all tasks here
   final String searchQuery;
   final ClientDetailAnalytics? clientAnalytics;
@@ -51,7 +51,7 @@ class ClientDetailState {
     bool? isLoading,
     bool? isLoadingTasks,
     String? message,
-    RoleTab? selectedTab,
+    String? selectedTab,
     List<CommonTaskModel>? allTasks,
     String? searchQuery,
     ClientDetailAnalytics? clientAnalytics,
@@ -78,23 +78,26 @@ class ClientDetailState {
     switch (selectedTab) {
       case RoleTab.regionalManager:
         roleTasks = allTasks
-            .where((task) => task.assignedRole == "rm")
+            .where((task) => task.assignedRole == UserRoles.rm)
             .toList();
         break;
       case RoleTab.generalManager:
         roleTasks = allTasks
-            .where((task) => task.assignedRole == "gm")
+            .where((task) => task.assignedRole == UserRoles.gm)
             .toList();
         break;
       case RoleTab.departmentManager:
         roleTasks = allTasks
-            .where((task) => task.assignedRole == "dm")
+            .where((task) => task.assignedRole == UserRoles.dm)
             .toList();
         break;
       case RoleTab.operators:
         roleTasks = allTasks
-            .where((task) => task.assignedRole == "staff")
+            .where((task) => task.assignedRole == UserRoles.operators)
             .toList();
+        break;
+      default:
+        roleTasks = [];
         break;
     }
 
@@ -117,16 +120,18 @@ class ClientDetailState {
   }
 
   // Get tab display name
-  String getTabDisplayName(RoleTab tab) {
+  String getTabDisplayName(String tab) {
     switch (tab) {
       case RoleTab.regionalManager:
-        return "Regional Manager";
+        return RoleTab.regionalManager;
       case RoleTab.generalManager:
-        return "General Manager";
+        return RoleTab.generalManager;
       case RoleTab.departmentManager:
-        return "Department Manager";
+        return RoleTab.departmentManager;
       case RoleTab.operators:
-        return "Operators";
+        return RoleTab.operators;
+      default:
+        return tab;
     }
   }
 }
