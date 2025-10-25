@@ -301,7 +301,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                   ),
                   _buildInfoChip(
                     CupertinoIcons.money_dollar,
-                    "\$${client.totalRevenue.toStringAsFixed(0)}",
+                    "${client.totalRevenue.toStringAsFixed(0)}",
                   ),
                   _buildInfoChip(
                     CupertinoIcons.calendar,
@@ -337,7 +337,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                   Spacer(),
                   const SizedBox(width: 20),
                   InkWell(
-                    onTap: () => _showEditDialog(client),
+                    onTap: () => _showEditDialog(client, true),
                     child: Icon(Icons.edit, size: 18),
                   ),
                   const SizedBox(width: 12),
@@ -554,6 +554,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
         Expanded(child: Text("Hotels", style: AppTextStyles.tabelHeader)),
         Expanded(child: Text("Revenue", style: AppTextStyles.tabelHeader)),
         Expanded(child: Text("Expiry", style: AppTextStyles.tabelHeader)),
+        Expanded(child: Text("Last Login", style: AppTextStyles.tabelHeader)),
         Expanded(child: Text("Status", style: AppTextStyles.tabelHeader)),
         SizedBox(
           width: TableConfig.viewColumnWidth,
@@ -612,6 +613,12 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
               style: AppTextStyles.tableRowBoldValue,
             ),
           ),
+          Expanded(
+            child: Text(
+              client.lastLogin?.goodDayDate() ?? 'N/A',
+              style: AppTextStyles.tableRowBoldValue,
+            ),
+          ),
           Expanded(child: Row(children: [_buildStatusBadge(client.status)])),
           SizedBox(
             width: TableConfig.viewColumnWidth,
@@ -657,7 +664,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
               onSelected: (value) {
                 Future.delayed(Duration.zero, () {
                   if (value == 'edit') {
-                    _showEditDialog(client);
+                    _showEditDialog(client, false);
                   } else if (value == 'delete') {
                     _showDeleteDialog(client);
                   }
@@ -670,16 +677,29 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
     );
   }
 
-  void _showEditDialog(ClientModel client) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return Dialog(
-          backgroundColor: Color(0xffFAFAFA),
-          child: ClientFormModal(clientToEdit: client),
-        );
-      },
-    );
+  void _showEditDialog(ClientModel client, bool isMobile) {
+    if (isMobile) {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: ClientFormModal(clientToEdit: client),
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return Dialog(
+            backgroundColor: Color(0xffFAFAFA),
+            child: ClientFormModal(clientToEdit: client),
+          );
+        },
+      );
+    }
   }
 
   void _showDeleteDialog(ClientModel client) {

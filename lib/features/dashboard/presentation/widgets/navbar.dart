@@ -129,60 +129,162 @@ class Navbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget userDropdown({bool isMobile = false, required BuildContext context}) {
-    return PopupMenuButton<String>(
-      color: Colors.white,
-      offset: const Offset(0, 40),
-      onSelected: (value) {
-        if (value == "Settings") {
-          // context.go("/settings");
-        } else if (value == "Logout") {
-          context.read<AuthCubit>().logout(context);
-        }
-      },
-      itemBuilder: (context) {
-        return [
-          const PopupMenuItem(
-            value: "Settings",
+    return true
+        ? _HoverableUserDropdown(isMobile: isMobile)
+        : PopupMenuButton<String>(
+            tooltip: "",
+            color: Colors.white,
+            offset: const Offset(0, 40),
+            onSelected: (value) {
+              if (value == "Settings") {
+                // context.go("/settings");
+              } else if (value == "Logout") {
+                context.read<AuthCubit>().logout(context);
+              }
+            },
+            itemBuilder: (context) {
+              return [
+                const PopupMenuItem(
+                  value: "Settings",
+                  child: Row(
+                    children: [
+                      Icon(Icons.settings, size: 18, color: Colors.black54),
+                      SizedBox(width: 8),
+                      Text("Settings"),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: "Logout",
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, size: 18, color: Colors.black54),
+                      SizedBox(width: 8),
+                      Text("Logout"),
+                    ],
+                  ),
+                ),
+              ];
+            },
             child: Row(
               children: [
-                Icon(Icons.settings, size: 18, color: Colors.black54),
-                SizedBox(width: 8),
-                Text("Settings"),
+                const CircleAvatar(
+                  radius: 15,
+                  backgroundColor: Color(0xFF4f4f53),
+                  child: Icon(
+                    Icons.person_outlined,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+                if (!isMobile) ...[
+                  const SizedBox(width: 8),
+                  Text(
+                    "Super Admin",
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const Icon(Icons.arrow_drop_down, color: Colors.white),
+                ],
               ],
             ),
-          ),
-          const PopupMenuItem(
-            value: "Logout",
-            child: Row(
-              children: [
-                Icon(Icons.logout, size: 18, color: Colors.black54),
-                SizedBox(width: 8),
-                Text("Logout"),
-              ],
-            ),
-          ),
-        ];
-      },
-      child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 15,
-            backgroundColor: Color(0xFF4f4f53),
-            child: Icon(Icons.person_outlined, color: Colors.white, size: 20),
-          ),
-          if (!isMobile) ...[
-            const SizedBox(width: 8),
-            Text(
-              "Super Admin",
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+          );
+  }
+}
+
+// ---------------------------
+// ✅ Hoverable User Dropdown Widget
+// ---------------------------
+class _HoverableUserDropdown extends StatefulWidget {
+  final bool isMobile;
+
+  const _HoverableUserDropdown({required this.isMobile});
+
+  @override
+  State<_HoverableUserDropdown> createState() => _HoverableUserDropdownState();
+}
+
+class _HoverableUserDropdownState extends State<_HoverableUserDropdown> {
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isHovered ? const Color(0xFF2A2A2D) : Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: PopupMenuButton<String>(
+          tooltip: "",
+          color: Colors.white,
+          offset: const Offset(0, 40),
+          onSelected: (value) {
+            if (value == "Settings") {
+              // context.go("/settings");
+            } else if (value == "Logout") {
+              context.read<AuthCubit>().logout(context);
+            }
+          },
+          itemBuilder: (context) {
+            return [
+              const PopupMenuItem(
+                value: "Settings",
+                child: Row(
+                  children: [
+                    Icon(Icons.settings, size: 18, color: Colors.black54),
+                    SizedBox(width: 8),
+                    Text("Settings"),
+                  ],
+                ),
               ),
-            ),
-            const Icon(Icons.arrow_drop_down, color: Colors.white),
-          ],
-        ],
+              const PopupMenuItem(
+                value: "Logout",
+                child: Row(
+                  children: [
+                    Icon(Icons.logout, size: 18, color: Colors.black54),
+                    SizedBox(width: 8),
+                    Text("Logout"),
+                  ],
+                ),
+              ),
+            ];
+          },
+          child: Row(
+            children: [
+              const CircleAvatar(
+                radius: 15,
+                backgroundColor: Color(0xFF4f4f53),
+                child: Icon(
+                  Icons.person_outlined,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              if (!widget.isMobile) ...[
+                const SizedBox(width: 8),
+                Text(
+                  "Super Admin",
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Icon(Icons.arrow_drop_down, color: Colors.white),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }

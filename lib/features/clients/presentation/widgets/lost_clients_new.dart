@@ -80,7 +80,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
         ),
         StatCardIconLeft(
           icon: CupertinoIcons.building_2_fill,
-          label: "Lost Hotels",
+          label: "Never Paid",
           value: "${state.stats?.lostHotels ?? 0}",
           iconColor: Colors.orange,
         ),
@@ -287,7 +287,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
                   ),
                   _buildInfoChip(
                     CupertinoIcons.money_dollar,
-                    "\$${client.totalRevenue.toStringAsFixed(0)}",
+                    "${client.totalRevenue.toStringAsFixed(0)}",
                   ),
                 ],
               ),

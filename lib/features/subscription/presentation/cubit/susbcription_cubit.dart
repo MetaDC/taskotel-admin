@@ -32,6 +32,10 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
           .getSubscriptionPlansStream()
           .listen(
             (plans) {
+              plans.sort(
+                (a, b) =>
+                    a.price['monthly']?.compareTo(b.price['monthly'] ?? 0) ?? 0,
+              );
               emit(
                 state.copyWith(
                   subscriptionPlans: plans,

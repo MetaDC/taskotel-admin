@@ -32,7 +32,7 @@ class ClientCubit extends Cubit<ClientState> {
       Query query = FBFireStore.clients
           .where('status', whereIn: ['active', 'trial'])
           .where("isDeleted", isEqualTo: false)
-          .orderBy('lastPaymentExpiry', descending: true)
+          .orderBy('updatedAt', descending: true)
           .limit(_pageSize);
 
       if (state.activeLastFetchedDoc != null) {
@@ -475,7 +475,6 @@ class ClientCubit extends Cubit<ClientState> {
     );
   }
 
-  // Tab management methods - FIXED VERSION
   // Tab management methods - FIXED to clear delete message on tab switch
   void switchTab(ClientTab tab) {
     if (state.selectedTab != tab) {
