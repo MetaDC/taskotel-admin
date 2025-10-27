@@ -33,7 +33,7 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
     super.initState();
 
     final cubit = context.read<ClientDetailCubit>();
-    cubit.loadHotelDetails(widget.hotelId);
+    cubit.loadHotelDetails(widget.hotelId, widget.clientId);
     cubit.switchTab(RoleTab.regionalManager);
   }
 
@@ -414,17 +414,20 @@ class _HotelDetailPageState extends State<HotelDetailPage> {
       );
     }
 
-    return CupertinoSlidingSegmentedControl<String>(
-      children: segmentedControlTabs,
-      groupValue: state.selectedTab,
-      onValueChanged: (String? value) {
-        if (value != null) {
-          context.read<ClientDetailCubit>().switchTab(value);
-        }
-      },
-      backgroundColor: AppColors.slateLightGray,
-      thumbColor: Colors.white,
-      padding: const EdgeInsets.all(4),
+    return SizedBox(
+      width: double.infinity,   
+      child: CupertinoSlidingSegmentedControl<String>(
+        children: segmentedControlTabs,
+        groupValue: state.selectedTab,
+        onValueChanged: (String? value) {
+          if (value != null) {
+            context.read<ClientDetailCubit>().switchTab(value);
+          }
+        },
+        backgroundColor: AppColors.slateLightGray,
+        thumbColor: Colors.white,
+        padding: const EdgeInsets.all(4),
+      ),
     );
   }
 

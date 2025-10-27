@@ -179,43 +179,6 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
     }
   }
 
-  // Header for Mobile
-  Widget _buildHeaderMobile(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.HotelName,
-          style: AppTextStyles.headerHeading.copyWith(fontSize: 20),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          "Manage master tasks and franchise details",
-          style: AppTextStyles.headerSubheading.copyWith(fontSize: 12),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => Dialog(
-                  child: MasterTaskExcelFormScreen(hotelId: widget.hotelId),
-                ),
-              );
-            },
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text("Create Task"),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   // Role Tabs for Desktop/Tablet
   Widget _buildRoleTabs(MasterhotelTaskState state, {bool isCompact = false}) {
     Map<String, Widget> segmentedControlTabs = {};
@@ -255,47 +218,6 @@ class _MasterHotelTaskPageState extends State<MasterHotelTaskPage> {
         backgroundColor: AppColors.slateLightGray,
         thumbColor: Colors.white,
         padding: const EdgeInsets.all(4),
-      ),
-    );
-  }
-
-  // Role Tabs for Mobile (Scrollable)
-  Widget _buildRoleTabsMobile(MasterhotelTaskState state) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: roles.map((role) {
-          final tab = role['key']!;
-          final isSelected = state.selectedTab == tab;
-          return GestureDetector(
-            onTap: () {
-              context.read<MasterhotelTaskCubit>().switchTab(
-                tab,
-                widget.hotelId,
-              );
-            },
-            child: Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: isSelected ? Colors.white : AppColors.slateLightGray,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: isSelected ? AppColors.slateGray : Colors.transparent,
-                  width: 1,
-                ),
-              ),
-              child: Text(
-                state.getTabDisplayName(tab),
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? Colors.black : AppColors.slateGray,
-                ),
-              ),
-            ),
-          );
-        }).toList(),
       ),
     );
   }

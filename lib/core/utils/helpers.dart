@@ -162,6 +162,19 @@ String genStrongPassword() {
   return List.generate(8, (_) => chars[rnd.nextInt(chars.length)]).join();
 }
 
+String toTitleCase(String text) {
+  if (text.isEmpty) return text;
+
+  return text
+      .split(' ')
+      .map((word) {
+        if (word.isEmpty) return word;
+        return word[0].toUpperCase() + word.substring(1).toLowerCase();
+      })
+      .join(' ');
+}
+
+
 
 // Client Task Helper Function 
 

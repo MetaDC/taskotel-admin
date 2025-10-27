@@ -174,7 +174,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          client.name,
+                          toTitleCase(client.name),
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -544,7 +544,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
           Expanded(
             flex: 2,
             child: TableTwoLineContent(
-              primaryText: client.name,
+              primaryText: toTitleCase(client.name),
               secondaryText: "Lost on ${client.updatedAt.goodDayDate()}",
             ),
           ),
@@ -651,7 +651,7 @@ class _LostClientsNewState extends State<LostClientsNew> {
         context.read<ClientCubit>().deleteClient(client.docId);
       },
       title: "Delete Client",
-      message: "Are you sure you want to delete ${client.name}?",
+      message: "Are you sure you want to delete ${toTitleCase(client.name)}?",
       btnText: "Delete",
       isLoadingSelector: (state) => state.isLoading,
     );

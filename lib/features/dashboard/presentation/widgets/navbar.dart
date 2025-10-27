@@ -225,6 +225,7 @@ class _HoverableUserDropdownState extends State<_HoverableUserDropdown> {
           borderRadius: BorderRadius.circular(6),
         ),
         child: PopupMenuButton<String>(
+          
           tooltip: "",
           color: Colors.white,
           offset: const Offset(0, 40),

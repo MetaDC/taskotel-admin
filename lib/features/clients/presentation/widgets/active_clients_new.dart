@@ -186,7 +186,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          client.name,
+                          toTitleCase(client.name),
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -577,7 +577,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
           Expanded(
             flex: 2,
             child: TableTwoLineContent(
-              primaryText: client.name,
+              primaryText: toTitleCase(client.name),
               secondaryText: "Joined ${client.createdAt.goodDayDate()}",
             ),
           ),
@@ -709,7 +709,7 @@ class _ActiveClientsNewState extends State<ActiveClientsNew> {
         context.read<ClientCubit>().deleteClient(client.docId);
       },
       title: "Delete Client",
-      message: "Are you sure you want to delete ${client.name}?",
+      message: "Are you sure you want to delete ${toTitleCase(client.name)}?",
       btnText: "Delete",
       isLoadingSelector: (state) => state.isLoading,
     );

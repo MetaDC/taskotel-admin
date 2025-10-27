@@ -159,6 +159,7 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Initialize active clients pagination
   Future<void> initializeActiveClientsPagination() async {
+    // Clear search when initializing pagination
     searchController.clear();
     // Don't re-initialize if we already have data and we're on the active tab
     if (state.activeClients.isNotEmpty &&
@@ -169,7 +170,9 @@ class ClientCubit extends Cubit<ClientState> {
         emit(
           state.copyWith(
             filteredActiveClients: state.activeClients[currentPageIndex],
+            filteredLostClients: state.filteredLostClients,
             isLoading: false,
+            searchQuery: '',
           ),
         );
       }
@@ -198,6 +201,7 @@ class ClientCubit extends Cubit<ClientState> {
           filteredActiveClients: state.activeClients.isNotEmpty
               ? state.activeClients[0]
               : [],
+          searchQuery: '',
         ),
       );
     } catch (e) {
@@ -208,6 +212,7 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Initialize lost clients pagination
   Future<void> initializeLostClientsPagination() async {
+    // Clear search when initializing pagination
     searchController.clear();
     // Don't re-initialize if we already have data and we're on the lost tab
     if (state.lostClients.isNotEmpty && state.selectedTab == ClientTab.lost) {
@@ -216,8 +221,10 @@ class ClientCubit extends Cubit<ClientState> {
       if (currentPageIndex < state.lostClients.length) {
         emit(
           state.copyWith(
+            filteredActiveClients: state.filteredActiveClients,
             filteredLostClients: state.lostClients[currentPageIndex],
             isLoading: false,
+            searchQuery: '',
           ),
         );
       }
@@ -246,6 +253,7 @@ class ClientCubit extends Cubit<ClientState> {
           filteredLostClients: state.lostClients.isNotEmpty
               ? state.lostClients[0]
               : [],
+          searchQuery: '',
         ),
       );
     } catch (e) {
@@ -256,6 +264,11 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Fetch next active clients page
   Future<void> fetchNextActiveClientsPage({required int page}) async {
+    // If there's an active search, don't allow pagination
+    if (state.searchQuery.trim().isNotEmpty) {
+      return;
+    }
+
     emit(state.copyWith(isLoading: true, activeCurrentPage: page));
     try {
       await fetchActiveClientsPage();
@@ -275,6 +288,11 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Fetch next lost clients page
   Future<void> fetchNextLostClientsPage({required int page}) async {
+    // If there's an active search, don't allow pagination
+    if (state.searchQuery.trim().isNotEmpty) {
+      return;
+    }
+
     emit(state.copyWith(isLoading: true, lostCurrentPage: page));
     try {
       await fetchLostClientsPage();
@@ -292,35 +310,78 @@ class ClientCubit extends Cubit<ClientState> {
     }
   }
 
-  // Search functionality
+  // Search functionality - Direct database search
   void searchClients(String query) {
     if (debounce?.isActive ?? false) debounce?.cancel();
     emit(state.copyWith(searchQuery: query));
-    // Filter active clients
 
-    debounce = Timer(const Duration(milliseconds: 500), () {
-      if (state.activeClients.isNotEmpty) {
-        final currentActiveClients =
-            state.activeClients[state.activeCurrentPage - 1];
-        final filteredActive = currentActiveClients.where((client) {
-          return client.name.toLowerCase().contains(query.toLowerCase()) ||
-              client.email.toLowerCase().contains(query.toLowerCase());
+    // If search is empty, reset to current page data
+    if (query.trim().isEmpty) {
+      _resetSearchToCurrentPage();
+      return;
+    }
+
+    debounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        emit(state.copyWith(isLoading: true));
+
+        // Search in database for active clients
+        final searchResults = await clientRepo.searchClients(
+          query.trim().toLowerCase(),
+        );
+
+        // Filter results based on current tab and status
+        final filteredActiveResults = searchResults.where((client) {
+          return (client.status == 'active' || client.status == 'trial') &&
+              !(client.isDeleted ?? false);
         }).toList();
 
-        emit(state.copyWith(filteredActiveClients: filteredActive));
-      }
-
-      // Filter lost clients
-      if (state.lostClients.isNotEmpty) {
-        final currentLostClients = state.lostClients[state.lostCurrentPage - 1];
-        final filteredLost = currentLostClients.where((client) {
-          return client.name.toLowerCase().contains(query.toLowerCase()) ||
-              client.email.toLowerCase().contains(query.toLowerCase());
+        final filteredLostResults = searchResults.where((client) {
+          return ['churned', 'inactive', 'suspended'].contains(client.status) &&
+              !(client.isDeleted ?? false);
         }).toList();
 
-        emit(state.copyWith(filteredLostClients: filteredLost));
+        // Update the filtered lists
+        emit(
+          state.copyWith(
+            filteredActiveClients: filteredActiveResults,
+            filteredLostClients: filteredLostResults,
+            isLoading: false,
+          ),
+        );
+      } catch (e) {
+        print('Error searching clients: $e');
+        emit(state.copyWith(isLoading: false, message: 'Search failed: $e'));
+        _resetSearchToCurrentPage();
       }
     });
+  }
+
+  // Helper method to reset search to current page when search is cleared
+  void _resetSearchToCurrentPage() {
+    if (state.selectedTab == ClientTab.active &&
+        state.activeClients.isNotEmpty) {
+      final currentPageIndex = state.activeCurrentPage - 1;
+      if (currentPageIndex < state.activeClients.length) {
+        emit(
+          state.copyWith(
+            filteredActiveClients: state.activeClients[currentPageIndex],
+            filteredLostClients: state.filteredLostClients,
+          ),
+        );
+      }
+    } else if (state.selectedTab == ClientTab.lost &&
+        state.lostClients.isNotEmpty) {
+      final currentPageIndex = state.lostCurrentPage - 1;
+      if (currentPageIndex < state.lostClients.length) {
+        emit(
+          state.copyWith(
+            filteredActiveClients: state.filteredActiveClients,
+            filteredLostClients: state.lostClients[currentPageIndex],
+          ),
+        );
+      }
+    }
   }
 
   // Update single client in the list (for optimized updates)
@@ -478,35 +539,38 @@ class ClientCubit extends Cubit<ClientState> {
   // Tab management methods - FIXED to clear delete message on tab switch
   void switchTab(ClientTab tab) {
     if (state.selectedTab != tab) {
-      searchController.clear();
-
+      // Don't clear search when switching tabs, maintain search state
       // Clear the delete message when switching tabs
       emit(
         state.copyWith(
           selectedTab: tab,
           message: "", // This will clear the "Client Deleted" message
-          searchQuery: '',
         ),
       );
 
-      // Update the filtered lists based on current page for the selected tab
-      if (tab == ClientTab.active && state.activeClients.isNotEmpty) {
-        final currentPageIndex = state.activeCurrentPage - 1;
-        if (currentPageIndex < state.activeClients.length) {
-          emit(
-            state.copyWith(
-              filteredActiveClients: state.activeClients[currentPageIndex],
-            ),
-          );
-        }
-      } else if (tab == ClientTab.lost && state.lostClients.isNotEmpty) {
-        final currentPageIndex = state.lostCurrentPage - 1;
-        if (currentPageIndex < state.lostClients.length) {
-          emit(
-            state.copyWith(
-              filteredLostClients: state.lostClients[currentPageIndex],
-            ),
-          );
+      // If there's a search query active, re-run the search for the new tab
+      if (state.searchQuery.trim().isNotEmpty) {
+        searchClients(state.searchQuery);
+      } else {
+        // Update the filtered lists based on current page for the selected tab
+        if (tab == ClientTab.active && state.activeClients.isNotEmpty) {
+          final currentPageIndex = state.activeCurrentPage - 1;
+          if (currentPageIndex < state.activeClients.length) {
+            emit(
+              state.copyWith(
+                filteredActiveClients: state.activeClients[currentPageIndex],
+              ),
+            );
+          }
+        } else if (tab == ClientTab.lost && state.lostClients.isNotEmpty) {
+          final currentPageIndex = state.lostCurrentPage - 1;
+          if (currentPageIndex < state.lostClients.length) {
+            emit(
+              state.copyWith(
+                filteredLostClients: state.lostClients[currentPageIndex],
+              ),
+            );
+          }
         }
       }
     }

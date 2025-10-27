@@ -25,7 +25,7 @@ class ClientFormCubit extends Cubit<ClientFormState> {
   // Initialize form for editing
   void initializeForm(ClientModel? client) {
     if (client != null) {
-      nameController.text = client.name;
+      nameController.text = toTitleCase(client.name);
       emailController.text = client.email;
       phoneController.text = client.phone;
       emit(state.copyWith(selectedStatus: client.status));

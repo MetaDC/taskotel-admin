@@ -1,12 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
-import 'package:taskoteladmin/features/clients/domain/entity/%20analytics_models.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/client_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hoteltask_model.dart';
-
 import 'package:taskoteladmin/features/clients/domain/repo/client_repo.dart';
-import 'package:taskoteladmin/features/subscription/domain/model/subscription_model.dart';
 
 class ClientFirebaseRepo extends ClientRepo {
   final clientsCollectionRef = FBFireStore.clients;
@@ -19,7 +16,7 @@ class ClientFirebaseRepo extends ClientRepo {
   ) async {
     try {
       final res = await FBFunctions.ff.httpsCallable('createClient').call({
-        "name": client.name,
+        "name": client.name.toLowerCase(),
         "email": client.email,
         "password": password,
         "phone": client.phone,
@@ -69,12 +66,38 @@ class ClientFirebaseRepo extends ClientRepo {
   @override
   Future<List<ClientModel>> searchClients(String query) async {
     try {
-      final snapshot = await clientsCollectionRef
+      // Search by name
+      final nameSnapshot = await clientsCollectionRef
           .where('name', isGreaterThanOrEqualTo: query)
-          .where('name', isLessThanOrEqualTo: '$query\uf8ff')
+          .where('name', isLessThanOrEqualTo: '$query\uf7ff')
           .get();
 
-      return snapshot.docs.map((doc) => ClientModel.fromDocSnap(doc)).toList();
+      // Search by email
+      final emailSnapshot = await clientsCollectionRef
+          .where('email', isGreaterThanOrEqualTo: query)
+          .where('email', isLessThanOrEqualTo: '$query\uf7ff')
+          .get();
+
+      // Combine results and remove duplicates
+      final allDocs = <String, QueryDocumentSnapshot>{};
+
+      // Add name search results
+      for (var doc in nameSnapshot.docs) {
+        allDocs[doc.id] = doc;
+      }
+
+      // Add email search results
+      for (var doc in emailSnapshot.docs) {
+        allDocs[doc.id] = doc;
+      }
+
+      return allDocs.values
+          .map(
+            (doc) => ClientModel.fromDocSnap(
+              doc as QueryDocumentSnapshot<Map<String, dynamic>>,
+            ),
+          )
+          .toList();
     } catch (e) {
       throw Exception("Failed to search clients: $e");
     }
