@@ -971,7 +971,7 @@ class _ClientPlanDialogContent extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  "Date Range (Optional)",
+                  "Date Range *",
                   style: AppTextStyles.textFieldTitle.copyWith(
                     fontSize: isMobile ? 14 : 16,
                   ),

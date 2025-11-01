@@ -9,17 +9,17 @@ class AssignPlanState extends Equatable {
   final bool isAssigning;
   final List<SubscriptionPlanModel> subscriptionPlans;
   final List<SubscriptionPlanModel> activePlans;
-  
+
   // Form fields
   final String? selectedPlanType; // "trial" | "gift"
   final SubscriptionPlanModel? selectedPlan;
   final int allowedHotels;
   final int duration; // in days (always)
-  
+
   // Optional date fields (separate from duration)
   final DateTime? redeemStartAt;
   final DateTime? redeemEndAt;
-  
+
   // UI state
   final String? errorMessage;
   final String? successMessage;
@@ -71,6 +71,8 @@ class AssignPlanState extends Equatable {
 
   bool get canAssign =>
       selectedPlanType != null &&
+      redeemStartAt != null &&
+      redeemEndAt != null &&
       selectedPlan != null &&
       allowedHotels > 0 &&
       duration > 0 &&
@@ -78,18 +80,17 @@ class AssignPlanState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
-        isAssigning,
-        subscriptionPlans,
-        activePlans,
-        selectedPlanType,
-        selectedPlan,
-        allowedHotels,
-        duration,
-        redeemStartAt,
-        redeemEndAt,
-        errorMessage,
-        successMessage,
-      ];
+    isLoading,
+    isAssigning,
+    subscriptionPlans,
+    activePlans,
+    selectedPlanType,
+    selectedPlan,
+    allowedHotels,
+    duration,
+    redeemStartAt,
+    redeemEndAt,
+    errorMessage,
+    successMessage,
+  ];
 }
-
