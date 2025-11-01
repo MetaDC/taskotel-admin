@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -88,7 +87,7 @@ class CustomTextField extends StatelessWidget {
 }
 
 class CustomNumTextField extends StatelessWidget {
-  CustomNumTextField({
+  const CustomNumTextField({
     super.key,
     required this.controller,
     required this.hintText,
@@ -383,7 +382,7 @@ class CustomDescTextField extends StatelessWidget {
               if (value == null || value.isEmpty) {
                 return title.isEmpty
                     ? "this field is required"
-                    : "Enter ${title}";
+                    : "Enter $title";
               }
             }
             return null;
@@ -426,7 +425,7 @@ class CustomDropDownField extends StatelessWidget {
         SizedBox(height: 5),
         DropdownButtonHideUnderline(
           child: DropdownButtonFormField(
-            value: initialValue,
+            initialValue: initialValue,
             validator: (value) {
               if (validator == true) {
                 if (value == null || value.isEmpty) {
@@ -434,6 +433,7 @@ class CustomDropDownField extends StatelessWidget {
                 }
                 return null;
               }
+              return null;
             },
             dropdownColor: AppColors.secondary,
 

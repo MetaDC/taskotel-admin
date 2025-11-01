@@ -5,7 +5,7 @@ class AuthFirebaseRepo extends AuthRepo {
   final firebaseAuth = FBAuth.auth;
   @override
   Future<void> login(String email, String password) async {
-    final user = await firebaseAuth.signInWithEmailAndPassword(
+    await firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );

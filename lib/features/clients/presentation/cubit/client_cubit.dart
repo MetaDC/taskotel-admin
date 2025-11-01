@@ -12,7 +12,7 @@ part 'client_state.dart';
 
 class ClientCubit extends Cubit<ClientState> {
   final ClientRepo clientRepo;
-  static const int _pageSize = 10;
+  static const int _pageSize = 3;
 
   ClientCubit({required this.clientRepo}) : super(ClientState.initial());
   final searchController = TextEditingController();
@@ -264,6 +264,123 @@ class ClientCubit extends Cubit<ClientState> {
 
   // Fetch next active clients page
   Future<void> fetchNextActiveClientsPage({required int page}) async {
+    final isNextPage = page > state.activeCurrentPage;
+    emit(state.copyWith(isLoading: true, activeCurrentPage: page));
+    print(isNextPage);
+    if (isNextPage) {
+      Query query = FBFireStore.clients
+          .where('status', whereIn: ['active', 'trial'])
+          .where("isDeleted", isEqualTo: false)
+          .orderBy('updatedAt', descending: true)
+          .limit(_pageSize);
+
+      if (state.activeLastFetchedDoc != null) {
+        query = query.startAfterDocument(state.activeLastFetchedDoc!);
+      }
+
+      final snap = await query.get();
+
+      if (snap.docs.isNotEmpty) {
+        final clients = snap.docs
+            .map(
+              (doc) => ClientModel.fromDocSnap(
+                doc as QueryDocumentSnapshot<Map<String, dynamic>>,
+              ),
+            )
+            .toList();
+
+        final newActiveLastFetchedDoc = snap.docs.last;
+        final newActiveFirstFetchedDoc = snap.docs.first;
+        final updatedActiveClients = List<List<ClientModel>>.from(
+          state.activeClients,
+        );
+
+        // Update total pages based on whether we have more data
+        int newTotalPages = state.activeTotalPages;
+        print(state.activeCurrentPage);
+        if (snap.docs.length == _pageSize) {
+          // If we got a full page, there might be more pages
+          newTotalPages = state.activeCurrentPage + 1;
+        } else {
+          // If we got less than a full page, this is the last page
+          newTotalPages = state.activeCurrentPage;
+        }
+        print("Active total page: $newTotalPages");
+        emit(
+          state.copyWith(
+            // activeClients: updatedActiveClients,
+            filteredActiveClients: clients,
+            activeLastFetchedDoc: newActiveLastFetchedDoc,
+            activeFirstFetchedDoc: newActiveFirstFetchedDoc,
+            activeTotalPages: newTotalPages,
+          ),
+        );
+        // print(
+        //   "Active clients fetched: ${state.activeClients.length} -- ${state.activeClients[pageZeroIndex]}",
+        // );
+      } else {
+        print("Active clients fetched: No more data");
+        // No more data, current page is the last page
+        emit(state.copyWith(activeTotalPages: state.activeCurrentPage - 1));
+      }
+    } else {
+      Query query = FBFireStore.clients
+          .where('status', whereIn: ['active', 'trial'])
+          .where("isDeleted", isEqualTo: false)
+          .orderBy('updatedAt', descending: false)
+          .limit(_pageSize);
+      if (state.activeFirstFetchedDoc != null) {
+        query = query.startAfterDocument(state.activeFirstFetchedDoc!);
+      }
+
+      final snap = await query.get();
+
+      if (snap.docs.isNotEmpty) {
+        final clients = snap.docs
+            .map(
+              (doc) => ClientModel.fromDocSnap(
+                doc as QueryDocumentSnapshot<Map<String, dynamic>>,
+              ),
+            )
+            .toList();
+        snap.docs.sort(
+          (a, b) => ((b.data() as Map<String, dynamic>)['updatedAt'] as int)
+              .compareTo(
+                ((a.data() as Map<String, dynamic>)['updatedAt'] as int),
+              ),
+        );
+        final newActiveFirstFetchedDoc = snap.docs.last;
+        final newActiveLastFetchedDoc = snap.docs.first;
+        final updatedActiveClients = List<List<ClientModel>>.from(
+          state.activeClients,
+        );
+        clients.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+        // Update total pages based on whether we have more data
+        // int newTotalPages = state.activeTotalPages;
+        // if (snap.docs.length == _pageSize) {
+        //   // If we got a full page, there might be more pages
+        //   newTotalPages = state.activeCurrentPage + 1;
+        // } else {
+        //   // If we got less than a full page, this is the last page
+        //   newTotalPages = state.activeCurrentPage;
+        // }
+
+        emit(
+          state.copyWith(
+            // activeClients: updatedActiveClients,
+            filteredActiveClients: clients,
+            activeFirstFetchedDoc: newActiveFirstFetchedDoc,
+            activeLastFetchedDoc: newActiveLastFetchedDoc,
+            // activeTotalPages: newTotalPages,
+          ),
+        );
+      } else {
+        print("Active clients fetched: No more data");
+        // No more data, current page is the last page
+        emit(state.copyWith(activeTotalPages: state.activeCurrentPage - 1));
+      }
+    }
+    return;
     // If there's an active search, don't allow pagination
     if (state.searchQuery.trim().isNotEmpty) {
       return;

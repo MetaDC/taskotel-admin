@@ -56,7 +56,7 @@ class TransactionState extends Equatable {
       lastDocument: null,
       firstDocument: null,
       analytics: null,
-      pageSize: 15,
+      pageSize: 2,
     );
   }
 
@@ -79,7 +79,8 @@ class TransactionState extends Equatable {
     int? pageSize,
   }) {
     return TransactionState(
-      currentPageTransactions: currentPageTransactions ?? this.currentPageTransactions,
+      currentPageTransactions:
+          currentPageTransactions ?? this.currentPageTransactions,
       searchResults: searchResults ?? this.searchResults,
       currentPage: currentPage ?? this.currentPage,
       totalPages: totalPages ?? this.totalPages,
@@ -100,22 +101,21 @@ class TransactionState extends Equatable {
 
   @override
   List<Object?> get props => [
-        currentPageTransactions,
-        searchResults,
-        currentPage,
-        totalPages,
-        isLoading,
-        isSearching,
-        errorMessage,
-        selectedFilter,
-        customStartDate,
-        customEndDate,
-        searchQuery,
-        searchWithinFilter,
-        lastDocument,
-        firstDocument,
-        analytics,
-        pageSize,
-      ];
+    currentPageTransactions,
+    searchResults,
+    currentPage,
+    totalPages,
+    isLoading,
+    isSearching,
+    errorMessage,
+    selectedFilter,
+    customStartDate,
+    customEndDate,
+    searchQuery,
+    searchWithinFilter,
+    lastDocument,
+    firstDocument,
+    analytics,
+    pageSize,
+  ];
 }
-

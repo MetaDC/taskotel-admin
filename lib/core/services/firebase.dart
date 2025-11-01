@@ -17,17 +17,15 @@ class FBFireStore {
   static final departments = fb.collection('departments');
   static final hotels = fb.collection('hotels');
   static final masterHotels = fb.collection('masterHotels');
-  static final masterTasks = fb.collection('masterTasks');
   static final serviceContractors = fb.collection('serviceContractors');
   static final subscriptionPurchases = fb.collection('subscriptionPurchases');
   static final subscriptions = fb.collection('subscriptions');
   static final tasks = fb.collection('commonTask');
   static final transactions = fb.collection('transactions');
   static final users = fb.collection('users');
+  static final clientPlans = fb.collection('clientPlans');
 
   // Notification collections
-  static final activityNotifications = fb.collection('activity_notifications');
-  static final taskNotifications = fb.collection('task_notifications');
   static final notifications = fb.collection('notifications');
 }
 

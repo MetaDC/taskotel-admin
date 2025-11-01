@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taskoteladmin/core/theme/app_colors.dart';
 import 'package:taskoteladmin/core/theme/app_text_styles.dart';
-import 'package:taskoteladmin/core/widget/custom_container.dart';
 
 class StatCardIconRight extends StatelessWidget {
   final IconData icon;
@@ -43,9 +42,7 @@ class StatCardIconRight extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: true
-                  ? Color(0xfff1f5f9)
-                  : AppColors.slateGray.withOpacity(0.1),
+              color: Color(0xfff1f5f9),
             ),
             child: Icon(icon, color: iconColor, size: 25),
           ),

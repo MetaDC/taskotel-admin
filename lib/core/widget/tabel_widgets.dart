@@ -35,8 +35,7 @@ class TableIconTextRow extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const TableIconTextRow({Key? key, required this.icon, required this.text})
-    : super(key: key);
+  const TableIconTextRow({super.key, required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -62,10 +61,10 @@ class TableTwoLineContent extends StatelessWidget {
   final String secondaryText;
 
   const TableTwoLineContent({
-    Key? key,
+    super.key,
     required this.primaryText,
     required this.secondaryText,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,11 +85,11 @@ class TableIconCountLabel extends StatelessWidget {
   final String label;
 
   const TableIconCountLabel({
-    Key? key,
+    super.key,
     required this.icon,
     required this.count,
     required this.label,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -113,33 +112,24 @@ class TableActionButton extends StatelessWidget {
   final Color? color;
 
   const TableActionButton({
-    Key? key,
+    super.key,
     required this.icon,
     required this.onPressed,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return true
-        ? Align(
-            alignment: Alignment.centerLeft,
-            child: InkWell(
-              onTap: onPressed,
-              child: Icon(
-                icon,
-                size: TableConfig.mediumIconSize,
-                color: color ?? AppColors.textBlackColor,
-              ),
-            ),
-          )
-        : IconButton(
-            icon: Icon(
-              icon,
-              size: TableConfig.mediumIconSize,
-              color: color ?? AppColors.textBlackColor,
-            ),
-            onPressed: onPressed,
-          );
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: InkWell(
+        onTap: onPressed,
+        child: Icon(
+          icon,
+          size: TableConfig.mediumIconSize,
+          color: color ?? AppColors.textBlackColor,
+        ),
+      ),
+    );
   }
 }

@@ -16,7 +16,8 @@ import 'package:taskoteladmin/core/widget/tabel_widgets.dart';
 import 'package:taskoteladmin/core/widget/responsive_widget.dart';
 import 'package:taskoteladmin/features/clients/domain/entity/hotel_model.dart';
 import 'package:taskoteladmin/features/clients/presentation/cubit/client_detail_cubit.dart';
-import 'package:taskoteladmin/features/subscription/presentation/widgets/subscription_assignment_dialog.dart';
+import 'package:taskoteladmin/features/subscription/presentation/widgets/client_subscription_assignment_dialog.dart';
+import 'package:taskoteladmin/features/subscription/presentation/widgets/hotel_subscription_assignment_dialog.dart';
 import 'package:taskoteladmin/features/transactions/presentation/widgets/client_transactions_view.dart';
 import 'package:taskoteladmin/features/transactions/presentation/cubit/client_transaction_cubit.dart';
 
@@ -113,7 +114,7 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
 
   Widget _buildHeader(ClientDetailState state) {
     return PageHeaderWithTitle(
-      heading: state.client?.name ?? '',
+      heading: toTitleCase(state.client?.name ?? ''),
       subHeading: "Comprehensive client overview and hotel management",
     );
   }
@@ -148,14 +149,122 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
           value: "${state.clientAnalytics?.activeSubscriptions ?? 0}",
           iconColor: Colors.green,
         ),
-        StatCardIconLeft(
-          icon: CupertinoIcons.star_fill,
-          label: "Average Hotel Rating",
-          value: "${state.clientAnalytics?.averageHotelRating ?? 0}",
-          iconColor: Colors.green,
+        InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () {
+            // Handle gift plan action
+            _handleGiftPlan(context, false, state);
+            ;
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.blueGreyBorder),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(shape: BoxShape.circle),
+                  child: Icon(
+                    CupertinoIcons.gift_fill,
+                    color: Colors.purple.shade700,
+                    size: 28,
+                  ),
+                ),
+                SizedBox(width: 5),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Gift Plan",
+                        style: AppTextStyles.statCardLabel.copyWith(height: 0),
+                      ),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Click to Send",
+                            style: AppTextStyles.statCardValue.copyWith(
+                              height: 0,
+                            ),
+                          ),
+
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.purple.shade400,
+                            size: 16,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
+  }
+
+  void _handleGiftPlan(
+    BuildContext context,
+
+    bool isTablet,
+    ClientDetailState state,
+  ) {
+    if (isTablet) {
+      showModalBottomSheet(
+        context: context,
+        builder: (modelContext) {
+          return BlocProvider.value(
+            value: context.read<ClientDetailCubit>(),
+            child: Padding(
+              padding: MediaQuery.of(modelContext).viewInsets,
+              child: ClientPlanAssignmentDialog(
+                clientId: widget.clientId,
+                clientName: state.client?.name ?? '',
+                clientEmail: state.client?.email ?? '',
+                assignedBy: 'Admin',
+                onAssignmentComplete: (purchaseId) {
+                  // Use the original context for refreshing
+                  context.read<ClientDetailCubit>().loadClientDetails(
+                    widget.clientId,
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return BlocProvider.value(
+            value: context.read<ClientDetailCubit>(),
+            child: ClientPlanAssignmentDialog(
+              clientId: widget.clientId,
+              clientName: state.client?.name ?? '',
+              clientEmail: state.client?.email ?? '',
+              assignedBy: 'Admin',
+              onAssignmentComplete: (purchaseId) {
+                // Use the original context for refreshing
+                context.read<ClientDetailCubit>().loadClientDetails(
+                  widget.clientId,
+                );
+              },
+            ),
+          );
+        },
+      );
+    }
   }
 
   Widget _buildHotelPortfolioTable(
@@ -377,8 +486,11 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
               const SizedBox(width: 8),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () =>
-                      _showSubscriptionAssignmentDialog(context, hotel, true),
+                  onPressed: () => _showHotelSubscriptionAssignmentDialog(
+                    context,
+                    hotel,
+                    true,
+                  ),
                   icon: const Icon(CupertinoIcons.doc_text, size: 16),
                   label: const Text("Assign Plan"),
                   style: OutlinedButton.styleFrom(
@@ -617,7 +729,7 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
                 Expanded(
                   child: TableActionButton(
                     icon: CupertinoIcons.doc_text,
-                    onPressed: () => _showSubscriptionAssignmentDialog(
+                    onPressed: () => _showHotelSubscriptionAssignmentDialog(
                       context,
                       hotel,
                       isTablet,
@@ -635,7 +747,7 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
 
   // Show subscription assignment dialog
   // Fixed method to show subscription assignment dialog
-  void _showSubscriptionAssignmentDialog(
+  void _showHotelSubscriptionAssignmentDialog(
     BuildContext context,
     HotelModel hotel,
     bool isTablet,
@@ -645,13 +757,13 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
       showModalBottomSheet(
         isScrollControlled: true,
         context: context,
-      
-        builder: (context) {
+
+        builder: (modalContext) {
           return Padding(
-            padding: MediaQuery.of(context).viewInsets,
+            padding: MediaQuery.of(modalContext).viewInsets,
             child: BlocProvider.value(
               value: context.read<ClientDetailCubit>(),
-              child: SubscriptionAssignmentDialog(
+              child: HotelSubscriptionAssignmentDialog(
                 hotel: hotel,
                 clientName: state.client?.name ?? '',
                 clientEmail: state.client?.email ?? '',
@@ -672,7 +784,7 @@ class _ClientDetailPageState extends State<ClientDetailPage> {
         builder: (dialogContext) => BlocProvider.value(
           // Provide the existing SubscriptionCubit to the dialog
           value: context.read<ClientDetailCubit>(),
-          child: SubscriptionAssignmentDialog(
+          child: HotelSubscriptionAssignmentDialog(
             hotel: hotel,
             clientName: state.client?.name ?? '',
             clientEmail: state.client?.email ?? '',

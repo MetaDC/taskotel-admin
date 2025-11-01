@@ -79,6 +79,7 @@ dependencies:
   web: ^1.0.0
   pdf: ^3.10.4
   screenshot: ^3.0.0
+  bloc: ^9.1.0
 
 dev_dependencies:
   flutter_test:

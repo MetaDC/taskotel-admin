@@ -7,6 +7,7 @@ class ClientState {
   final int activeCurrentPage;
   final int activeTotalPages;
   final DocumentSnapshot? activeLastFetchedDoc;
+  final DocumentSnapshot? activeFirstFetchedDoc;
 
   // Lost clients pagination
   final List<List<ClientModel>> lostClients;
@@ -28,6 +29,7 @@ class ClientState {
     required this.activeCurrentPage,
     required this.activeTotalPages,
     this.activeLastFetchedDoc,
+    this.activeFirstFetchedDoc,
     required this.lostClients,
     required this.filteredLostClients,
     required this.lostCurrentPage,
@@ -50,6 +52,7 @@ class ClientState {
       activeLastFetchedDoc: null,
       lostClients: [],
       filteredLostClients: [],
+      activeFirstFetchedDoc: null,
       lostCurrentPage: 1,
       lostTotalPages: 1,
       lostLastFetchedDoc: null,
@@ -73,6 +76,7 @@ class ClientState {
     int? lostTotalPages,
     DocumentSnapshot? lostLastFetchedDoc,
     bool? isLoading,
+    DocumentSnapshot? activeFirstFetchedDoc,
     String? message,
     ClientListAnalytics? stats,
     String? searchQuery,
@@ -95,6 +99,8 @@ class ClientState {
       stats: stats ?? this.stats,
       searchQuery: searchQuery ?? this.searchQuery,
       selectedTab: selectedTab ?? this.selectedTab,
+      activeFirstFetchedDoc:
+          activeFirstFetchedDoc ?? this.activeFirstFetchedDoc,
     );
   }
 }

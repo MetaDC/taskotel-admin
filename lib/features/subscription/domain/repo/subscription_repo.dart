@@ -1,3 +1,4 @@
+import 'package:taskoteladmin/features/subscription/domain/model/client_plan_model.dart';
 import 'package:taskoteladmin/features/subscription/domain/model/subscription_model.dart';
 import 'package:taskoteladmin/features/subscription/domain/model/subscription_purchase_model.dart';
 
@@ -27,6 +28,9 @@ abstract class SubscriptionRepo {
     required String billingCycle, // 'monthly' or 'yearly'
     required String paymentMethod,
   });
+
+  // Client subscription assignment
+  Future<void> assignSubscriptionToClient(ClientPlanModel clientPlan);
 
   // Analytics
   // Future<Map<String, dynamic>> getSubscriptionAnalytics();

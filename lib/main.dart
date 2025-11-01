@@ -10,7 +10,7 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    print('Failed to initialize Firebase: $e');
+    throw Exception("Failed to initialize Firebase: $e");
     // You might want to show an error screen here
   }
   runApp(const MyApp());

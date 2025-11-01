@@ -17,8 +17,8 @@ var transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "teammetadc@gmail.com",
-    pass: "skfbnyjbyotmfvmw",
+    user: "taskotel.ops@gmail.com",
+    pass: "erramgqblkzqsnjz",
   },
 });
 
@@ -323,55 +323,55 @@ exports.deleteUser = onCall(async (request) => {
 
 // NOTIFICATION FUNCTIONS
 
-exports.sendNotification = onDocumentCreated(
-  "notifications/{docId}",
-  async (event) => {
-    const snapshot = event.data;
-    const doc = snapshot?.data();
+// exports.sendNotification = onDocumentCreated(
+//   "notifications/{docId}",
+//   async (event) => {
+//     const snapshot = event.data;
+//     const doc = snapshot?.data();
 
-    if (!doc) {
-      console.error("No data in notification document");
-      return;
-    }
+//     if (!doc) {
+//       console.error("No data in notification document");
+//       return;
+//     }
 
-    const notifyType = doc.notifyType || "general";
-    const title = doc.title || "New Notification";
-    const messageBody = doc.message || "You have a new update";
+//     const notifyType = doc.notifyType || "general";
+//     const title = doc.title || "New Notification";
+//     const messageBody = doc.message || "You have a new update";
 
-    const extraData = doc.data || {};
+//     const extraData = doc.data || {};
 
-    const message = {
-      notification: {
-        title,
-        body: messageBody,
-      },
-      data: {
-        type: notifyType,
-        ...Object.fromEntries(
-          Object.entries(extraData).map(([key, value]) => [
-            key,
-            typeof value === "boolean" || typeof value === "number"
-              ? String(value)
-              : value ?? "",
-          ])
-        ),
-      },
-    };
+//     const message = {
+//       notification: {
+//         title,
+//         body: messageBody,
+//       },
+//       data: {
+//         type: notifyType,
+//         ...Object.fromEntries(
+//           Object.entries(extraData).map(([key, value]) => [
+//             key,
+//             typeof value === "boolean" || typeof value === "number"
+//               ? String(value)
+//               : value ?? "",
+//           ])
+//         ),
+//       },
+//     };
 
-    if (doc.topic) {
-      message.topic = doc.topic;
-    } else if (doc.token) {
-      message.token = doc.token;
-    } else {
-      console.error("No token or topic provided");
-      return;
-    }
+//     if (doc.topic) {
+//       message.topic = doc.topic;
+//     } else if (doc.token) {
+//       message.token = doc.token;
+//     } else {
+//       console.error("No token or topic provided");
+//       return;
+//     }
 
-    try {
-      const response = await admin.messaging().send(message);
-      console.log(`${notifyType} notification sent:`, response);
-    } catch (error) {
-      console.error(`Error sending ${notifyType} notification:`, error);
-    }
-  }
-);
+//     try {
+//       const response = await admin.messaging().send(message);
+//       console.log(`${notifyType} notification sent:`, response);
+//     } catch (error) {
+//       console.error(`Error sending ${notifyType} notification:`, error);
+//     }
+//   }
+// );

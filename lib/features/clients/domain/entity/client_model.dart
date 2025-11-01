@@ -55,6 +55,8 @@ class ClientModel {
     };
   }
 
+  
+
   /// 🔹 Create model from JSON map
   factory ClientModel.fromJson(Map<String, dynamic> json, String docId) {
     return ClientModel(

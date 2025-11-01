@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:taskoteladmin/core/services/firebase.dart';
+import 'package:taskoteladmin/features/subscription/domain/model/client_plan_model.dart';
 import 'package:taskoteladmin/features/subscription/domain/model/subscription_model.dart';
 import 'package:taskoteladmin/features/subscription/domain/model/subscription_purchase_model.dart';
 import 'package:taskoteladmin/features/subscription/domain/repo/subscription_repo.dart';
@@ -238,6 +239,16 @@ class SubscriptionFirebaserepo extends SubscriptionRepo {
       return purchaseId;
     } catch (e) {
       throw Exception('Failed to assign subscription to hotel: $e');
+    }
+  }
+
+  @override
+  Future<void> assignSubscriptionToClient(ClientPlanModel clientPlan) async {
+    try {
+      final clientPlanData = clientPlan.toMap();
+      final docRef = await FBFireStore.clientPlans.add(clientPlanData);
+    } catch (e) {
+      throw Exception('Failed to assign subscription to client: $e');
     }
   }
 }

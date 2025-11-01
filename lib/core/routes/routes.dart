@@ -27,4 +27,6 @@ class Routes {
   static const transactions = '/transactions';
   static const reports = '/reports';
   static const dashboard = '/';
+
+  static const testClinet = "/testClient";
 }
